@@ -5,6 +5,7 @@
 # Define a cleanup function for ctrl-c
 cleanup() {
     echo "Caught Interrupt. Exiting..."
+    ray down golem-cluster.yaml --yes
     exit 1
 }
 
