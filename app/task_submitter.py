@@ -27,7 +27,7 @@ def execute_remote_word_search(
         Tuple[List[dict], Dict]: Tuple containing the search results and history information.
     """
     # logging.getLogger().setLevel(logging.WARNING)
-    from app.worker.wordsearch import WordSearcher
+    from worker.wordsearch import WordSearcher
 
     if enable_logging:
         logging.basicConfig(
