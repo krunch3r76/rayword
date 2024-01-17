@@ -95,7 +95,7 @@ class WordSearcher:
                 searchHistories.append(SearchHistory(word_id=word_id, path_id=path_id))
 
         logging.debug(
-            f"searched {len(paths_searched)} paths of which {len(bad_path_ids)} were unreachable"
+            f"searched {len(paths_searched)} paths of which {len(bad_path_ids)} {'was' if len(bad_path_ids) == 1 else 'were'} unreachable"
         )
         self.workerModel.insert_records_into_worker_db(
             [searchHistory.to_dict() for searchHistory in searchHistories],
