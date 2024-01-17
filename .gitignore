@@ -1,0 +1,32 @@
+# temporary project files
+/app/manager/input/*
+/app/output/*
+!app/output/.gitkeep
+# !app/input/.gitkeep
+
+# Byte-compiled / optimized files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+*.env
+
+# Logs and databases
+*.log
+*.sqlite
+data/*.db
+
+# Compiled Python files
+*.pyc
+# Other generated files
+*.swp
+*.swo
+*.tmp
+.DS_Store
+
+# vim backups
+*~
