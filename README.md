@@ -21,5 +21,5 @@ $ ./demo.sh <word>
 README will be completed at a later date
 
 # TODO
-a lot but first thing will be so repeat searches when a word is not found
+a lot but first thing will be to repeat searches when a word is not found
 at first run
