@@ -27,7 +27,17 @@ def execute_remote_word_search(
         Tuple[List[dict], Dict]: Tuple containing the search results and history information.
     """
     # logging.getLogger().setLevel(logging.WARNING)
-    from worker.wordsearch import WordSearcher
+    import sys
+
+    # Get the directory of the current script
+    current_script_path = os.path.dirname(os.path.abspath(__file__))
+
+    # Get the parent directory
+    parent_directory = os.path.dirname(current_script_path)
+
+    # Add the parent directory to sys.path
+    sys.path.insert(0, parent_directory)
+    from app.worker.wordsearch import WordSearcher
 
     if enable_logging:
         logging.basicConfig(
