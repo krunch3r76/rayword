@@ -26,6 +26,8 @@ Or specify a different word:
 # additional details
 On the surface rayword appears to find a random occurrence of a given word, but internally it collects all occurrences for all word forms of a given word for later lookup. It may someday be expanded to index every dictionary word from every text requiring less spending on each future run to analyze the corpus.
 
+Note, only a fresh subset of the entire corpus (tens of thousands of texts) are searched each run, batched to several providers.
+
 
 # TODO
 * Video demo
