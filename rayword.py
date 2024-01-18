@@ -105,13 +105,17 @@ def main(args):
     # check model for highest indexed WordIndices
     last_word_index_row_id = managerModel.get_max_word_indices_id()
 
+    ############################ START CONTROLLER ###############################
     controller = Controller(managerModel, args.batch_size)
     controller(primary_word, enable_console_logging=args.enable_console_logging)
-    newly_last_word_index_row_id = managerModel.get_max_word_indices_id()
-    words_found_count = newly_last_word_index_row_id - last_word_index_row_id
-    print(f"A total of {words_found_count} records were inserted")
+    #############################################################################
 
-    if words_found_count > 0:
+    managerModel.update_insertion_history()
+
+    count_inserted = managerModel.get_count_records_last_added()
+    print(f"A total of {count_inserted} instances of the word were inserted")
+
+    if count_inserted > 0:
         random_index = managerModel.get_random_word_index_above_id(
             last_word_index_row_id, primary_word
         )

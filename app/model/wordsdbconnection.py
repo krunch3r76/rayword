@@ -2,17 +2,41 @@
 # Handles the connection setup and table creation for the 'words' database.
 
 import sqlite3
+import os
 
 # import schema version from constants TODO
 
 
-def create_words_db_connection(db_path):
-    conn = sqlite3.connect(db_path, isolation_level="IMMEDIATE")
-    create_tables(conn)
+# def check_schema_condition(conn):
+#     # Replace this function with the actual check you need to perform.
+#     # Return True if the schema condition is met, False otherwise.
+#     # Example: Check if a specific table or column exists
+
+#     cursor = conn.cursor()
+#     cursor.execute(
+#         "SELECT version FROM schema_version ORDER BY applied_on DESC LIMIT 1"
+#     )
+
+
+def remove_db_file(conn, db_file_path):
+    # Close the connection before attempting to remove the file
+    conn.close()
+
+    # Remove the file
+    os.remove(db_file_path)
+    print(f"Removed file: {db_file_path}")
+
+
+def create_words_db_connection(db_path, model):
+    SUCCESSFUL = False
+    while not SUCCESSFUL:
+        conn = sqlite3.connect(db_path, isolation_level="IMMEDIATE")
+        model.words_db_connection = conn
+        SUCCESSFUL = create_tables(conn, db_path, model)
     return conn
 
 
-def create_tables(conn):
+def create_tables(conn, db_path, model):
     # SQL statements to create tables in the words database
     # to do, allow for multiple paths given a text number
     ddls = [
@@ -66,6 +90,11 @@ def create_tables(conn):
             applied_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             description TEXT
         )""",
+        """CREATE TABLE IF NOT EXISTS History (
+            ultimate_max_index_id INTEGER DEFAULT 0,
+            penultimate_max_index_id INTEGER DEFAULT 0
+            )
+            """,
     ]
 
     for ddl_statement in ddls:
@@ -80,8 +109,8 @@ def create_tables(conn):
     conn.commit()
 
     # Check for an existing version
-    current_version = "1"
-    description = "Initial schema version"
+    current_version = "2"
+    description = "Add History table"
 
     try:
         cursor = conn.cursor()
@@ -89,20 +118,22 @@ def create_tables(conn):
             "SELECT version FROM schema_version ORDER BY applied_on DESC LIMIT 1"
         )
         result = cursor.fetchone()
-
+        internal_version = None
         if result is None:
             # No version exists, insert the new version
             cursor.execute(
                 "INSERT INTO schema_version (version, description) VALUES (?, ?)",
                 (current_version, description),
             )
-        elif result[0] != current_version:
-            # A different version exists, raise an exception
-            raise Exception(
-                f"Database schema version mismatch. Expected: {current_version}, Found: {result[0]}"
-            )
+        else:
+            internal_version = result[0]
+            if internal_version == "1":
+                remove_db_file(conn, db_path)
+                return False
 
         conn.commit()
     except sqlite3.OperationalError as e:
         print(f"An error occurred: {e}")
         raise
+
+    return True

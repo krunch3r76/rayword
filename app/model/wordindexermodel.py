@@ -48,7 +48,7 @@ class WordIndexerModel:
             path_limit (int): max number of path's returned by unsearched paths query
         """
         # Create the primary connection (e.g., words database)
-        self.words_db_connection = create_words_db_connection(words_db_path)
+        self.words_db_connection = create_words_db_connection(words_db_path, self)
         self.path_limit = path_limit
         # # Create a secondary connection (e.g., context database)
         # # And optionally, if you need to perform cross-database queries:
@@ -133,6 +133,71 @@ class WordIndexerModel:
         return WordIndexerModel.CursorContextManager(
             model=self, use_row_factory=use_row_factory
         )
+
+    def get_history_index_range(self):
+        """return the inclusive range of row_id's corresponding to the most recent records added"""
+        with self.cursor_context() as cursor:
+            try:
+                # Execute the query
+                cursor.execute(
+                    "SELECT penultimate_max_index_id, ultimate_max_index_id FROM History"
+                )
+                result = cursor.fetchone()
+
+                # Check if the result is not None
+                if result is not None:
+                    return result  # Returns a tuple (penultimate_max_index_id, ultimate_max_index_id)
+                else:
+                    return None  # or some default value or raise an exception
+
+            except sqlite3.Error as e:
+                print(f"An error occurred: {e}")
+                return None  # or some default value or raise an exception
+
+    def get_count_records_last_added(self):
+        """return the number of records most recently added"""
+        index_range = self.get_history_index_range()
+        if index_range is None:
+            max_index = self.get_max_word_indices_id()
+            return max_index
+        return index_range[1] - index_range[0]
+
+    def update_insertion_history(self):
+        try:
+            new_max_id = self.get_max_word_indices_id()
+            with self.cursor_context() as cursor:
+                # Fetch the current ultimate_max_index_id
+                cursor.execute("SELECT ultimate_max_index_id FROM History")
+                result = cursor.fetchone()
+                if result is None:
+                    result = [0]
+                    # raise ValueError("No data in History table to update")
+
+                historical_max_id = result[0]
+
+                if new_max_id == historical_max_id:
+                    # no new records, can return
+                    return 0
+
+                # First update penultimate_max_index_id
+                cursor.execute(
+                    "UPDATE History SET penultimate_max_index_id = ?",
+                    (historical_max_id,),
+                )
+
+                # Then update ultimate_max_index_id
+                cursor.execute(
+                    "UPDATE History SET ultimate_max_index_id = ?", (new_max_id,)
+                )
+
+            # Commit the transaction
+            self.words_db_connection.commit()
+
+        except Exception as e:
+            # Handle exceptions
+            print(f"An error occurred: {e}")
+            # Rollback any changes made before the exception
+            self.words_db_connection.rollback()
 
     def get_max_word_indices_id(self):
         """

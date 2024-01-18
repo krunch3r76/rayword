@@ -6,12 +6,11 @@ import logging
 import zipfile
 import uuid
 import tempfile
-import time
 from pathlib import Path
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 
 
 class URLContentFetcher:
@@ -163,92 +162,80 @@ class URLContentFetcher:
 
 def process_zip_file(temp_zip_path):
     """
-    Processes a ZIP file located at the given temporary path and extracts its first file's contents.
-
-    This function opens a ZIP file, reads the contents of the first file in the ZIP archive,
-    and decodes it using the 'iso-8859-1' encoding. It is designed to work with ZIP files containing
-    a single file. If the ZIP file is corrupted or an error occurs during processing, it logs the error
-    and returns a failure indication.
-
-    Args:
-        temp_zip_path (str): The file path to the temporary ZIP file.
-
-    Returns:
-        tuple: A tuple containing the content of the first file in the ZIP archive as a decoded string
-               and a boolean flag. The flag is False if the file was processed successfully,
-               and True if an error occurred (e.g., if the ZIP file is bad or the process fails).
-
-    Notes:
-        called by load_resource
+    Processes a ZIP file and extracts its first file's contents, decoding based on file naming:
+    - Ends with '-0.zip': Encoded in UTF-8
+    - Ends with '-8.zip': Encoded in ISO-8859-1, convert to UTF-8
+    - Ends with '.zip': ASCII (subset of UTF-8)
     """
     try:
         with zipfile.ZipFile(temp_zip_path, "r") as zip_file:
             if zip_file.namelist():
                 file_name = zip_file.namelist()[0]
                 with zip_file.open(file_name, "r") as file:
-                    return file.read().decode("iso-8859-1"), False
+                    file_content = file.read()
+
+                    # Determine encoding based on the temp file name, not the file within the ZIP
+                    if temp_zip_path.endswith("-0.zip"):
+                        # Handle as UTF-8
+                        decoded_content = file_content.decode("utf-8")
+                    elif temp_zip_path.endswith("-8.zip"):
+                        # Handle as ISO-8859-1, then convert to UTF-8
+                        decoded_content = file_content.decode("iso-8859-1")
+                    else:
+                        # Handle as ASCII
+                        decoded_content = file_content.decode("ascii")
+                    return decoded_content, False
     except zipfile.BadZipFile:
-        logger.debug(f"Bad ZIP file from {temp_zip_path}")
+        logger.error(f"Bad ZIP file from {temp_zip_path}")
+    except UnicodeDecodeError as e:
+        logger.error(
+            f"Unicode decoding error for file {file_name} in {temp_zip_path}: {e}"
+        )
+
     return None, True
 
 
 def load_resource(url, max_retries=3):
     """
-    Load a ZIP file from a URL and decompress its contents. This function supports resuming
-    partial downloads and handles both HTTP and local file URLs. It uses a temporary file to store
-    the downloaded ZIP content, which is automatically cleaned up on function exit, even in cases of
-    errors or program crashes.
-
-    Args:
-        url (str): The URL of the ZIP file to be downloaded. Can be an HTTP URL or a local file URL (prefixed with 'file://').
-        max_retries (int, optional): The maximum number of retries for the download in case of failures. Defaults to 3.
-
-    Returns:
-        tuple: A tuple containing the decompressed file content as the first element, and a boolean flag as the second element
-               indicating whether an error occurred (True if an error occurred, False otherwise).
-               Returns (None, False) if the file is not found or is a bad ZIP file. Returns (None, True) if other errors occur.
+    Load a ZIP file from a URL and decompress its contents.
     """
-    if url.startswith("file://"):
-        local_file_path = Path(url[7:])
-        if not local_file_path.exists():
-            logger.debug(f"File not found at {local_file_path}")
-            return None, False
-        try:
-            with zipfile.ZipFile(local_file_path, "r") as zip_file:
-                if zip_file.namelist():
-                    file_name = zip_file.namelist()[0]
-                    with zip_file.open(file_name, "r") as file:
-                        return file.read().decode("iso-8859-1"), False
-        except zipfile.BadZipFile:
-            logger.debug(f"Bad ZIP file at {local_file_path}")
-            return None, False
+    try:
+        original_extension = ""
+        if url.endswith("-0.zip"):
+            original_extension = "-0.zip"
+        elif url.endswith("-8.zip"):
+            original_extension = "-8.zip"
+        elif url.endswith(".zip"):
+            original_extension = ".zip"
 
-    # Get the system-defined temporary directory
-    temp_dir = Path(tempfile.gettempdir())
-    unique_id = uuid.uuid4()  # Generate a unique ID
-    timestamp = int(time.time())  # Get current Unix timestamp
-    temp_zip_path = temp_dir / f"temp_partial_download_{unique_id}_{timestamp}.zip"
+        if url.startswith("file://"):
+            local_file_path = Path(url[7:])
+            if not local_file_path.exists():
+                logger.debug(f"File not found at {local_file_path}")
+                return None, False
+            return process_zip_file(str(local_file_path))
 
-    # Ensure any existing temporary file is removed
-    if temp_zip_path.exists():
-        # this would be really something if it happened :-p
-        raise Exception("temporary file collision, fatal error!")
+        temp_dir = Path(tempfile.gettempdir())
+        unique_id = uuid.uuid4()
+        temp_zip_path = temp_dir / f"temp_{unique_id}{original_extension}"
 
-    fetcher = URLContentFetcher(url, str(temp_zip_path), max_retries)
-    fetcher()
-    timeout_error = fetcher.timeout_error
+        fetcher = URLContentFetcher(url, str(temp_zip_path), max_retries)
+        if fetcher():
+            logger.debug(f"URL fetching failed for {url}")
+            return None, True
 
-    if not timeout_error and temp_zip_path.exists():
-        try:
-            file_content, zip_error = process_zip_file(str(temp_zip_path))
-            if zip_error:
-                raise zipfile.BadZipFile(f"Error processing ZIP file from {url}")
-            return file_content, False
-        finally:
-            # Clean-up temporary file
-            if temp_zip_path.exists():
-                temp_zip_path.unlink()
-    elif not timeout_error:
-        logger.debug("Downloaded file not found for processing.")
+        if temp_zip_path.exists():
+            return process_zip_file(str(temp_zip_path))
+        else:
+            logger.debug(f"Downloaded file not found for {url}")
+            return None, True
 
-    return None, timeout_error
+    except zipfile.BadZipFile:
+        logger.error(f"Bad ZIP file encountered with {url}")
+        return None, True
+    except Exception as e:
+        logger.error(f"Error processing file from {url}: {e}")
+        return None, True
+    finally:
+        if temp_zip_path and temp_zip_path.exists():
+            temp_zip_path.unlink()
