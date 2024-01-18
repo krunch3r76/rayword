@@ -8,16 +8,17 @@ Incidentally, finding instances of words in the wild is one way to train your ow
 This project is in development and is being shared early in its development to keep interest alive.
 
 # installation and running
+Install ray-on-golem
 ```bash
 pip install ray-on-golem -U
 ```
 
+Run the demo to search for the word "sobriquet":
 ```bash
 ./demo.sh
 ```
-this will search gutenberg texts for the word sobriquet (and related but only sobriquet will sample)
 
-or
+Or specify a different word:
 ```bash
 ./demo.sh <word>
 ```
@@ -27,8 +28,6 @@ On the surface rayword appears to find a random occurrence of a given word, but 
 
 
 # TODO
-video demo
-
-automatically search more paths when word is not found
-
-a lot more..
+* Video demo
+* Automaticall ysearch more paths when a word is not found
+* A lot more..
