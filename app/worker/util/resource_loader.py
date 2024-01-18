@@ -164,8 +164,8 @@ def process_zip_file(temp_zip_path):
     """
     Processes a ZIP file and extracts its first file's contents, decoding based on file naming:
     - Ends with '-0.zip': Encoded in UTF-8
-    - Ends with '-8.zip': Encoded in ISO-8859-1, convert to UTF-8
-    - Ends with '.zip': ASCII (subset of UTF-8)
+    - Ends with '-8.zip': Encoded in ISO-8859-1
+    - Ends with '.zip': Treat as UTF-8 (originally ASCII)
     """
     try:
         with zipfile.ZipFile(temp_zip_path, "r") as zip_file:
@@ -174,16 +174,18 @@ def process_zip_file(temp_zip_path):
                 with zip_file.open(file_name, "r") as file:
                     file_content = file.read()
 
-                    # Determine encoding based on the temp file name, not the file within the ZIP
-                    if temp_zip_path.endswith("-0.zip"):
+                    # Determine encoding based on the temp file name
+                    if temp_zip_path.endswith("-0.zip") or temp_zip_path.endswith(
+                        ".zip"
+                    ):
                         # Handle as UTF-8
                         decoded_content = file_content.decode("utf-8")
                     elif temp_zip_path.endswith("-8.zip"):
-                        # Handle as ISO-8859-1, then convert to UTF-8
+                        # Handle as ISO-8859-1
                         decoded_content = file_content.decode("iso-8859-1")
                     else:
-                        # Handle as ASCII
-                        decoded_content = file_content.decode("ascii")
+                        # Default to UTF-8 if the file doesn't match any known patterns
+                        decoded_content = file_content.decode("utf-8")
                     return decoded_content, False
     except zipfile.BadZipFile:
         logger.error(f"Bad ZIP file from {temp_zip_path}")
