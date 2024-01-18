@@ -162,10 +162,8 @@ class URLContentFetcher:
 
 def process_zip_file(temp_zip_path):
     """
-    Processes a ZIP file and extracts its first file's contents, decoding based on file naming:
-    - Ends with '-0.zip': Encoded in UTF-8
-    - Ends with '-8.zip': Encoded in ISO-8859-1
-    - Ends with '.zip': Treat as UTF-8 (originally ASCII)
+    Processes a ZIP file and extracts its first file's contents, attempting decoding based on file naming first,
+    then falling back to other encodings if necessary.
     """
     try:
         with zipfile.ZipFile(temp_zip_path, "r") as zip_file:
@@ -174,25 +172,29 @@ def process_zip_file(temp_zip_path):
                 with zip_file.open(file_name, "r") as file:
                     file_content = file.read()
 
-                    # Determine encoding based on the temp file name
-                    if temp_zip_path.endswith("-0.zip") or temp_zip_path.endswith(
-                        ".zip"
-                    ):
-                        # Handle as UTF-8
-                        decoded_content = file_content.decode("utf-8")
+                    # Guess encoding based on the file name
+                    encodings = ["utf-8"]
+                    if temp_zip_path.endswith("-0.zip"):
+                        encodings = ["utf-8", "windows-1252", "iso-8859-1"]
                     elif temp_zip_path.endswith("-8.zip"):
-                        # Handle as ISO-8859-1
-                        decoded_content = file_content.decode("iso-8859-1")
-                    else:
-                        # Default to UTF-8 if the file doesn't match any known patterns
-                        decoded_content = file_content.decode("utf-8")
-                    return decoded_content, False
-    except zipfile.BadZipFile:
-        logger.error(f"Bad ZIP file from {temp_zip_path}")
-    except UnicodeDecodeError as e:
-        logger.error(
-            f"Unicode decoding error for file {file_name} in {temp_zip_path}: {e}"
-        )
+                        encodings = ["iso-8859-1", "windows-1252", "utf-8"]
+                    elif temp_zip_path.endswith(".zip"):
+                        encodings = ["utf-8", "windows-1252", "iso-8859-1"]
+
+                    # Try decoding with the guessed encoding first, then fallbacks
+                    for encoding in encodings:
+                        try:
+                            decoded_content = file_content.decode(encoding)
+                            return decoded_content, False
+                        except UnicodeDecodeError:
+                            pass  # Try the next encoding
+
+                    # If all decodings fail, log an error
+                    logger.error(
+                        f"Failed to decode file {file_name} in {temp_zip_path}"
+                    )
+    except zipfile.BadZipFile as e:
+        logger.error(f"Bad ZIP file from {temp_zip_path}: {e}")
 
     return None, True
 
