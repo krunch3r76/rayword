@@ -1,24 +1,30 @@
 # rayword
-leverage ray on golem to search gutenberg texts for instances of a word via outbound networking
+`rayword` leverages Ray on Golem to search Project Gutenberg texts for instances of a word, utilizing outbound networking.
 
-this concept shows how ray-on-golem can use existing libraries to do distributed work. it employs python's nltk to perform simple word searches. one can imagine however how such toolkits and distributed computing could read a corpus of texts and develop a sense of language etc.
+This project demonstrates how Ray-on-Golem can employ existing libraries and outbound networking for distributed computing. It uses Python's NLTK for simple contextual word searches, showcasing the potential for distributed analysis of a text corpus to develop language models and more.
 
-incidentally, finding instances of words in the wild is one way to train your own brain's model of language. this project will eventually facilitate browsing of all results to that end.
+Incidentally, finding instances of words in the wild is one way to train your own brain's model of language. This project will eventually facilitate browsing of all results to that end.
 
-this project is in development and is being shared early in its development to keep interest alive.
+This project is in development and is being shared early in its development to keep interest alive.
 
-ray-on-golem just works:
-
-pip install ray-on-golem -U
+# installation and running
 ```bash
-$ ./demo.sh
+pip install ray-on-golem -U
+```
+
+```bash
+./demo.sh
 ```
 this will search gutenberg texts for the word sobriquet (and related but only sobriquet will sample)
 
 or
 ```bash
-$ ./demo.sh <word>
+./demo.sh <word>
 ```
+
+# additional details
+On the surface rayword appears to find a random occurrence of a given word, but internally it collects all occurrences for all word forms of a given word for later lookup. It may someday be expanded to index every dictionary word from every text requiring less spending on each future run to analyze the corpus.
+
 
 # TODO
 video demo
