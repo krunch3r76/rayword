@@ -23,6 +23,11 @@ Or specify a different word:
 ./demo.sh <word>
 ```
 
+For a faster search if the word is fairly common:
+```bash
+./demo.sh <word> --batch-size 50
+```
+
 ## additional details
 On the surface rayword appears to find a random occurrence of a given word, but internally it collects all occurrences for all word forms of a given word for later lookup. It may someday be expanded to index every dictionary word from every text requiring less spending on each future run to analyze the corpus.
 
@@ -32,4 +37,5 @@ Note, only a fresh subset of the entire corpus (tens of thousands of texts) are 
 ## TODO
 * Video demo
 * Automaticall ysearch more paths when a word is not found
+* Exclude gutenberg disclaimer
 * A lot more..
