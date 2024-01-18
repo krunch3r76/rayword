@@ -27,7 +27,7 @@ ray rsync-up golem-cluster.yaml ./bin/espeak/ /espeak/
 if [ -z "$1" ]; then
     ray submit golem-cluster.yaml rayword.py sobriquet --enable-console-logging --batch-size=50
 else
-    ray submit golem-cluster.yaml rayword.py "$1"
+    ray submit golem-cluster.yaml rayword.py "$@"
 fi
 
 ray rsync-down golem-cluster.yaml ./data/words.db ./data/words.db
