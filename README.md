@@ -36,6 +36,8 @@ Note, only a fresh subset of the entire corpus (tens of thousands of texts) are 
 
 ## TODO
 * Video demo
-* Automaticall ysearch more paths when a word is not found
+* Automatically search more paths when a word is not found
 * Exclude gutenberg disclaimer
+* Index all dictionary words excluding prepositions etc
+* Search for phrases or sentences
 * A lot more..
