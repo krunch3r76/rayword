@@ -203,6 +203,7 @@ def load_resource(url, max_retries=3):
     """
     Load a ZIP file from a URL and decompress its contents.
     """
+    temp_zip_path = None
     try:
         original_extension = ""
         if url.endswith("-0.zip"):

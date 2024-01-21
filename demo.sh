@@ -14,14 +14,14 @@ trap cleanup SIGINT
 
 pkill -9 ray-on-golem
 # Exit immediately if a command exits with a non-zero status.
-rm sample.wav
+rm -f ./app/output/sample.wav
 set -e
 set -x
 ray up golem-cluster.yaml --yes
-ray exec golem-cluster.yaml 'mkdir -p /root/nltk_data/corpora'
-ray exec golem-cluster.yaml 'pip3 install word_forms'
-ray rsync-up golem-cluster.yaml ./nltk_data/corpora/wordnet.zip /root/nltk_data/corpora/wordnet.zip
-ray rsync-up golem-cluster.yaml ./bin/espeak/ /espeak/
+ray exec golem-cluster.yaml 'mkdir -p /root/nltk_data/corpora' &> /dev/null
+ray exec golem-cluster.yaml 'pip3 install word_forms' &> /dev/null
+ray rsync-up golem-cluster.yaml ./nltk_data/corpora/wordnet.zip /root/nltk_data/corpora/wordnet.zip &> /dev/null
+ray rsync-up golem-cluster.yaml ./bin/espeak/ /espeak/ &> /dev/null
 
 # Check if argument $1 is provided
 if [ -z "$1" ]; then

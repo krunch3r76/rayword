@@ -6,13 +6,14 @@ import logging
 from pathlib import Path
 import os
 import re
+import subprocess
 
 from app.controller import Controller
 from app.model import WordIndexerModel
 from constants import TARGETS_FILE
 from app.util.resource import parse_resources_file
 
-os.environ["PYTHONDONTWRITEBYTECODE"] = "0"
+# os.environ["PYTHONDONTWRITEBYTECODE"] = "0"
 
 
 def get_max_workers_from_config(config_file):
@@ -40,8 +41,6 @@ def find_word_forms(word):
 
 
 def main(args):
-    import os
-
     # formatter = logging.Formatter(">>>%(filename)s:%(lineno)d - %(message)s")
     # Create a logger
     logger = logging.getLogger()
@@ -127,31 +126,27 @@ def main(args):
         print(random_context_sentence, flush=True)
         print()
         random_context_sentence_stripped = random_context_sentence.replace("\r\n", " ")
-        try:
-            import subprocess
 
-            subprocess.run(
-                [
-                    "/espeak/bin/espeak",
-                    "-v",
-                    "en-us",
-                    "-p",
-                    "45",
-                    "-s",
-                    "120",
-                    "-a",
-                    "110",
-                    "-g",
-                    "10",
-                    "-k",
-                    "5",
-                    f"{random_context_sentence_stripped}",
-                    "-w",
-                    "./app/output/sample.wav",
-                ]
-            )
-        except Exception as e:
-            pass
+        subprocess.run(
+            [
+                "/espeak/bin/espeak",
+                "-v",
+                "en-us",
+                "-p",
+                "45",
+                "-s",
+                "120",
+                "-a",
+                "110",
+                "-g",
+                "10",
+                "-k",
+                "5",
+                f"{random_context_sentence_stripped}",
+                "-w",
+                "./app/output/sample.wav",
+            ]
+        )
 
 
 if __name__ == "__main__":

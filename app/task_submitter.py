@@ -5,7 +5,8 @@ import os
 from typing import List, Dict, Tuple
 
 from app.task_generator import Task
-from app.worker.wordsearch import WordSearcher
+
+# from app.worker.wordsearch import WordSearcher
 
 runtime_env = {"pip": ["nltk==3.8.1", "requests"]}
 ray.init(runtime_env=runtime_env)
@@ -13,7 +14,7 @@ ray.init(runtime_env=runtime_env)
 
 @ray.remote
 def execute_remote_word_search(
-    WordSearcher, words_table, paths_table, path_prefix=None, enable_logging=False
+    words_table, paths_table, path_prefix=None, enable_logging=False
 ):
     """
     Executes a search for words in the given paths, run as a Ray remote function.
@@ -27,6 +28,7 @@ def execute_remote_word_search(
         Tuple[List[dict], Dict]: Tuple containing the search results and history information.
     """
     # logging.getLogger().setLevel(logging.WARNING)
+    from .worker.wordsearch import WordSearcher
 
     if enable_logging:
         logging.basicConfig(
@@ -67,7 +69,6 @@ class TaskSubmitter:
         """
         futures = [
             execute_remote_word_search.remote(
-                WordSearcher,
                 task.word_records,
                 task.path_records,
                 task.path_prefix,
