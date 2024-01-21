@@ -20,11 +20,9 @@ set -x
 ray up golem-cluster.yaml --yes
 ray exec golem-cluster.yaml 'mkdir -p /root/nltk_data/corpora' &> /dev/null
 ray exec golem-cluster.yaml 'pip3 install word_forms' &> /dev/null
-# ray rsync-up golem-cluster.yaml ./data/words.db ./data/words.db
 ray rsync-up golem-cluster.yaml ./nltk_data/corpora/wordnet.zip /root/nltk_data/corpora/wordnet.zip &> /dev/null
 ray rsync-up golem-cluster.yaml ./bin/espeak.tar.gz / &> /dev/null
 ray exec golem-cluster.yaml 'tar -xzf /espeak.tar.gz -C /' &> /dev/null
-# ray rsync-up golem-cluster.yaml ./bin/espeak/ /espeak/ &> /dev/null
 
 # Check if argument $1 is provided
 if [ -z "$1" ]; then
@@ -33,8 +31,8 @@ else
     ray submit golem-cluster.yaml rayword.py "$@"
 fi
 
-ray rsync-down golem-cluster.yaml ./data/words.db ./data/words.db
-ray rsync-down golem-cluster.yaml ./app/output/sample.wav ./app/output/sample.wav
+ray rsync-down golem-cluster.yaml ./data/words.db ./data/words.db &> /dev/null
+ray rsync-down golem-cluster.yaml ./app/output/sample.wav ./app/output/sample.wav &> /dev/null
 aplay ./app/output/sample.wav
 # implement logic to check whether any records were added and if not rerun, use output dir in manager
 # ray attach golem-cluster.yaml

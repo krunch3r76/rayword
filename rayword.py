@@ -131,7 +131,7 @@ def main(args):
             [
                 "/espeak/bin/espeak",
                 "-v",
-                "Storm",
+                "en-us",
                 "-p",
                 "45",
                 "-s",
