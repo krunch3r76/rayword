@@ -1,8 +1,0 @@
-2 create an initialize db script to initialize the word indexer database
-
-__init__.py
-  WordIndexerModel
-wordindexermodel.py
-wordsdbconnection.py
-contextdbconnection.py
-

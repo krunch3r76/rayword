@@ -113,7 +113,7 @@ def main(args):
 
     count_inserted = managerModel.get_count_records_last_added()
     print(f"A total of {count_inserted} instances of the word were inserted")
-
+    logging.debug(f"last_word_index_row_id: {last_word_index_row_id}")
     if count_inserted > 0:
         random_index = managerModel.get_random_word_index_above_id(
             last_word_index_row_id, primary_word

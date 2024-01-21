@@ -20,8 +20,11 @@ set -x
 ray up golem-cluster.yaml --yes
 ray exec golem-cluster.yaml 'mkdir -p /root/nltk_data/corpora' &> /dev/null
 ray exec golem-cluster.yaml 'pip3 install word_forms' &> /dev/null
+# ray rsync-up golem-cluster.yaml ./data/words.db ./data/words.db
 ray rsync-up golem-cluster.yaml ./nltk_data/corpora/wordnet.zip /root/nltk_data/corpora/wordnet.zip &> /dev/null
-ray rsync-up golem-cluster.yaml ./bin/espeak/ /espeak/ &> /dev/null
+ray rsync-up golem-cluster.yaml ./bin/espeak.tar.gz / &> /dev/null
+ray exec golem-cluster.yaml 'tar -xzf /espeak.tar.gz -C /' &> /dev/null
+# ray rsync-up golem-cluster.yaml ./bin/espeak/ /espeak/ &> /dev/null
 
 # Check if argument $1 is provided
 if [ -z "$1" ]; then

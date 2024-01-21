@@ -61,6 +61,8 @@ class Controller:
             if found_count == -1:
                 print("All targets have been searched already for this word")
                 break
+            if found_count == 0:
+                print("Word(s) not found, expanding search.")
 
     def distribute_word_search_tasks(self, words_to_unsearched_paths):
         """
@@ -79,6 +81,7 @@ class Controller:
         path_prefix = os.environ.get("RAYWORD_URL_PREFIX", None)
         found_count = 0
         for words, path_records in words_to_unsearched_paths.items():
+            print(f"searching {len(path_records)} texts")
             word_records = self.model.fetch_word_records(words)
             task_batches = task_generator.generate(
                 word_records, path_records, path_prefix
