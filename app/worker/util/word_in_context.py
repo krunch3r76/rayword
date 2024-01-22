@@ -3,16 +3,13 @@
 import re
 import os
 import nltk
+from pathlib import Path
 
 from nltk.tokenize import sent_tokenize
 
-# Current script's directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Navigate up one level to get the worker directory
-worker_dir = os.path.dirname(current_dir)
-# Construct the nltk_data path
-nltk_data_path = os.path.join(worker_dir, "nltk_data")
-nltk.data.path.append(nltk_data_path)
+worker_dir = Path(__file__).parent.parent
+nltk_data_path = worker_dir / "nltk_data"
+nltk.data.path.append(str(nltk_data_path))
 
 
 def find_all_words_details(text, target_words):

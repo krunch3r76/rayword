@@ -4,9 +4,6 @@ from .task_generator import TaskGenerator
 import logging
 import os
 
-# runtime_env = {"pip": ["nltk", "requests"]}
-# ray.init(runtime_env=runtime_env)
-
 
 class Controller:
     """

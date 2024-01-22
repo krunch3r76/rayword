@@ -29,8 +29,12 @@ def get_max_workers_from_config(config_file):
 
 def find_word_forms(word):
     try:
+        import nltk
+
+        nltk_data_dir = Path(__file__) / "nltk_data"
+        nltk.data.path.append(str(nltk_data_dir))
         from word_forms.word_forms import get_word_forms
-    except ModuleNotFoundError:
+    except (NameError, ModuleNotFoundError):
         return [word]
     else:
         word_forms_data = get_word_forms(word)
@@ -109,12 +113,13 @@ def main(args):
     controller(primary_word, enable_console_logging=args.enable_console_logging)
     #############################################################################
 
-    managerModel.update_insertion_history()
+    count_inserted = managerModel.update_insertion_history()
 
-    count_inserted = managerModel.get_count_records_last_added()
-    print(f"A total of {count_inserted} instances of the word were inserted")
-    logging.debug(f"last_word_index_row_id: {last_word_index_row_id}")
-    if count_inserted > 0:
+    # count_inserted = managerModel.get_count_records_last_added()
+    if count_inserted >= -1:
+        if count_inserted >= 1:
+            print(f"A total of {count_inserted} instances of the word(s) were inserted")
+        # logging.debug(f"last_word_index_row_id: {last_word_index_row_id}")
         random_index = managerModel.get_random_word_index_above_id(
             last_word_index_row_id, primary_word
         )
@@ -126,10 +131,11 @@ def main(args):
         print(random_context_sentence, flush=True)
         print()
         random_context_sentence_stripped = random_context_sentence.replace("\r\n", " ")
-
+        env = os.environ.copy()
+        env["PATH"] = "/espeak/bin:" + env["PATH"]
         subprocess.run(
             [
-                "/espeak/bin/espeak",
+                "espeak",
                 "-v",
                 "en-us",
                 "-p",
@@ -145,7 +151,8 @@ def main(args):
                 f"{random_context_sentence_stripped}",
                 "-w",
                 "./app/output/sample.wav",
-            ]
+            ],
+            env=env,
         )
 
 

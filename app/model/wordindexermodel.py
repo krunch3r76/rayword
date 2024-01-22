@@ -163,6 +163,16 @@ class WordIndexerModel:
         return index_range[1] - index_range[0]
 
     def update_insertion_history(self):
+        """
+        Updates the insertion history in the History table with the latest word index ID.
+
+        Retrieves the current maximum word index ID and updates the History table by
+        setting this as the new ultimate maximum ID and the previous ID as the penultimate maximum ID.
+        If no record exists, inserts a new one. Logs the historical and new maximum IDs for debugging.
+
+        Returns:
+            int: -1 if no prior history exists, 0 if no new insertions, or the number of new insertions since the last update.
+        """
         try:
             new_max_id = self.get_max_word_indices_id()
             with self.cursor_context() as cursor:
@@ -170,34 +180,36 @@ class WordIndexerModel:
                 cursor.execute("SELECT ultimate_max_index_id FROM History")
                 result = cursor.fetchone()
                 if result is None:
-                    result = [0]
-                    # raise ValueError("No data in History table to update")
+                    cursor.execute(
+                        "INSERT OR REPLACE INTO History (id, ultimate_max_index_id, penultimate_max_index_id) VALUES (1, ?, ?)",
+                        (new_max_id, new_max_id),
+                    )
+                    self.words_db_connection.commit()
+                    return -1
 
                 historical_max_id = result[0]
-
+                logging.debug(
+                    f"HISTORICAL_MAX_ID: {historical_max_id}, NEW_MAX_ID: {new_max_id}"
+                )
                 if new_max_id == historical_max_id:
                     # no new records, can return
                     return 0
 
-                # First update penultimate_max_index_id
                 cursor.execute(
-                    "UPDATE History SET penultimate_max_index_id = ?",
-                    (historical_max_id,),
-                )
-
-                # Then update ultimate_max_index_id
-                cursor.execute(
-                    "UPDATE History SET ultimate_max_index_id = ?", (new_max_id,)
+                    "INSERT OR REPLACE INTO History (id, ultimate_max_index_id, penultimate_max_index_id) VALUES (1, ?, ?)",
+                    (new_max_id, historical_max_id),
                 )
 
             # Commit the transaction
             self.words_db_connection.commit()
+            return new_max_id - historical_max_id
 
         except Exception as e:
             # Handle exceptions
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
             # Rollback any changes made before the exception
             self.words_db_connection.rollback()
+            raise
 
     def get_max_word_indices_id(self):
         """

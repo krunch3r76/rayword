@@ -91,6 +91,7 @@ def create_tables(conn, db_path, model):
             description TEXT
         )""",
         """CREATE TABLE IF NOT EXISTS History (
+            id INTEGER PRIMARY KEY CHECK (id=1),
             ultimate_max_index_id INTEGER DEFAULT 0,
             penultimate_max_index_id INTEGER DEFAULT 0
             )
@@ -109,7 +110,7 @@ def create_tables(conn, db_path, model):
     conn.commit()
 
     # Check for an existing version
-    current_version = "2"
+    current_version = "3"
     description = "Add History table"
 
     try:
@@ -127,7 +128,7 @@ def create_tables(conn, db_path, model):
             )
         else:
             internal_version = result[0]
-            if internal_version == "1":
+            if internal_version == "1" or internal_version == "2":
                 remove_db_file(conn, db_path)
                 return False
 
