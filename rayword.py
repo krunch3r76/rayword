@@ -13,13 +13,12 @@ from app.model import WordIndexerModel
 from constants import TARGETS_FILE
 from app.util.resource import parse_resources_file
 
-# os.environ["PYTHONDONTWRITEBYTECODE"] = "0"
 
-
-def get_max_workers_from_config(config_file):
+def get_max_workers_from_config(yaml_config_path):
+    """parse the yaml config file for the maximum number of workers"""
     max_workers_pattern = re.compile(r"max_workers:\s*(\d+)")
 
-    with open(config_file, "r") as file:
+    with open(yaml_config_path, "r") as file:
         for line in file:
             match = max_workers_pattern.search(line)
             if match:
@@ -28,6 +27,14 @@ def get_max_workers_from_config(config_file):
 
 
 def find_word_forms(word):
+    """leverage nltk (if available) to find all the forms of the word being searched
+
+    Args:
+        word: the word searched for
+
+    Returns:
+        list (str): the word searched for and other forms (if any) found
+    """
     try:
         import nltk
 
