@@ -19,9 +19,9 @@ import json
 import sqlite3
 
 from .wordsdbconnection import create_words_db_connection
-from constants import WORDS_DB_FILE
+from constants import WORDS_DB_FILE, TEXT_DETAILS_DB_FILE
 
-# from .contextdbconnection import create_context_db_connection
+from .contextdbconnection import create_text_details_db_connection
 
 logger = logging.getLogger()
 
@@ -39,7 +39,10 @@ class WordIndexerModel:
 
     # (attribute) words_db_connection
     def __init__(
-        self, words_db_path=str(WORDS_DB_FILE), context_db_path=None, path_limit=None
+        self,
+        words_db_path=str(WORDS_DB_FILE),
+        text_details_db_path=str(TEXT_DETAILS_DB_FILE),
+        path_limit=None,
     ):
         """
         Args:
@@ -50,18 +53,20 @@ class WordIndexerModel:
         # Create the primary connection (e.g., words database)
         self.words_db_connection = create_words_db_connection(words_db_path, self)
         self.path_limit = path_limit
-        # # Create a secondary connection (e.g., context database)
-        # # And optionally, if you need to perform cross-database queries:
-        # self.context_db_connection = create_context_db_connection(context_db_path)
-        # self._attach_context_db(self.context_db_connection)
+        # Create a secondary connection (e.g., context database)
+        self.text_details_db_connection = create_text_details_db_connection(
+            text_details_db_path
+        )
+        self._attach_textinfo_db(self.text_details_db_connection)
 
-    # deprecated
-    # def _attach_context_db(self, context_conn):
-    #     # Use the ATTACH DATABASE command to attach context database to words database
-    #     context_db_path = context_conn.execute("PRAGMA database_list").fetchone()[2]
-    #     self.words_db_connection.execute(
-    #         f"ATTACH DATABASE '{context_db_path}' AS contextDb"
-    #     )
+    def _attach_textinfo_db(self, text_details_conn):
+        # Use the ATTACH DATABASE command to attach context database to words database
+        text_details_db_path = text_details_conn.execute(
+            "PRAGMA database_list"
+        ).fetchone()[2]
+        self.words_db_connection.execute(
+            f"ATTACH DATABASE '{text_details_db_path}' AS contextDb"
+        )
 
     class CursorContextManager:
         """

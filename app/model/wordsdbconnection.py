@@ -105,6 +105,7 @@ def create_tables(conn, db_path, model):
         except sqlite3.OperationalError as e:
             print(f"exception thrown when executing:\n{ddl_statement}\n")
             print(e)
+            raise
 
     # Additional table creation as needed
     conn.commit()
