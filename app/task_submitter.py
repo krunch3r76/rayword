@@ -41,7 +41,6 @@ class TaskSubmitter:
         """
         futures = [
             execute_remote_word_search.remote(
-                task.word_records,
                 task.path_records,
                 task.path_prefix,
                 self.enable_console_logging,
@@ -52,11 +51,4 @@ class TaskSubmitter:
         logging.debug(f"Number of futures: {len(futures)}")
         searchResults = ray.get(futures)
 
-        word_indices_aggregated, search_histories, bad_path_ids = [], [], set()
-        for searchResult in searchResults:
-            word_indices_aggregated.extend(searchResult["word_indices"])
-            search_histories.extend(searchResult["search_histories"])
-            bad_path_ids.update(searchResult["unreachable_path_ids"])
-
-        summary = {"bad_path_ids": list(bad_path_ids)}
-        return word_indices_aggregated, search_histories, summary
+        return searchResults

@@ -195,6 +195,7 @@ def process_zip_file(temp_zip_path):
                     )
     except zipfile.BadZipFile as e:
         logger.error(f"Bad ZIP file from {temp_zip_path}: {e}")
+        return None, False
 
     return None, True
 
@@ -202,6 +203,10 @@ def process_zip_file(temp_zip_path):
 def load_resource(url, max_retries=3):
     """
     Load a ZIP file from a URL and decompress its contents.
+
+    Returns:
+        text (str): text loaded or None
+        connection timed out (bool): True if timed out
     """
     temp_zip_path = None
     try:
@@ -237,7 +242,7 @@ def load_resource(url, max_retries=3):
 
     except zipfile.BadZipFile:
         logger.error(f"Bad ZIP file encountered with {url}")
-        return None, True
+        return None, False
     except Exception as e:
         logger.error(f"Error processing file from {url}: {e}")
         return None, True

@@ -29,7 +29,6 @@ class WorkerIndexerModel:
 
     def __init__(
         self,
-        words_table_dict,
         paths_table_dict,
         path_prefix="http://aleph.gutenberg.org",
     ):
@@ -50,7 +49,6 @@ class WorkerIndexerModel:
         self.worker_db_connection = create_worker_db_connection()
 
         # Insert records
-        self.insert_records_into_worker_db(words_table_dict, "Words")
         self.insert_records_into_worker_db(paths_table_dict, "Paths")
 
     class CursorContextManager:

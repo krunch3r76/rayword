@@ -37,9 +37,9 @@ provider:
         outbound_urls: ["https://pypi.dev.golem.network", "http://aleph.gutenberg.org"]
 
         # Minimal values of parameters offered by Golem provider 
-        min_mem_gib: 1
+        min_mem_gib: 12
         min_cpu_threads: 1
-        min_storage_gib: 1
+        min_storage_gib: 12
 
         # Maximal values of parameters offered by Golem provider
         max_cpu_threads: null
@@ -79,7 +79,6 @@ provider:
 file_mounts: {
   ./golem-cluster.yaml: ./golem-cluster.yaml,
   ./app: ./app,
-  ./data: ./data,
   ./constants.py: ./constants.py,
   ./rayword.py: ./rayword.py
   # <remote_path>: <local_path>
@@ -111,7 +110,7 @@ available_node_types:
 #initialization_commands: [
 #  "pip install endplay",
 #]
-initialization_commands: []
+initialization_commands: ["mkdir -p /root/data"]
 
 # List of shell commands to run to set up nodes
 setup_commands: []

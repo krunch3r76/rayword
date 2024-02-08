@@ -2,6 +2,8 @@
 /app/manager/input/*
 /app/output/*
 !app/output/.gitkeep
+/app/input/*
+!/app/input/.gitkeep
 # !app/input/.gitkeep
 
 # Byte-compiled / optimized files

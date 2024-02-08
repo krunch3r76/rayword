@@ -17,6 +17,7 @@ Created by krunch3r76 on 12-28-2023
 import logging
 import json
 import sqlite3
+import bz2
 
 from .wordsdbconnection import create_words_db_connection
 from constants import WORDS_DB_FILE, TEXT_DETAILS_DB_FILE
@@ -34,39 +35,21 @@ class WordIndexerModel:
 
     Attributes:
         words_db_connection (sqlite3.connection):
-        path_limit (int): upper count of paths to return when querying unsearched
     """
 
-    # (attribute) words_db_connection
     def __init__(
         self,
-        words_db_path=str(WORDS_DB_FILE),
-        text_details_db_path=str(TEXT_DETAILS_DB_FILE),
-        path_limit=None,
+        path_records_to_insert,
     ):
         """
         Args:
-            words_db_path (stringable): path to on disk sqlite words database (created if non existent)
-            context_db_path (stringable): deprecated, path to context database
-            path_limit (int): max number of path's returned by unsearched paths query
+            path_records_to_insert (list of dicts): records corresponding to Path table entries to insert
         """
-        # Create the primary connection (e.g., words database)
-        self.words_db_connection = create_words_db_connection(words_db_path, self)
-        self.path_limit = path_limit
-        # Create a secondary connection (e.g., context database)
-        self.text_details_db_connection = create_text_details_db_connection(
-            text_details_db_path
-        )
-        self._attach_textinfo_db(self.text_details_db_connection)
+        if WORDS_DB_FILE.exists():
+            WORDS_DB_FILE.unlink(missing_ok=True)
 
-    def _attach_textinfo_db(self, text_details_conn):
-        # Use the ATTACH DATABASE command to attach context database to words database
-        text_details_db_path = text_details_conn.execute(
-            "PRAGMA database_list"
-        ).fetchone()[2]
-        self.words_db_connection.execute(
-            f"ATTACH DATABASE '{text_details_db_path}' AS contextDb"
-        )
+        self.words_db_connection = create_words_db_connection(WORDS_DB_FILE, self)
+        self.insert_path_records(path_records_to_insert)
 
     class CursorContextManager:
         """
@@ -103,152 +86,10 @@ class WordIndexerModel:
                 # Log or handle the exception
                 pass
 
-    def get_random_word_index_above_id(self, last_processed_id, words):
-        """
-        Fetches a random WordIndices row where word_indices_id is greater than last_processed_id
-        and the word matches one of the specified words in the Words table.
-
-        Args:
-            last_processed_id (int): The word_indices_id threshold.
-            words (list of str): The words to match in the Words table.
-
-        Returns:
-            dict: A dictionary representing the selected row from WordIndices.
-        """
-        if not isinstance(words, list):
-            words = [words]
-
-        with self.cursor_context(use_row_factory=True) as cursor:
-            placeholders = ",".join("?" * len(words))
-            query = f"""
-                    SELECT wi.*
-                    FROM WordIndices wi
-                    JOIN Words w ON wi.word_id = w.word_id
-                    WHERE wi.word_indices_id > ?
-                    AND w.word IN ({placeholders})
-                    ORDER BY RANDOM()
-                    LIMIT 1;
-                    """
-            cursor.execute(query, (last_processed_id, *words))
-
-            result = cursor.fetchone()
-            return dict(result) if result else None
-
     def cursor_context(self, use_row_factory=False):
         return WordIndexerModel.CursorContextManager(
             model=self, use_row_factory=use_row_factory
         )
-
-    def get_history_index_range(self):
-        """return the inclusive range of row_id's corresponding to the most recent records added"""
-        with self.cursor_context() as cursor:
-            try:
-                # Execute the query
-                cursor.execute(
-                    "SELECT penultimate_max_index_id, ultimate_max_index_id FROM History"
-                )
-                result = cursor.fetchone()
-
-                # Check if the result is not None
-                if result is not None:
-                    return result  # Returns a tuple (penultimate_max_index_id, ultimate_max_index_id)
-                else:
-                    return None  # or some default value or raise an exception
-
-            except sqlite3.Error as e:
-                print(f"An error occurred: {e}")
-                return None  # or some default value or raise an exception
-
-    def get_count_records_last_added(self):
-        """return the number of records most recently added"""
-        index_range = self.get_history_index_range()
-        if index_range is None:
-            max_index = self.get_max_word_indices_id()
-            return max_index
-        return index_range[1] - index_range[0]
-
-    def update_insertion_history(self):
-        """
-        Updates the insertion history in the History table with the latest word index ID.
-
-        Retrieves the current maximum word index ID and updates the History table by
-        setting this as the new ultimate maximum ID and the previous ID as the penultimate maximum ID.
-        If no record exists, inserts a new one. Logs the historical and new maximum IDs for debugging.
-
-        Returns:
-            int: -1 if no prior history exists, 0 if no new insertions, or the number of new insertions since the last update.
-        """
-        try:
-            new_max_id = self.get_max_word_indices_id()
-            with self.cursor_context() as cursor:
-                # Fetch the current ultimate_max_index_id
-                cursor.execute("SELECT ultimate_max_index_id FROM History")
-                result = cursor.fetchone()
-                if result is None:
-                    cursor.execute(
-                        "INSERT OR REPLACE INTO History (id, ultimate_max_index_id, penultimate_max_index_id) VALUES (1, ?, ?)",
-                        (new_max_id, new_max_id),
-                    )
-                    self.words_db_connection.commit()
-                    return -1
-
-                historical_max_id = result[0]
-                logging.debug(
-                    f"HISTORICAL_MAX_ID: {historical_max_id}, NEW_MAX_ID: {new_max_id}"
-                )
-                if new_max_id == historical_max_id:
-                    # no new records, can return
-                    return 0
-
-                cursor.execute(
-                    "INSERT OR REPLACE INTO History (id, ultimate_max_index_id, penultimate_max_index_id) VALUES (1, ?, ?)",
-                    (new_max_id, historical_max_id),
-                )
-
-            # Commit the transaction
-            self.words_db_connection.commit()
-            return new_max_id - historical_max_id
-
-        except Exception as e:
-            # Handle exceptions
-            logging.error(f"An error occurred: {e}")
-            # Rollback any changes made before the exception
-            self.words_db_connection.rollback()
-            raise
-
-    def get_max_word_indices_id(self):
-        """
-        Performs a sql query to identify the most recent inserted record.
-        """
-        with self.cursor_context() as cursor:
-            cursor.execute("SELECT MAX(word_indices_id) FROM WordIndices")
-            max_id = cursor.fetchone()[0]
-
-        if max_id is not None:
-            return max_id
-        else:
-            return 0
-
-    # def select_random_word_indices_record(
-    def update_or_insert_paths(self, paths_and_text_numbers):
-        """
-        Inserts or updates path records
-
-        Args:
-            paths_and_text_numbers (list): tuples of paths (str) paired with the
-             gutenberg text number (int)
-
-        Notes:
-            paths input and stored as the path component of a gutenberg url
-        """
-        cursor = self.words_db_connection.cursor()
-
-        for path, text_number in paths_and_text_numbers:
-            cursor.execute(
-                "INSERT OR IGNORE INTO Paths (path, text_number) VALUES (?, ?)",
-                (path, text_number),
-            )
-        self.words_db_connection.commit()
 
     def mark_paths_unreachable(self, path_ids):
         """
@@ -262,24 +103,23 @@ class WordIndexerModel:
         cursor.executemany(update_query, [(path_id,) for path_id in path_ids])
         self.words_db_connection.commit()
 
-    def fetch_word_records(self, words):
-        """
-        Retrieves a list Words records for the words in the input group
+    def get_unreachable_paths(self):
+        """Select path values from Paths for which is_unreachable = 1 and return as a list"""
+        unreachable_paths = []
+        query = "SELECT path FROM Paths WHERE is_unreachable = 1"
+        with self.cursor_context(use_row_factory=True) as cursor:
+            cursor.execute(query)
+            unreachable_paths = [row["path"] for row in cursor.fetchall()]
+        return unreachable_paths
 
-        Args:
-            words (list of str): words to look up the corresponding Words records
-
-        Returns:
-            list of dict: a list of dictionaries containing complete Words records
-        """
-        original_row_factory = self.words_db_connection.row_factory
-        self.words_db_connection.row_factory = sqlite3.Row
-        cursor = self._cursor()
-        placeholders = ", ".join("?" for _ in words)
-        cursor.execute(f"SELECT * FROM Words WHERE word IN ({placeholders})", words)
-        word_records = cursor.fetchall()
-        self.words_db_connection.row_factory = original_row_factory
-        return [dict(record) for record in word_records]
+    def get_text_numbers_searched(self):
+        """Select text_number values from SearchHistory"""
+        text_numbers_searched = []
+        query = "SELECT text_number from SearchHistory"
+        with self.cursor_context() as cursor:
+            cursor.execute(query)
+            text_numbers_searched = [row[0] for row in cursor.fetchall()]
+        return text_numbers_searched
 
     def fetch_selected_path_records(self, path_ids):
         """
@@ -315,51 +155,24 @@ class WordIndexerModel:
 
         return records
 
-    def update_or_insert_word_groups(self, word_list):
-        """
-        Inserts or updates a grouping of words by creating or associating a FormGroup record
+    def _fetch_table_data(self, table_name):
+        """Fetch data from the specified table and return it as a list of dictionaries."""
+        with self.cursor_context(use_row_factory=True) as cursor:
+            cursor.execute(f"SELECT * FROM {table_name}")
+            return [dict(row) for row in cursor.fetchall()]
 
-        Args:
-            word_list (list of str): words to be recognized as part of the single group
-        """
-        cursor = self.words_db_connection.cursor()
+    def export_table_to_file(self, table_name, filepath, compress=False):
+        """Export specified table to the specified path, with optional bzip2 compression."""
+        data = self._fetch_table_data(table_name)
+        serialized_data = json.dumps(data).encode("utf-8")
 
-        for word in word_list:
-            # Check if the word already exists
-            cursor.execute(
-                "SELECT word_id, form_group_id FROM Words WHERE word = ?", (word,)
-            )
-            result = cursor.fetchone()
-
-            if result:
-                # Word exists, fetch its form_group_id
-                word_id, form_group_id = result
-            else:
-                # Word doesn't exist, create new FormGroup
-                cursor.execute("INSERT INTO FormGroups DEFAULT VALUES")
-                form_group_id = cursor.lastrowid
-
-                # Add all words in the list to Words with the new form_group_id
-                for w in word_list:
-                    cursor.execute(
-                        "INSERT INTO Words (word, form_group_id) VALUES (?, ?)",
-                        (w, form_group_id),
-                    )
-
-            # If the word exists, update other words in the same group if necessary
-            if result:
-                cursor.execute(
-                    "SELECT word FROM Words WHERE form_group_id = ?", (form_group_id,)
-                )
-                existing_words = {row[0] for row in cursor.fetchall()}
-                new_words = set(word_list) - existing_words
-
-                for w in new_words:
-                    cursor.execute(
-                        "INSERT INTO Words (word, form_group_id) VALUES (?, ?)",
-                        (w, form_group_id),
-                    )
-            self.words_db_connection.commit()
+        if compress:
+            compressed_data = bz2.compress(serialized_data)
+            with open(filepath, "wb") as file:
+                file.write(compressed_data)
+        else:
+            with open(filepath, "wb") as file:
+                file.write(serialized_data)
 
     def _cursor(self):
         """
@@ -370,149 +183,55 @@ class WordIndexerModel:
         """
         return self.words_db_connection.cursor()
 
-    def serialize_selected_words_to_json(self, word_list):
+    def get_path_records(self):
         """
-        Serializes Words records corresponding to the word_list as json records
-
-        Args:
-            word_list (list of str): words to look up corresponding Words records
+        Retrieves a list of all path_ids from the Paths table.
 
         Returns:
-            str: json list of dictionaries corresponding to Words records
+            list of int: a list of path_ids
         """
+        with self.cursor_context(use_row_factory=True) as cursor:
+            cursor.execute("SELECT * FROM Paths")
+            return [dict(row) for row in cursor.fetchall()]
+            # return [row["path"] for row in cursor.fetchall()]
 
-        def convert_words_to_ids(word_list):
-            """
-            Returns word_ids corresponding to the word_list
-
-            Args:
-                word_list (list of str): words to search for in Words
-
-            Returns:
-                list of int: word_id's from Words
-            """
-            placeholders = ", ".join("?" for _ in word_list)
-            query = "SELECT word_id from Words WHERE word IN ({})".format(placeholders)
-            logger.debug(query)
-            cursor = self._cursor()
-            cursor.execute(query, word_list)
-            word_ids_rows = cursor.fetchall()
-            word_ids = [row[0] for row in word_ids_rows]
-            return word_ids
-
-        original_row_factory = self.words_db_connection.row_factory
-        self.words_db_connection.row_factory = sqlite3.Row
-        cursor = self._cursor()
-
-        word_ids = convert_words_to_ids(word_list)
-        placeholders = ", ".join("?" for _ in word_list)
-        query = f"SELECT word_id, word, form_group_id FROM Words WHERE word_id IN ({placeholders})"
-        cursor.execute(query, word_ids)
-        fetched = cursor.fetchall()
-        words_data = [dict(row) for row in fetched]
-        self.words_db_connection = original_row_factory
-        json_data = json.dumps(words_data)
-        return json_data
-
-    # def _compress_to_base64(self, text):
-    #     compressed_text = gzip.compress(text.encode("utf-8"))
-    #     base64_compressed_text = base64.b64encode(compressed_text).decode("utf-8")
-    #     return base64_compressed_text
-
-    def get_unsearched_path_ids_for_word_group(self, word):
+    def insert_search_histories(self, path_ids_searched):
         """
-        Collates words with shared paths for which the words have not yet been searched on.
+        Find the text_number corresponding to each path_id in the Paths table and insert a new
+        SearchHistory record with this text_number.
 
         Args:
-            word (str): a representative word of the group to which it may belong
-
-        Returns:
-            dictionary of tuples to lists: keys are tuples of words associated with a list of
-                path_ids from Paths
+            path_ids_searched (list): List of path_ids to be searched in the Paths table.
         """
+        # Retrieve text_numbers corresponding to the provided path_ids
+        text_numbers = []
+        with self.cursor_context(use_row_factory=True) as cursor:
+            for path_id in path_ids_searched:
+                cursor.execute(
+                    "SELECT text_number FROM Paths WHERE path_id = ?", (path_id,)
+                )
+                result = cursor.fetchone()
+                if result:
+                    text_numbers.append(result["text_number"])
 
-        # setup cursor for Row factory
-        original_row_factory = self.words_db_connection.row_factory
-        self.words_db_connection.row_factory = sqlite3.Row
-        cursor = self._cursor()
-
-        # Combined query to get word_ids and words for a given group
-        query = """
-        SELECT w1.word_id, w1.word
-        FROM Words w1
-        JOIN Words w2 ON w1.form_group_id = w2.form_group_id
-        WHERE w2.word = ?
-        """
-        cursor.execute(query, (word,))
-        word_ids_and_words = cursor.fetchall()
-
-        # Function to get unsearched path IDs for a given word_id
-        def unsearched_path_ids_for_word_id(word_id, randomorder=True):
-            limit_clause = (
-                f"LIMIT {self.path_limit}" if self.path_limit is not None else ""
+        # Insert new records into SearchHistory
+        with self.cursor_context() as cursor:
+            insert_query = "INSERT INTO SearchHistory (text_number) VALUES (?)"
+            cursor.executemany(
+                insert_query, [(text_number,) for text_number in text_numbers]
             )
-            order_by_clause = "ORDER BY RANDOM()" if randomorder else "ORDER BY path_id"
-            query = f"""
-            SELECT path_id
-            FROM Paths
-            WHERE path_id NOT IN (
-                SELECT path_id
-                FROM SearchHistory
-                WHERE word_id = ?
-            )
-            AND is_unreachable = 0
-            {order_by_clause} {limit_clause}
-            """
-            cursor.execute(query, (word_id,))
-            return [row[0] for row in cursor.fetchall()]
-
-        # Building the mapping
-        unsearched_paths_to_words = {}
-        for word_id, word in word_ids_and_words:
-            path_ids = tuple(unsearched_path_ids_for_word_id(word_id))
-            if path_ids not in unsearched_paths_to_words:
-                unsearched_paths_to_words[path_ids] = []
-            unsearched_paths_to_words[path_ids].append(word)
-
-        self.words_db_connection.row_factory = original_row_factory
-
-        # Invert the mapping to map the lists of words to distinct lists of search paths
-        return {
-            tuple(words): paths for paths, words in unsearched_paths_to_words.items()
-        }
-
-    def get_unsearched_paths_for_word_group(self, word):
-        """collate words with unsearched path ids
-
-        Args:
-            word (str): a word expected to be a sampling from the group it belongs to
-
-        Returns:
-            one or more lists of words keyed to unsearched paths
-        """
-        word_groups_to_path_ids = self.get_unsearched_path_ids_for_word_group(word)
-        wordlists_to_paths = {}
-        for wordlist, path_ids in word_groups_to_path_ids.items():
-            path_records = self.fetch_selected_path_records(path_ids)
-            wordlists_to_paths[wordlist] = path_records
-        return wordlists_to_paths
-
-    def insert_search_histories(self, searchHistories):
-        """update the model with what paths were searched for the words
-
-        Args:
-            word_id_to_path_id_pairs (list): tuples of individual word ids associated to path ids
-        """
-        if len(searchHistories) != 0:
-            cursor = self._cursor()
-
-            columns = ", ".join(searchHistories[0].keys())
-            placeholders = ":" + ", :".join(searchHistories[0].keys())
-            sql = f"INSERT INTO SearchHistory ({columns}) VALUES ({placeholders})"
-            cursor.executemany(sql, searchHistories)
             self.words_db_connection.commit()
 
-        return len(searchHistories)
+    def insert_path_records(self, path_records_list):
+        """update model with path records"""
+        if len(path_records_list) > 0:
+            cursor = self._cursor()
+            columns = ", ".join(path_records_list[0].keys())
+            placeholders = ":" + ", :".join(path_records_list[0].keys())
+            sql = f"INSERT INTO Paths ({columns}) VALUES ({placeholders})"
+
+            cursor.executemany(sql, path_records_list)
+            self.words_db_connection.commit()
 
     def insert_search_results(self, wordIndices_list):
         """update the model with word search results
@@ -530,3 +249,20 @@ class WordIndexerModel:
             cursor.executemany(sql, wordIndices_list)
             self.words_db_connection.commit()
         return len(wordIndices_list)
+
+    def lookup_text_number_by_path_id(self, path_id):
+        """
+        Retrieves the text_number associated with a given path_id.
+
+        Args:
+            path_id (int): The path_id for which to find the corresponding text_number.
+
+        Returns:
+            int: The text_number associated with the given path_id, or None if not found.
+        """
+        with self.cursor_context(use_row_factory=True) as cursor:
+            cursor.execute(
+                "SELECT text_number FROM Paths WHERE path_id = ?", (path_id,)
+            )
+            result = cursor.fetchone()
+            return result["text_number"] if result else None
