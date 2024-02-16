@@ -10,7 +10,10 @@
 
 import sqlite3
 import logging
+import json
+import bz2
 
+from typing import Union
 from .workerdbconnection import create_worker_db_connection
 
 
@@ -46,10 +49,12 @@ class WorkerIndexerModel:
             self.path_prefix = path_prefix
 
         # Create the connecton
-        self.worker_db_connection = create_worker_db_connection()
+        self.worker_db_connection = create_worker_db_connection(in_memory=True)
 
         # Insert records
+        self.start_transaction()
         self.insert_records_into_worker_db(paths_table_dict, "Paths")
+        self.end_transaction()
 
     class CursorContextManager:
         """
@@ -85,6 +90,266 @@ class WorkerIndexerModel:
             if exc_type:
                 # Log or handle the exception
                 pass
+
+    def start_transaction(self):
+        with self.cursor_context() as cursor:
+            cursor.execute("BEGIN")
+
+    def end_transaction(self):
+        with self.cursor_context() as cursor:
+            cursor.execute("COMMIT")
+
+    def insert_word(self, word):
+        """
+        Inserts a word into the Words table if it doesn't exist and returns the word_id.
+
+        Args:
+            word (str): The word to be inserted.
+
+        Returns:
+            int: The word_id of the inserted or existing word.
+        """
+        word_id = self.get_word_id(word)
+        if word_id is not None:
+            return word_id
+
+        with self.cursor_context() as cursor:
+            cursor.execute("INSERT INTO Words (word) VALUES (?)", (word,))
+            return cursor.lastrowid
+
+    def insert_word_position(self, word_id, path_id, position):
+        """
+        Inserts a word position into the Positions table.
+
+        Args:
+            word_id (int): The word_id of the word.
+            path_id (int): The path_id where the word is found.
+            position (int): The position of the word in the text.
+        """
+        with self.cursor_context() as cursor:
+            cursor.execute(
+                "INSERT INTO Positions (word_id, path_id, position) VALUES (?, ?, ?)",
+                (word_id, path_id, position),
+            )
+
+    def serialize_to_dict_or_compressed_json(
+        self, compress: bool = False
+    ) -> Union[dict, bytes]:
+        """
+        Serializes the database content to a dictionary mapping or compressed JSON.
+
+        Args:
+            compress (bool, optional): If True, serialize to compressed JSON. Defaults to False.
+
+        Returns:
+            Union[dict, bytes]: The serialized data as a dictionary or compressed JSON bytes.
+        """
+        # Fetch the word data from the database
+        word_data = self.fetch_word_data()
+
+        if compress:
+            # Convert to JSON and then compress
+            json_data = json.dumps(word_data)
+            compressed_data = bz2.compress(json_data.encode("utf-8"))
+            return compressed_data
+        else:
+            return word_data
+
+    def _fetch_word_data(self) -> dict:
+        """
+        Fetches words and their positions from the database, organized by path.
+
+        Returns:
+            dict: A dictionary mapping paths to another dictionary, which maps words to their positions.
+        """
+        path_word_positions = {}
+        query = """
+            SELECT pa.path, w.word, p.position
+            FROM Words w
+            INNER JOIN Positions p ON w.word_id = p.word_id
+            INNER JOIN Paths pa ON p.path_id = pa.path_id
+            ORDER BY pa.path, w.word, p.position
+        """
+
+        with self.cursor_context(use_row_factory=True) as cursor:
+            cursor.execute(query)
+            for row in cursor:
+                path = row["path"]
+                word = row["word"]
+                position = row["position"]
+
+                if path not in path_word_positions:
+                    path_word_positions[path] = {}
+
+                if word not in path_word_positions[path]:
+                    path_word_positions[path][word] = []
+
+                path_word_positions[path][word].append(position)
+
+        return path_word_positions
+
+    def fetch_word_data(self) -> dict:
+        """
+        Fetches words and their positions from the database, organized by path.
+        Processes and deletes the data in batches.
+
+        Returns:
+            dict: A dictionary mapping paths to another dictionary, which maps words to their positions.
+        """
+        BATCH_SIZE = 999
+        path_word_positions = {}
+        total_word_ids = set()
+
+        # Function to process a batch of words and delete them
+        def process_batch(batch_word_ids):
+            self.delete_word_positions_by_ids(batch_word_ids)
+            with self.cursor_context() as cursor:
+                cursor.execute("VACUUM")
+
+        # Function to fetch a batch of data
+        def fetch_batch(last_word_id=None):
+            batch_word_ids = set()
+            query = """
+                SELECT pa.path, w.word_id, w.word, p.position
+                FROM Words w
+                INNER JOIN Positions p ON w.word_id = p.word_id
+                INNER JOIN Paths pa ON p.path_id = pa.path_id
+                {}
+                ORDER BY pa.path, w.word, p.position
+                LIMIT {}
+            """.format(
+                f"WHERE w.word_id > {last_word_id}" if last_word_id else "", BATCH_SIZE
+            )
+
+            with self.cursor_context(use_row_factory=True) as cursor:
+                cursor.execute(query)
+                for row in cursor:
+                    path = row["path"]
+                    word_id = row["word_id"]
+                    word = row["word"]
+                    position = row["position"]
+
+                    if path not in path_word_positions:
+                        path_word_positions[path] = {}
+                    if word not in path_word_positions[path]:
+                        path_word_positions[path][word] = []
+
+                    path_word_positions[path][word].append(position)
+                    batch_word_ids.add(word_id)
+
+            return batch_word_ids
+
+        # Main loop for fetching and processing data
+        last_processed_word_id = None
+        while True:
+            batch_word_ids = fetch_batch(last_processed_word_id)
+            if not batch_word_ids:
+                break  # Exit loop if no more data to fetch
+            last_processed_word_id = max(batch_word_ids)
+            total_word_ids.update(batch_word_ids)
+
+            # Process the batch
+            process_batch(batch_word_ids)
+
+        return path_word_positions
+
+    def delete_and_vacuum(self, word_ids):
+        """
+        Deletes position records for a set of word_ids and then vacuums the database.
+
+        Args:
+            word_ids (set): The set of word_ids for which to delete position records.
+        """
+        self.delete_word_positions_by_ids(word_ids)
+
+        # Vacuum the database
+        with self.cursor_context() as cursor:
+            cursor.execute("VACUUM")
+
+    def delete_word_positions_by_ids(self, word_ids):
+        """
+        Deletes position records for a set of word_ids.
+
+        Args:
+            word_ids (set): The set of word_ids for which to delete position records.
+        """
+        word_ids_list = list(word_ids)
+        MAX_VARIABLES = (
+            999  # SQLite limit for the number of host parameters in a statement
+        )
+        for i in range(0, len(word_ids_list), MAX_VARIABLES):
+            chunk = word_ids_list[i : i + MAX_VARIABLES]
+            word_ids_tuple = tuple(chunk)
+
+            with self.cursor_context() as cursor:
+                query = "DELETE FROM Positions WHERE word_id IN ({})".format(
+                    ",".join("?" * len(word_ids_tuple))
+                )
+                cursor.execute(query, word_ids_tuple)
+
+    def __fetch_word_data(self) -> dict:
+        """
+        Fetches words and their positions from the database, organized by path,
+        and deletes the position records for each word after fetching.
+
+        Returns:
+            dict: A dictionary mapping paths to another dictionary, which maps words to their positions.
+        """
+        path_word_positions = {}
+        fetched_word_ids = set()
+
+        query = """
+            SELECT pa.path, w.word_id, w.word, p.position
+            FROM Words w
+            INNER JOIN Positions p ON w.word_id = p.word_id
+            INNER JOIN Paths pa ON p.path_id = pa.path_id
+            ORDER BY pa.path, w.word, p.position
+        """
+
+        with self.cursor_context(use_row_factory=True) as cursor:
+            cursor.execute(query)
+            for row in cursor:
+                path = row["path"]
+                word_id = row["word_id"]
+                word = row["word"]
+                position = row["position"]
+
+                if path not in path_word_positions:
+                    path_word_positions[path] = {}
+                if word not in path_word_positions[path]:
+                    path_word_positions[path][word] = []
+
+                path_word_positions[path][word].append(position)
+                fetched_word_ids.add(word_id)
+
+        # Delete position records for the fetched words
+        self.delete_word_positions_by_ids(fetched_word_ids)
+
+        return path_word_positions
+
+    def __delete_word_positions_by_ids(self, word_ids):
+        """
+        Deletes position records for a set of word_ids by splitting the set into
+        smaller chunks if necessary.
+
+        Args:
+            word_ids (set): The set of word_ids for which to delete position records.
+        """
+        MAX_VARIABLES = (
+            999  # SQLite limit for the number of host parameters in a statement
+        )
+        word_ids_list = list(word_ids)
+
+        # Split word_ids into smaller chunks
+        for i in range(0, len(word_ids_list), MAX_VARIABLES):
+            chunk = word_ids_list[i : i + MAX_VARIABLES]
+            word_ids_tuple = tuple(chunk)
+
+            with self.cursor_context() as cursor:
+                query = "DELETE FROM Positions WHERE word_id IN ({})".format(
+                    ",".join("?" * len(word_ids_tuple))
+                )
+                cursor.execute(query, word_ids_tuple)
 
     def get_word_id(self, word):
         """

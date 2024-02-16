@@ -10,70 +10,25 @@ worker_dir = Path(__file__).parent.parent
 nltk_data_path = worker_dir / "nltk_data"
 nltk.data.path.append(str(nltk_data_path))
 from nltk.tokenize import RegexpTokenizer
+from sys import intern
 
 
-def _find_all_words_positions(text, exclude_words):
-    """Index position of every word leveraging nltk RegexpTokenizer, excluding punctuation, words with numbers,
-    single characters, specified words, and stripping leading and trailing underscores.
-
-    Args:
-        text (str): Text to tokenize.
-        exclude_words (set): Set of words to exclude from adding to returned result.
-
-    Returns:
-        dictionary: Dictionary that maps a word to a list of offsets.
-    """
-    tokenizer = RegexpTokenizer(r"\w+(?:[-\']\w+)*")
-    words = tokenizer.tokenize(text)
-
-    word_dict = {}
-    offset = 0
-
-    for word in words:
-        # Strip leading and trailing underscores and trailing possessive 's
-        stripped_word = word.strip("_").rstrip("'s")
-        normalized_word = stripped_word.lower()
-
-        # Skip words in the exclusion list, words with digits, single characters, and blank words
-        if (
-            normalized_word in exclude_words
-            or not normalized_word.isalpha()
-            or len(normalized_word) <= 1
-        ):
-            offset += len(word)
-            continue
-
-        # Find the position of the cleaned word in the text
-        current_offset = text.find(stripped_word, offset)
-
-        # Check if the word was found and adjust the offset
-        if current_offset != -1:
-            word_dict.setdefault(normalized_word, []).append(current_offset)
-            offset = current_offset + len(word)
-        else:
-            offset += len(word)
-
-    return word_dict
-
-
-def find_all_words_positions(text, exclude_words):
-    """Index position of every word leveraging nltk RegexpTokenizer, excluding specified words.
+def find_all_words_positions(worker_indexer_model, text, exclude_words, path_id):
+    """Index position of every word leveraging nltk RegexpTokenizer, excluding specified words,
+    and inserts them into a database using WorkerIndexerModel.
 
     Args:
+        worker_indexer_model (WorkerIndexerModel): The WorkerIndexerModel instance for DB operations.
         text (str): Text to tokenize.
         exclude_words (set): Set of words to exclude from adding to returned result.
-
-    Returns:
-        dictionary: Dictionary that maps a word to a list of offsets.
+        path_id (int): The identifier of the path or text being processed.
     """
     tokenizer = RegexpTokenizer(r"\w+(?:[-\']\w+)*")
-    exclude_words = set(word.lower() for word in exclude_words)
-
-    word_dict = {}
+    exclude_words = set(intern(word.lower()) for word in exclude_words)
 
     for start, end in tokenizer.span_tokenize(text):
         word = text[start:end]
-        normalized_word = word.lower()
+        normalized_word = intern(word.lower())
 
         # Skip words in the exclusion list, words with digits, single characters, and blank words
         if (
@@ -83,6 +38,8 @@ def find_all_words_positions(text, exclude_words):
         ):
             continue
 
-        word_dict.setdefault(normalized_word, []).append(start)
+        # Insert the word into the Words table and get the word_id
+        word_id = worker_indexer_model.insert_word(normalized_word)
 
-    return word_dict
+        # Insert the position into the Positions table
+        worker_indexer_model.insert_word_position(word_id, path_id, start)

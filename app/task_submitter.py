@@ -2,6 +2,8 @@
 import ray
 import logging
 import os
+import bz2
+import json
 from typing import List, Dict, Tuple
 
 from app.task_generator import Task
@@ -20,9 +22,10 @@ class TaskSubmitter:
     Utilizes Ray to distribute and execute tasks across a cluster, and aggregates results.
     """
 
-    def __init__(self, enable_console_logging=None):
+    def __init__(self, model, enable_console_logging=None):
+        self.model = model
         if enable_console_logging is None:
-            self.enable_logging = True if "KRUNCHDEBUG" in os.environ else False
+            self.enable_console_logging = True if "KRUNCHDEBUG" in os.environ else False
         else:
             self.enable_console_logging = enable_console_logging
 
@@ -49,6 +52,11 @@ class TaskSubmitter:
         ]
 
         logging.debug(f"Number of futures: {len(futures)}")
-        searchResults = ray.get(futures)
+        searchResults_compressed = ray.get(futures)
+
+        # Decompress and deserialize searchResults
+        searchResults = [
+            json.loads(bz2.decompress(result)) for result in searchResults_compressed
+        ]
 
         return searchResults

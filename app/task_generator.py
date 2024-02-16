@@ -30,7 +30,7 @@ class TaskGenerator:
     A generator for creating batches of tasks to be processed for word searches.
 
     The TaskGenerator is responsible for dividing a large set of path records into smaller
-    batchesforming tasks that are ready for further processing.
+    batches forming tasks that are ready for further processing.
 
     Attributes:
         batch_size (int): The number of path records to include in each batch.

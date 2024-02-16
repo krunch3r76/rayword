@@ -176,6 +176,6 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
         paths_table, path_prefix=path_prefix, exclude_words=exclusions
     )
     word_search_results = word_searcher.perform_search()
-    return word_search_results.to_dict()
+    return word_search_results.to_compressed_json()
 
     # return perform_word_search(words_table, paths_table, path_prefix)

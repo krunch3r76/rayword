@@ -3,6 +3,8 @@
 # from collections import namedtuple
 import logging
 import json
+import bz2
+
 from dataclasses import dataclass, asdict
 
 from .model import WorkerIndexerModel
@@ -27,6 +29,16 @@ class WordSearchResults:
     def to_json(self):
         return json.dumps(asdict(self))
 
+    def to_compressed_json(self):
+        # Serialize the object to JSON and encode it to bytes
+        json_bytes = self.to_json().encode("utf-8")
+
+        # Compress the JSON bytes
+        compressed_json_bytes = bz2.compress(json_bytes)
+
+        # Return the compressed bytes
+        return compressed_json_bytes
+
     def to_dict(self):
         return asdict(self)
 
@@ -50,9 +62,9 @@ class WordSearcher:
         self.paths_table = paths_table
         self.path_prefix = path_prefix
         self.workerModel = WorkerIndexerModel(paths_table, path_prefix)
-        self.path_id_to_results = (
-            dict()
-        )  # maps path to a dictionary of word to list of offsets
+        # self.path_id_to_results = (
+        #     dict()
+        # )  # maps path to a dictionary of word to list of offsets
         self.paths_searched = []
         self.bad_path_ids = []
 
@@ -76,12 +88,16 @@ class WordSearcher:
         )
 
         search_results = WordSearchResults(
-            word_positions_by_paths=self.path_id_to_results,
+            word_positions_by_paths=self.path_id_to_results(),
             paths_searched=self.paths_searched,
             bad_paths=self.bad_path_ids,
         )
 
         return search_results
+
+    def path_id_to_results(self):
+        word_to_positions = self.workerModel.serialize_to_dict_or_compressed_json()
+        return word_to_positions
 
     def search_words_in_paths(self):
         """
@@ -91,18 +107,21 @@ class WordSearcher:
             self.paths_searched
             self.path_id_to_results
         """
-
+        self.workerModel.start_transaction()
         for path, path_id in self.workerModel.select_path_records(
             fields=["path", "path_id"]
         ):
             text, connection_timed_out = load_resource(path)
             if text:
                 self.paths_searched.append(path_id)
-                word_to_positions = find_all_words_positions(text, self.exclude_words)
-                self.path_id_to_results[path_id] = word_to_positions
+                find_all_words_positions(
+                    self.workerModel, text, self.exclude_words, path_id
+                )
+                # self.path_id_to_results[path_id] = word_to_positions
             elif not connection_timed_out:
                 self.bad_path_ids.append(path_id)
 
             if connection_timed_out:
                 logging.debug("connection timed out")
                 continue
+        self.workerModel.end_transaction()
