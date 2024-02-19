@@ -22,15 +22,15 @@ def create_tables(conn):
     # Additional table creation as needed
     ddls = [
         """CREATE TABLE IF NOT EXISTS Meta (
-    TextNumber INT,
-    Type TEXT,
-    Issued TEXT,
-    Title TEXT,
-    Language TEXT,
-    Authors TEXT,
-    Subjects TEXT,
-    LoCC TEXT,
-    Bookshelves TEXT
+    TextNumber INT NOT NULL,
+    Type TEXT NOT NULL,
+    Issued TEXT NOT NULL,
+    Title TEXT NOT NULL,
+    Language TEXT NOT NULL,
+    Authors TEXT NOT NULL,
+    Subjects TEXT NOT NULL,
+    LoCC TEXT NOT NULL,
+    Bookshelves TEXT NOT NULL
 )""",
     ]
     conn.commit()

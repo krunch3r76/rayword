@@ -46,20 +46,20 @@ def create_tables(conn, db_path, model):
     ddls = [
         """CREATE TABLE IF NOT EXISTS Paths (
             path_id INTEGER PRIMARY KEY,
-            path TEXT UNIQUE,
-            text_number INTEGER UNIQUE,
+            path TEXT UNIQUE NOT NULL,
+            text_number INTEGER UNIQUE NOT NULL,
             is_unreachable INTEGER DEFAULT 0
         )""",
         """CREATE TABLE IF NOT EXISTS WordIndices (
             word_indices_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            word TEXT,
-            word_index INTEGER,
-            text_number INTEGER,
+            word TEXT NOT NULL,
+            word_index INTEGER NOT NULL,
+            text_number INTEGER NOT NULL,
             UNIQUE (word, word_index, text_number)
         )""",
         """CREATE TABLE IF NOT EXISTS SearchHistory (
             search_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            text_number INTEGER,
+            text_number INTEGER NOT NULL,
             FOREIGN KEY (text_number) REFERENCES Paths(text_number),
             UNIQUE (text_number)
         )""",

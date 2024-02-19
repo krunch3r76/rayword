@@ -250,19 +250,66 @@ class WordIndexerModel:
             self.words_db_connection.commit()
         return len(wordIndices_list)
 
-    def lookup_text_number_by_path_id(self, path_id):
+    def lookup_text_number_by_path(self, path):
         """
-        Retrieves the text_number associated with a given path_id.
+        Retrieves the text_number associated with a given path string.
 
         Args:
-            path_id (int): The path_id for which to find the corresponding text_number.
+            path (str): The path string for which to find the corresponding text_number.
 
         Returns:
-            int: The text_number associated with the given path_id, or None if not found.
+            int: The text_number associated with the given path string, or None if not found.
         """
+        if not isinstance(path, str):
+            raise Exception("Invalid argument, path is not a string")
+
         with self.cursor_context(use_row_factory=True) as cursor:
-            cursor.execute(
-                "SELECT text_number FROM Paths WHERE path_id = ?", (path_id,)
-            )
+            cursor.execute("SELECT text_number FROM Paths WHERE path = ?", (path,))
             result = cursor.fetchone()
-            return result["text_number"] if result else None
+            if result is None:
+                logging.critical(f"no text number corresponding to path {path}")
+                cursor.execute("SELECT * FROM Paths")
+                all_rows = cursor.fetchall()
+
+                with open("/tmp/dump", "w") as f:
+                    for row in all_rows:
+                        f.write(
+                            str(dict(row)) + "\n"
+                        )  # Convert each row to string and write to file
+
+                raise Exception("fatal error")
+            text_number = result["text_number"]
+            return text_number
+
+    # def lookup_text_number_by_path_id(self, path_id):
+    #     """
+    #     Retrieves the text_number associated with a given path_id.
+
+    #     Args:
+    #         path_id (int): The path_id for which to find the corresponding text_number.
+
+    #     Returns:
+    #         int: The text_number associated with the given path_id, or None if not found.
+    #     """
+    #     if not isinstance(path_id, int):
+    #         raise Exception("Invalid argument, path_id is not a number")
+
+    #     with self.cursor_context(use_row_factory=True) as cursor:
+    #         cursor.execute(
+    #             "SELECT text_number FROM Paths WHERE path_id = ?", (path_id,)
+    #         )
+    #         result = cursor.fetchone()
+    #         if result is None:
+    #             logging.critical(f"no text number corresponding to path_id {path_id}")
+    #             cursor.execute("SELECT * FROM Paths")
+    #             all_rows = cursor.fetchall()
+
+    #             with open("/tmp/dump", "w") as f:
+    #                 for row in all_rows:
+    #                     f.write(
+    #                         str(dict(row)) + "\n"
+    #                     )  # Convert each row to string and write to file
+
+    #             raise Exception("fatal error")
+    #         text_number = result["text_number"]
+    #         return text_number

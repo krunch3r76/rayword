@@ -37,7 +37,7 @@ provider:
         outbound_urls: ["https://pypi.dev.golem.network", "http://aleph.gutenberg.org"]
 
         # Minimal values of parameters offered by Golem provider 
-        min_mem_gib: 8 
+        min_mem_gib: 6 
         min_cpu_threads: 1
         min_storage_gib: 12
 
@@ -53,14 +53,14 @@ provider:
         
           # Estimated expected load and duration for worker that tells budget control to pick the least expensive Golem provider offers first.
           # If not provided, offers will be picked at random.
-          cpu_load: 0.8
-          duration_hours: 0.5 # 30 minutes
+          cpu_load: 400.0
+          duration_hours: 0.2
 
           # Amount of GLMs for expected usage which Golem provider offer will be rejected if exceeded.
-          max_cost: 11.5
+          max_cost: 50
 
         # Amount of GLMs for worker initiation which Golem provider offer will be rejected if exceeded.
-        max_start_price: 10.5
+        max_start_price: 0.1
 
         # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
         max_cpu_per_hour_price: 110.5

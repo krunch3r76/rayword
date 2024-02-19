@@ -9,19 +9,19 @@ def create_tables(conn):
     ddls = [
         """CREATE TABLE IF NOT EXISTS Paths (
             path_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            path TEXT UNIQUE,
-            text_number INTEGER UNIQUE,
+            path TEXT UNIQUE NOT NULL,
+            text_number INTEGER UNIQUE NOT NULL,
             is_unreachable INTEGER -- not used here
         )""",
         """CREATE TABLE IF NOT EXISTS Words (
             word_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            word TEXT UNIQUE
+            word TEXT UNIQUE NOT NULL
         )""",
         """CREATE TABLE IF NOT EXISTS Positions (
             position_id INTEGER PRIMARY KEY AUTOINCREMENT,
             word_id INTEGER,
             path_id INTEGER,
-            position INTEGER,
+            position INTEGER NOT NULL,
             FOREIGN KEY (word_id) REFERENCES Words(word_id),
             FOREIGN KEY (path_id) REFERENCES Paths(path_id)
         )""",

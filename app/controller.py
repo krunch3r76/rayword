@@ -82,9 +82,9 @@ class Controller:
         for searchResult in searchResults:
             search_histories_aggregated.extend(searchResult["paths_searched"])
             word_positions_by_paths = searchResult["word_positions_by_paths"]
-            for pathid, word_positions in word_positions_by_paths.items():
+            for path, word_positions in word_positions_by_paths.items():
                 # lookup textnumber
-                text_number = self.model.lookup_text_number_by_path_id(pathid)
+                text_number = self.model.lookup_text_number_by_path(path)
                 for word, positions in word_positions.items():
                     for position in positions:
                         wordIndex = {
