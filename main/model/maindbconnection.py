@@ -88,7 +88,7 @@ def create_tables(conn, db_path, model):
     conn.commit()
 
     # Check for an existing version
-    current_version = "4"
+    current_version = "5"
     description = "Add History table"
 
     try:
@@ -106,10 +106,8 @@ def create_tables(conn, db_path, model):
             )
         else:
             internal_version = result[0]
-            if internal_version == "1" or internal_version == "2":
-                remove_db_file(conn, db_path)
-                return False
             if internal_version != current_version:
+                print("Discarding old database")
                 remove_db_file(conn, db_path)
                 return False
 

@@ -47,7 +47,7 @@ def create_tables(conn, db_path, model):
         """CREATE TABLE IF NOT EXISTS Paths (
             path_id INTEGER PRIMARY KEY,
             path TEXT UNIQUE NOT NULL,
-            text_number INTEGER UNIQUE NOT NULL,
+            text_number INTEGER NOT NULL,
             is_unreachable INTEGER DEFAULT 0
         )""",
         """CREATE TABLE IF NOT EXISTS WordIndices (

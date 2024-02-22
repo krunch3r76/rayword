@@ -66,6 +66,17 @@ class MainModel:
                 # Log or handle the exception
                 pass
 
+    def lookup_path_for_text_number(self, text_number):
+        """get the path field on Paths for a given text number"""
+        with self.CursorContextManager(self, use_row_factory=False) as cursor:
+            row = cursor.execute(
+                "SELECT path FROM paths_db.Paths WHERE text_number = ?", (text_number,)
+            ).fetchone()
+            if row is not None:
+                return row[0]
+            else:
+                return None
+
     def insert_search_histories(self, text_numbers, commit=False):
         """Insert text numbers into SearchHistory table.
 
@@ -92,6 +103,16 @@ class MainModel:
             # Insert each path_id into UnreachablePaths
             cursor.executemany(insert_query, [(path,) for path in path_strings])
             self.db_connection.commit()
+
+    def lookup_word_by_word_id(self, word_id):
+        """Return the word corresponding to the word_id"""
+        with self.CursorContextManager(self, use_row_factory=False) as cursor:
+            row = cursor.execute(
+                "SELECT word from Words WHERE word_id = ?", (word_id,)
+            ).fetchone()
+            if row is None:
+                raise Exception("no word for word id")
+            return row[0]
 
     def get_word_id(self, word):
         """Return the word_id for a given word from the Words table."""
@@ -212,3 +233,102 @@ class MainModel:
                 return json.dumps(results)
 
             return results
+
+    def _build_word_to_word_id_dict(self, wordlist):
+        word_to_word_id = dict()
+        with self.CursorContextManager(self, use_row_factory=True) as cursor:
+            for word in wordlist:
+                row = cursor.execute(
+                    "SELECT word_id FROM Words where word = ?", (word,)
+                ).fetchone()
+                if row is None:
+                    # add word
+                    word_id = self.insert_word(word, commit=True)
+                else:
+                    word_id = row[0]
+
+                word_to_word_id[word] = word_id
+        return word_to_word_id
+
+    def _build_word_id_to_count_dict(self, word_to_word_id):
+        def __count_word_indices_records_for_word_id(word_id):
+            with self.CursorContextManager(self, use_row_factory=True) as cursor:
+                count = cursor.execute(
+                    "SELECT COUNT(*) from WordIndices where word_id = ?", (word_id,)
+                ).fetchone()[0]
+                return count
+
+        word_id_list = [word_id for word_id in word_to_word_id.values()]
+        word_id_to_indices_count = dict()
+        for word_id in word_id_list:
+            indices_count_for_word_id = __count_word_indices_records_for_word_id(
+                word_id
+            )
+            word_id_to_indices_count[word_id] = indices_count_for_word_id
+        return word_id_to_indices_count
+
+    def count_instances_of_words(self, wordlist, primary_word):
+        word_to_word_id = self._build_word_to_word_id_dict(wordlist)
+        word_id_to_count = self._build_word_id_to_count_dict(word_to_word_id)
+        primary_word_count = word_id_to_count[word_to_word_id[primary_word]]
+        total_count = sum([count for count in word_id_to_count.values()])
+        non_primary_word_count = total_count - primary_word_count
+        return primary_word_count, non_primary_word_count
+
+    def random_word_index_record(
+        self, wordlist, primary_word, exclude_ids=None, prefer_primary=True
+    ):
+        """get a random WordIndex record corresponding to the word with optional preference
+        to the primary word or return None"""
+
+        def __randomly_select_index_record_given_word_id(word_id, exclude_ids):
+            with self.CursorContextManager(self, use_row_factory=True) as cursor:
+                records = cursor.execute(
+                    "SELECT * FROM WordIndices WHERE word_id = ? ORDER BY RANDOM()",
+                    (word_id,),
+                ).fetchall()
+                wordIndexRecord = None
+                for record in records:
+                    wordIndexRecord_candidate = dict(record)
+                    if wordIndexRecord_candidate["word_indices_id"] in exclude_ids:
+                        continue
+                    wordIndexRecord = wordIndexRecord_candidate
+                    break
+
+                return wordIndexRecord
+
+        if exclude_ids is None:
+            exclude_ids = []
+
+        word_to_word_id = self._build_word_to_word_id_dict(wordlist)
+        word_id_to_count = self._build_word_id_to_count_dict(word_to_word_id)
+        logging.debug(word_id_to_count)
+        primary_word_count = 0
+        word_id_to_search_for = None
+        random_record = None
+        if prefer_primary:
+            primary_word_id = word_to_word_id[primary_word]
+            primary_word_count = word_id_to_count[primary_word_id]
+            if primary_word_count > 0:  # review
+                word_id_to_search_for = primary_word_id
+                random_record = __randomly_select_index_record_given_word_id(
+                    word_id_to_search_for, exclude_ids=exclude_ids
+                )
+
+        excluded_count = 0
+        if random_record is None:
+            excluded_count = primary_word_count
+        max_count = sum([count for count in word_id_to_count.values()])
+        while excluded_count < max_count:
+            for word_id, count in word_id_to_count.items():
+                if count > 0:
+                    word_id_to_search_for = word_id
+                random_record = __randomly_select_index_record_given_word_id(
+                    word_id_to_search_for, exclude_ids=exclude_ids
+                )
+                if random_record is not None:
+                    return random_record
+                else:
+                    excluded_count += 1
+
+        return random_record
