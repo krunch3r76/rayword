@@ -23,7 +23,7 @@ provider:
     #payment_network: "polygon"
 
     # Maximum amount of GLMs that's going to be spent for the whole cluster
-    total_budget: 5
+    total_budget: 50
 
     # Common parameters for all node types. Can be overriden in available_node_types
     node_config:
@@ -58,16 +58,16 @@ provider:
           duration_hours: 0.2
 
           # Amount of GLMs for expected usage which Golem provider offer will be rejected if exceeded.
-          max_cost: 11.5
+          max_cost: 51.5
 
         # Amount of GLMs for worker initiation which Golem provider offer will be rejected if exceeded.
         max_start_price: 5.0
 
         # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
-        max_cpu_per_hour_price: 5.0
+        max_cpu_per_hour_price: 50.0
 
         # Amount of GLMs for each hour that worker runs which Golem provider offer will be rejected if exceeded.
-        max_env_per_hour_price: 5.0
+        max_env_per_hour_price: 50.0
 
         # If not provided payment will be sent only after cluster is stopped. Note: cluster will then run for maximum of 8 hours
         # Required for long running clusters
