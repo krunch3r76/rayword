@@ -87,8 +87,11 @@ if __name__ == "__main__":
         path_limit, path_to_db=PATH_TO_MAIN_DB, path_to_targets_db=PATH_TO_TARGETS_DB
     )
 
-    print(f"total number of indexable texts: {total_texts}")
-    print(f"total number of texts not yet indexed: {unsearched_count}")
+    print(f"{unsearched_count} texts out of {total_texts} have not been indexed")
+    number_of_texts_to_search_on_this_run = (
+        path_limit if path_limit >= unsearched_count else unsearched_count
+    )
+    print(f"attempting to index {path_limit} texts on ray")
     logging.debug(
         f"selecting at most a total of {path_limit} paths to search"
         + f" based on max workers of {max_workers} and batch size of {batch_size}"

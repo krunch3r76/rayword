@@ -167,12 +167,24 @@ class MainModel:
         """
         cursor = self.db_connection.cursor()
 
+        number_of_unique_text_numbers_before_addition = cursor.execute(
+            "SELECT COUNT(DISTINCT text_number) FROM paths_db.Paths"
+        ).fetchone()[0]
         for path, text_number in paths_and_text_numbers:
             cursor.execute(
                 "INSERT OR IGNORE INTO paths_db.Paths (path, text_number) VALUES (?, ?)",
                 (path, text_number),
             )
         self.db_connection.commit()
+
+        number_of_unique_text_numbers_after_addition = cursor.execute(
+            "SELECT COUNT(DISTINCT text_number) FROM paths_db.Paths"
+        ).fetchone()[0]
+
+        return (
+            number_of_unique_text_numbers_after_addition
+            - number_of_unique_text_numbers_before_addition
+        )
 
     def get_total_texts_and_unsearched_counts(self):
         """Return the total number of texts and the number of unsearched texts (that are reachable)."""

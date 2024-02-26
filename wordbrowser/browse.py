@@ -54,40 +54,29 @@ def construct_url_from_path(path, path_prefix="http://aleph.gutenberg.org"):
     return path_prefix + path
 
 
-def extract_sentence_with_context(text, word_offset, context_size=1000):
+def extract_sentence_with_context(text, word_offset):
     """
-    Extracts the sentence containing the word at the given offset by tokenizing
-    a larger context around the word.
+    Extracts the sentence containing the word at the given offset.
 
     Args:
         text (str): The full text.
         word_offset (int): The character offset of the word in the text.
-        context_size (int): The number of characters to include in the context.
 
     Returns:
-        str: The sentence containing the word.
+        str: The sentence containing the word, or 'Sentence not found.' if not found.
     """
-    # Ensure context doesn't start or end mid-sentence
-    start = max(0, word_offset - context_size)
-    end = min(len(text), word_offset + context_size)
+    sentences = sent_tokenize(text)
+    current_index = 0
 
-    # Expand start and end to nearest sentence boundaries
-    while start > 0 and text[start] not in ".!?":
-        start -= 1
-    while end < len(text) and text[end] not in ".!?":
-        end += 1
-
-    # Extract context and tokenize it into sentences
-    context = text[start:end]
-    sentences = sent_tokenize(context)
-
-    # Find the sentence that includes the word offset
-    offset_in_context = word_offset - start
-    char_count = 0
     for sentence in sentences:
-        char_count += len(sentence)
-        if char_count >= offset_in_context:
+        sentence_start = text.find(sentence, current_index)
+        sentence_end = sentence_start + len(sentence)
+
+        # Check if the word offset is within the current sentence
+        if sentence_start <= word_offset < sentence_end:
             return sentence
+
+        current_index = sentence_end
 
     return "Sentence not found."
 
@@ -171,4 +160,4 @@ if __name__ == "__main__":
                 wordlist, args.word, exclusion_ids
             )
         else:
-            input("that's all, enter to exit")
+            input("that's all folks: no more quotes. enter to exit")

@@ -33,7 +33,7 @@ def create_tables(conn, db_path):
         """CREATE TABLE IF NOT EXISTS Paths (
             path_id INTEGER PRIMARY KEY AUTOINCREMENT,
             path TEXT UNIQUE,
-            text_number INTEGER UNIQUE
+            text_number INTEGER
         )""",
         """CREATE TABLE IF NOT EXISTS schema_version (
             version VARCHAR(50) PRIMARY KEY,
@@ -55,7 +55,7 @@ def create_tables(conn, db_path):
     conn.commit()
 
     # Check for an existing version
-    current_version = "1"
+    current_version = "2"
     description = "first"
 
     try:
@@ -73,12 +73,10 @@ def create_tables(conn, db_path):
             )
         else:
             internal_version = result[0]
-            # if internal_version == "1" or internal_version == "2":
-            #     remove_db_file(conn, db_path)
-            #     return False
-            # if internal_version != current_version:
-            #     remove_db_file(conn, db_path)
-            #     return False
+            if internal_version != current_version:
+                print("Discarding old paths database")
+                remove_db_file(conn, db_path)
+                return False
 
         conn.commit()
     except sqlite3.OperationalError as e:

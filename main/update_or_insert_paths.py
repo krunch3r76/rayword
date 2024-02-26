@@ -24,7 +24,10 @@ def update_or_insert_paths():
             (resource.get_path(), Path(resource.get_path()).parent.name)
             for resource in resources
         ]
-    mainModel.update_or_insert_paths(paths_and_text_numbers)
+    print("checking data/targets.txt to add any new targets...")
+    number_of_new_texts = mainModel.update_or_insert_paths(paths_and_text_numbers)
+    if number_of_new_texts > 0:
+        print(f"added paths to {number_of_new_texts} unique texts to internal model")
 
 
 if __name__ == "__main__":
