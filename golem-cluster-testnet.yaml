@@ -25,6 +25,7 @@ provider:
     # Maximum amount of GLMs that's going to be spent for the whole cluster
     total_budget: 5
 
+    # Common parameters for all node types. Can be overriden in available_node_types
     node_config:
       # Parameters for golem demands (same for head and workers)
       demand:
@@ -37,7 +38,7 @@ provider:
         outbound_urls: ["https://pypi.dev.golem.network", "http://aleph.gutenberg.org"]
 
         # Minimal values of parameters offered by Golem provider 
-        min_mem_gib: 6 
+        min_mem_gib: 6
         min_cpu_threads: 1
         min_storage_gib: 12
 
@@ -57,16 +58,16 @@ provider:
           duration_hours: 0.2
 
           # Amount of GLMs for expected usage which Golem provider offer will be rejected if exceeded.
-          max_cost: 50
+          max_cost: 11.5
 
         # Amount of GLMs for worker initiation which Golem provider offer will be rejected if exceeded.
-        max_start_price: 0.1
+        max_start_price: 5.0
 
         # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
-        max_cpu_per_hour_price: 110.5
+        max_cpu_per_hour_price: 5.0
 
         # Amount of GLMs for each hour that worker runs which Golem provider offer will be rejected if exceeded.
-        max_env_per_hour_price: 110.5
+        max_env_per_hour_price: 5.0
 
         # If not provided payment will be sent only after cluster is stopped. Note: cluster will then run for maximum of 8 hours
         # Required for long running clusters
@@ -77,7 +78,6 @@ provider:
 # The files or directories to copy to the head and worker nodes
 # Remote workdir is /root/
 file_mounts: {
-  ./golem-cluster.yaml: ./golem-cluster.yaml,
   ./app: ./app,
   ./constants.py: ./constants.py,
   ./rayword.py: ./rayword.py
@@ -86,6 +86,11 @@ file_mounts: {
   # "./relative/path/dir/": ".",
   # "./relative/path/file.txt": "./file.txt"
 }
+
+# Satisfy checks to disable warning about legacy fields at `ray up`.
+# This will be removed by ray-on-golem on the fly.
+head_node: True
+worker_nodes: True
 
 # Tells the autoscaler the allowed node types and the resources they provide
 available_node_types:
@@ -99,7 +104,12 @@ available_node_types:
     # The node type's CPU and GPU resources
     resources: {}
 
-    node_config: {} # TODO: Demand description here
+    # Additional parameters specific for this node type added on top of node_config from provider.parameters.node_config
+    node_config: {}
+    #node_config:
+    #  demand:
+    #    min_mem_gib: 10
+
   ray.worker.default:
     min_workers: 1
     max_workers: 10
@@ -107,10 +117,10 @@ available_node_types:
     node_config: {}
 
 # List of commands that will be run to initialize the nodes (before `setup_commands`)
+initialization_commands: ["mkdir -p /root/data"]
 #initialization_commands: [
 #  "pip install endplay",
 #]
-initialization_commands: ["mkdir -p /root/data"]
 
 # List of shell commands to run to set up nodes
 setup_commands: []
