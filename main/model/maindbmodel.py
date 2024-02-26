@@ -314,7 +314,7 @@ class MainModel:
 
         word_to_word_id = self._build_word_to_word_id_dict(wordlist)
         word_id_to_count = self._build_word_id_to_count_dict(word_to_word_id)
-        logging.debug(word_id_to_count)
+        # logging.debug(word_id_to_count)
         primary_word_count = 0
         word_id_to_search_for = None
         random_record = None
