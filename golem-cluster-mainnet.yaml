@@ -63,10 +63,10 @@ provider:
         max_start_price: 0.1
 
         # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
-        max_cpu_per_hour_price: 110.5
+        max_cpu_per_hour_price: 0.05
 
         # Amount of GLMs for each hour that worker runs which Golem provider offer will be rejected if exceeded.
-        max_env_per_hour_price: 110.5
+        max_env_per_hour_price: 0.05
 
         # If not provided payment will be sent only after cluster is stopped. Note: cluster will then run for maximum of 8 hours
         # Required for long running clusters

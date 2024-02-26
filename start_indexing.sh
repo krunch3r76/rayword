@@ -8,4 +8,5 @@ ray rsync-up golem-cluster.yaml ./app/input/ /root/app/input/
 ray submit golem-cluster.yaml ./rayword.py --enable-console-logging
 ray rsync-down golem-cluster.yaml /root/app/output/ ./app/output
 main/import_ray_results.py
+ray down golem-cluster.yaml
 
