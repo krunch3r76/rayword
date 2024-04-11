@@ -18,6 +18,8 @@ from nltk.tokenize import sent_tokenize
 nltk_data_path = project_root_dir / "app" / "worker" / "nltk_data"
 nltk.data.path.append(str(nltk_data_path))
 
+IP_TO_GUTENBERG_TEXTS = "69.55.231.8"
+
 
 def find_word_forms(word):
     """leverage nltk (if available) to find all the forms of the word being searched
@@ -46,7 +48,7 @@ def find_word_forms(word):
         return list(combined_set)
 
 
-def construct_url_from_path(path, path_prefix="http://aleph.gutenberg.org"):
+def construct_url_from_path(path, path_prefix=IP_TO_GUTENBERG_TEXTS):
     import os
 
     if "RAYWORD_URL_PREFIX" in os.environ:

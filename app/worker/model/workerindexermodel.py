@@ -16,6 +16,8 @@ import bz2
 from typing import Union
 from .workerdbconnection import create_worker_db_connection
 
+IP_TO_GUTENBERG_TEXTS = "69.55.231.8"
+
 
 class WorkerIndexerModel:
     """
@@ -33,7 +35,7 @@ class WorkerIndexerModel:
     def __init__(
         self,
         paths_table_dict,
-        path_prefix="http://aleph.gutenberg.org",
+        path_prefix=IP_TO_GUTENBERG_TEXTS,
     ):
         """
         Args:
@@ -44,7 +46,7 @@ class WorkerIndexerModel:
 
         # Guarantee a path_prefix
         if path_prefix is None:
-            self.path_prefix = "http://aleph.gutenberg.org"
+            self.path_prefix = IP_TO_GUTENBERG_TEXTS
         else:
             self.path_prefix = path_prefix
 
