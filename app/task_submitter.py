@@ -11,7 +11,7 @@ from app.worker.execute_remote_word_search import execute_remote_word_search
 
 # from app.worker.wordsearch import WordSearcher
 
-runtime_env = {"pip": ["nltk==3.8.1", "requests"]}
+runtime_env = {"pip": ["requests"]}
 ray.init(runtime_env=runtime_env)
 
 
