@@ -117,7 +117,7 @@ available_node_types:
     node_config: {}
 
 # List of commands that will be run to initialize the nodes (before `setup_commands`)
-initialization_commands: ["mkdir -p /root/data"]
+initialization_commands: ["mkdir -p /root/data", "pip install nltk", "pip install upgrade nltk"]
 #initialization_commands: [
 #  "pip install endplay",
 #]

@@ -45,35 +45,35 @@ provider:
         # Maximal values of parameters offered by Golem provider
         max_cpu_threads: null
 
-      budget_control:
-        per_cpu_expected_usage:
-          # Per cpu expected cost is calculated as a sum of:
-          # - start_price / cpu_count
-          # - env_per_hour_price * duration_hours / cpu_count
-          # - cpu_per_hour_price * duration_hours * cpu_load 
+      # budget_control:
+      #   per_cpu_expected_usage:
+      #     # Per cpu expected cost is calculated as a sum of:
+      #     # - start_price / cpu_count
+      #     # - env_per_hour_price * duration_hours / cpu_count
+      #     # - cpu_per_hour_price * duration_hours * cpu_load 
         
-          # Estimated expected load and duration for worker that tells budget control to pick the least expensive Golem provider offers first.
-          # If not provided, offers will be picked at random.
-          cpu_load: 400.0
-          duration_hours: 0.2
+      #     # Estimated expected load and duration for worker that tells budget control to pick the least expensive Golem provider offers first.
+      #     # If not provided, offers will be picked at random.
+      #     cpu_load: 400.0
+      #     duration_hours: 0.2
 
-          # Amount of GLMs for expected usage which Golem provider offer will be rejected if exceeded.
-          max_cost: 51.5
+      #     # Amount of GLMs for expected usage which Golem provider offer will be rejected if exceeded.
+      #     max_cost: 51.5
 
-        # Amount of GLMs for worker initiation which Golem provider offer will be rejected if exceeded.
-        max_start_price: 5.0
+      #   # Amount of GLMs for worker initiation which Golem provider offer will be rejected if exceeded.
+      #   max_start_price: 5.0
 
-        # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
-        max_cpu_per_hour_price: 50.0
+      #   # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
+      #   max_cpu_per_hour_price: 50.0
 
-        # Amount of GLMs for each hour that worker runs which Golem provider offer will be rejected if exceeded.
-        max_env_per_hour_price: 50.0
+      #   # Amount of GLMs for each hour that worker runs which Golem provider offer will be rejected if exceeded.
+      #   max_env_per_hour_price: 50.0
 
-        # If not provided payment will be sent only after cluster is stopped. Note: cluster will then run for maximum of 8 hours
-        # Required for long running clusters
-        payment_interval_hours:
-          minimal: 1
-          optimal: 12 # optional defaults to `minimal`
+      #   # If not provided payment will be sent only after cluster is stopped. Note: cluster will then run for maximum of 8 hours
+      #   # Required for long running clusters
+      #   payment_interval_hours:
+      #     minimal: 1
+      #     optimal: 12 # optional defaults to `minimal`
 
 # The files or directories to copy to the head and worker nodes
 # Remote workdir is /root/
