@@ -1,3 +1,4 @@
+# windows.py
 import curses
 
 
@@ -107,7 +108,10 @@ class WrappedPad:
         """Refresh the pad display."""
         self.pad.refresh(pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol)
 
-    def move(self, line):
+    def move(self, y, x):
+        self.pad.move(y, x)
+
+    def movetoline(self, line):
         """Move the cursor to a specific line."""
         self.line = line
 

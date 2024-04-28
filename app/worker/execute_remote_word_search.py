@@ -2,6 +2,10 @@ import ray
 import logging
 
 
+# runtime_env = {"pip": ["requests", "nltk"]}
+# ray.init(runtime_env=runtime_env)
+
+
 @ray.remote
 def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=False):
     """

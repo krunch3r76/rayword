@@ -32,11 +32,7 @@ class WorkerIndexerModel:
 
     """
 
-    def __init__(
-        self,
-        paths_table_dict,
-        path_prefix=IP_TO_GUTENBERG_TEXTS,
-    ):
+    def __init__(self, paths_table_dict, path_prefix=None):
         """
         Args:
             words_table_dict (dict): Dictionary containing word records to be inserted into the Words table.
@@ -46,7 +42,7 @@ class WorkerIndexerModel:
 
         # Guarantee a path_prefix
         if path_prefix is None:
-            self.path_prefix = IP_TO_GUTENBERG_TEXTS
+            self.path_prefix = f"http://{IP_TO_GUTENBERG_TEXTS}"
         else:
             self.path_prefix = path_prefix
 

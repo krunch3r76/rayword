@@ -77,7 +77,6 @@ if __name__ == "__main__":
     with open(output_dir / "batch_size_config.json", "w") as f:
         json.dump(args_dict, f, indent=4)
 
-    # Continue with your existing logic
     PATH_TO_MAIN_DB = Path("./data/main.db").absolute()
     PATH_TO_TARGETS_DB = Path("./data/paths.db").absolute()
 

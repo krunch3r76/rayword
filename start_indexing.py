@@ -9,11 +9,13 @@ import threading
 from queue import Queue, Empty
 
 commands = [
+    "echo 'Hello, worlds!'",
     "rm -rf app/output/*",
     "python3 main/update_or_insert_paths.py",
     "python3 main/prepare_unsearched_paths_json.py golem-cluster.yaml --batch-size 100",
-    # "stdbuf -o0 'ray up golem-cluster.yaml --yes'",
-    "unbuffer ray up golem-cluster.yaml --yes",
+    # "stdbuf -oL -eL ray up golem-cluster.yaml --yes --redirect-command-output --use-normal-shells",
+    # "./run_ray_up.sh golem-cluster.yaml --yes --redirect-command-output --use-normal-shells 2>&1",
+    "./run_ray_up.sh golem-cluster.yaml --yes",
     "ray rsync-up golem-cluster.yaml ./app/input/ /root/app/input/",
     "ray submit golem-cluster.yaml ./rayword.py --enable-console-logging",
     "ray rsync-down golem-cluster.yaml /root/app/output/ ./app/output",
@@ -26,6 +28,9 @@ import curses
 import re
 import os
 import logging
+import subprocess
+import signal
+import socket
 
 # Constants
 CMD_WINDOW_HEIGHT = 2
@@ -33,117 +38,98 @@ CMD_WINDOW_HEIGHT = 2
 
 # Set up logging
 logging.basicConfig(
-    filename="debug_log.txt",
+    filename="debug.log",
+    filemode="w",
     level=logging.DEBUG,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+update_event = asyncio.Event()
 
-async def run_command(command, pad, pad_line, cmd_window):
-    args = command.split()
-    proc = await asyncio.create_subprocess_exec(
-        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+
+async def run_command(command, pad, pad_line):
+    # Start the subprocess
+    proc = await asyncio.create_subprocess_shell(
+        command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
 
-    line_buffer = ""
-    try:
-        while True:
-            data = await proc.stdout.read(1024)
-            if data:
-                text = data.decode("utf-8", errors="ignore")
-                logging.debug(f"Data read: {text}")
-                for char in text:
-                    if char == "\n":
-                        if line_buffer:
-                            pad_line[0] += 1
-                            pad.move(pad_line[0], 0)
-                            segments = parse_ansi_sequences(line_buffer)
-                            for text, attr in segments:
-                                pad.addstr(pad_line[0], pad.getyx()[1], text, attr)
-                            line_buffer = ""
-                    else:
-                        line_buffer += char
-            else:
-                if proc.stdout.at_eof():
-                    logging.debug("End of file reached.")
-                    if line_buffer:  # Handle any remaining buffer
-                        pad_line[0] += 1
-                        pad.move(pad_line[0], 0)
-                        segments = parse_ansi_sequences(line_buffer)
-                        for text, attr in segments:
-                            pad.addstr(pad_line[0], pad.getyx()[1], text, attr)
-                    break
-                else:
-                    logging.debug("No data read, but not at EOF.")
+    # Read stdout and stderr concurrently
+    await asyncio.gather(
+        read_stream(proc.stdout, pad, pad_line), read_stream(proc.stderr, pad, pad_line)
+    )
 
-            if proc.returncode is not None:
-                logging.debug(f"Process exited with returncode {proc.returncode}.")
-                break
-            await asyncio.sleep(0.1)
+    # Wait for the process to finish
+    return await proc.wait()
 
-    finally:
-        # Ensure cleanup
-        await proc.communicate()
-        logging.debug("Process communicate completed.")
 
-        # Ensure any remaining text in the buffer is processed
-        if line_buffer:
-            pad_line[0] += 1
-            pad.move(pad_line[0], 0)
-            segments = parse_ansi_sequences(line_buffer)
-            for text, attr in segments:
-                pad.addstr(pad_line[0], pad.getyx()[1], text, attr)
+async def read_stream(stream, pad, pad_line):
+    while True:
+        line = await stream.readline()
+        if line:
+            line = line.decode("utf-8").rstrip()
+            logging.debug(line)
+            await process_data(line, pad, pad_line)
+        else:
+            break  # Exit the loop when no more data is available
+
+
+async def process_data(text, pad, pad_line):
+    lines = text.split("\n")
+    for line in lines:
+        pad_line[0] += 1
+        pad.move(pad_line[0], 0)
+        segments = parse_ansi_sequences(line)
+        for txt, attr in segments:
+            pad.addstr(pad_line[0], pad.getyx()[1], txt, attr)
+            update_event.set()
+
+    # Instead of refreshing here, just signal that an update is needed
 
 
 async def handle_user_input_and_auto_scroll(stdscr, pad, pad_line, exit_event):
-    """Handle user input to scroll the pad display and auto-scroll until 'q' is pressed."""
     current_line = 0
-    auto_scroll_active = True  # Start with auto-scrolling enabled
-
-    stdscr.nodelay(True)  # Set getch to non-blocking
+    auto_scroll_active = (
+        True  # This flag is used to determine if the pad should auto-scroll
+    )
+    stdscr.nodelay(True)  # Non-blocking input
 
     try:
-        while True:
+        while not exit_event.is_set():
             ch = stdscr.getch()
             if ch == curses.KEY_DOWN:
                 if current_line < pad_line[0] - curses.LINES + CMD_WINDOW_HEIGHT + 1:
                     current_line += 1
-                    auto_scroll_active = (
-                        False  # User manually scrolled, stop auto-scrolling
-                    )
-                else:
-                    # Already at the bottom, ensure auto-scrolling is active
-                    auto_scroll_active = True
+                    auto_scroll_active = False
             elif ch == curses.KEY_UP:
                 if current_line > 0:
                     current_line -= 1
-                    auto_scroll_active = (
-                        False  # User manually scrolled, stop auto-scrolling
-                    )
+                    auto_scroll_active = False
             elif ch == ord("q"):
-                exit_event.set()  # Set the exit event to signal the main loop to terminate
-                break  # Exit the loop immediately
-            elif ch == -1:  # No input
-                # Auto-scroll to the bottom if new content is added and auto-scroll is active
-                if auto_scroll_active:
-                    current_line = max(
-                        0, pad_line[0] - (curses.LINES - (CMD_WINDOW_HEIGHT + 1))
-                    )
-
-            # Refresh the pad if necessary
-            if auto_scroll_active or ch in {curses.KEY_DOWN, curses.KEY_UP, -1}:
-                pad.refresh(
-                    current_line,
-                    0,
-                    CMD_WINDOW_HEIGHT + 1,
-                    0,
-                    curses.LINES - 1,
-                    curses.COLS - 1,
+                exit_event.set()
+            elif ch == -1 and auto_scroll_active:  # No input and autoscroll is active
+                # Auto-scroll to the most recent line that fits on screen
+                current_line = max(
+                    0, pad_line[0] - (curses.LINES - CMD_WINDOW_HEIGHT - 1)
                 )
 
-            await asyncio.sleep(0.05)  # Sleep briefly to reduce CPU usage
+            # Refresh logic: only refresh if the update event is set or autoscrolling is active
+            if update_event.is_set() or auto_scroll_active:
+                # Calculate the portion of the pad to show based on the current_line
+                pminrow = max(0, current_line)
+                sminrow = (
+                    CMD_WINDOW_HEIGHT  # Start showing pad just below the command window
+                )
+                smaxrow = curses.LINES - 1  # End at the last line of the screen
+
+                # Perform the refresh to show the appropriate part of the pad
+                pad.refresh(pminrow, 0, sminrow, 0, smaxrow, curses.COLS - 1)
+                update_event.clear()
+
+            await asyncio.sleep(0.05)  # Sleep to reduce CPU usage
     finally:
-        stdscr.nodelay(False)  # Restore blocking behavior
+        stdscr.nodelay(False)
 
 
 async def main_loop(stdscr, commands):
@@ -160,9 +146,18 @@ async def main_loop(stdscr, commands):
     # Execute commands
     for command in commands:
         render_command_header(cmd_window, command)
-        await run_command(command, pad, pad_line, cmd_window)
+        return_code = await run_command(
+            command, pad, pad_line
+        )  # This function now returns the return code
         cmd_window.refresh()
+        if return_code != 0:  # Check if the return code is not zero
+            logging.error(
+                f"Command '{command}' failed with return code {return_code}. Stopping execution of further commands."
+            )
+            update_event.set()
+            break  # Stop executing further commands
 
+    cmd_window.refresh()
     # Wait until the user decides to exit
     await exit_event.wait()
 
