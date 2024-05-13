@@ -38,7 +38,7 @@ provider:
         # List of urls which will be added to the Computation Manifest
         # Requires protocol to be defined in all URLs
         # If not provided demand will not use Computation Manifest
-        outbound_urls: ["https://pypi.dev.golem.network"]
+        outbound_urls: ["https://pypi.dev.golem.network", "http://69.55.231.8" ]
 
         # Minimal values of parameters offered by Golem provider 
         #min_mem_gib: 1
@@ -100,6 +100,9 @@ available_node_types:
 # The files or directories to copy to the head and worker nodes
 # Remote workdir is /root/
 file_mounts: {
+  ./app: ./app,
+  ./constants.py: ./constants.py,
+  ./rayword.py: ./rayword.py
   # <remote_path>: <local_path>
   # "/absolute/path/dir/": ".",
   # "./relative/path/dir/": ".",
@@ -110,7 +113,7 @@ file_mounts: {
 cluster_synced_files: []
 
 # List of commands that will be run to initialize the nodes (before `setup_commands`)
-initialization_commands: []
+initialization_commands: ["mkdir -p /root/data"]
 #initialization_commands: [
 #  "pip install endplay",
 #]

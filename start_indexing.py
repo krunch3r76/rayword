@@ -13,9 +13,11 @@ commands = [
     "rm -rf app/output/*",
     "python3 main/update_or_insert_paths.py",
     "python3 main/prepare_unsearched_paths_json.py golem-cluster.yaml --batch-size 100",
+    # "unbuffer ray up golem-cluster.yaml --yes --redirect-command-output --use-normal-shells",
+    "ray up golem-cluster.yaml --yes > >(cat)",
     # "stdbuf -oL -eL ray up golem-cluster.yaml --yes --redirect-command-output --use-normal-shells",
     # "./run_ray_up.sh golem-cluster.yaml --yes --redirect-command-output --use-normal-shells 2>&1",
-    "./run_ray_up.sh golem-cluster.yaml --yes",
+    # "./run_ray_up.sh golem-cluster.yaml --yes",
     "ray rsync-up golem-cluster.yaml ./app/input/ /root/app/input/",
     "ray submit golem-cluster.yaml ./rayword.py --enable-console-logging",
     "ray rsync-down golem-cluster.yaml /root/app/output/ ./app/output",
@@ -44,7 +46,44 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+
+# Create a separate logger for specific log messages
+temp_logger = logging.getLogger("temp_logger")
+temp_logger.setLevel(logging.DEBUG)  # Set the desired logging level
+file_handler = logging.FileHandler(
+    "temp.log", mode="w"
+)  # Set the file to write specific logs
+file_handler.setFormatter(
+    logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    )
+)
+temp_logger.addHandler(file_handler)
+temp_logger.propagate = False
 update_event = asyncio.Event()
+
+
+def is_process_sleeping(pid):
+    """Check if a process with the given PID is in a 'sleeping' state."""
+    try:
+        # Read the process status from /proc/PID/status
+        with open(f"/proc/{pid}/status", "r") as status_file:
+            status_lines = status_file.readlines()
+
+        # Search for the line containing the process state
+        for line in status_lines:
+            if line.startswith("State:"):
+                # Extract the process state from the line
+                state = line.split()[1]
+                # Check if the process state indicates it is sleeping
+                return state == "S"
+    except FileNotFoundError:
+        # Process with the given PID doesn't exist
+        return False
+    except Exception as e:
+        # Handle other exceptions
+        print(f"Error checking process state: {e}")
+        return False
 
 
 async def run_command(command, pad, pad_line):
@@ -57,16 +96,27 @@ async def run_command(command, pad, pad_line):
 
     # Read stdout and stderr concurrently
     await asyncio.gather(
-        read_stream(proc.stdout, pad, pad_line), read_stream(proc.stderr, pad, pad_line)
+        read_stream(proc.stdout, pad, pad_line, proc),
+        read_stream(proc.stderr, pad, pad_line, proc),
     )
 
     # Wait for the process to finish
+    temp_logger.debug(f"awaiting cmd: {command}")
     return await proc.wait()
 
 
-async def read_stream(stream, pad, pad_line):
+async def read_stream(stream, pad, pad_line, proc):
     while True:
-        line = await stream.readline()
+        line = ""
+        try:
+            temp_logger.debug("awaiting")
+            line = await asyncio.wait_for(stream.readline(), timeout=5.0)
+            temp_logger.debug("awaited")
+        except asyncio.TimeoutError:
+            temp_logger.debug("timeout")
+            asleep = is_process_sleeping(proc.pid)
+            temp_logger.debug(f"whether asleep: {asleep}")
+            continue
         if line:
             line = line.decode("utf-8").rstrip()
             logging.debug(line)
@@ -102,10 +152,13 @@ async def handle_user_input_and_auto_scroll(stdscr, pad, pad_line, exit_event):
                 if current_line < pad_line[0] - curses.LINES + CMD_WINDOW_HEIGHT + 1:
                     current_line += 1
                     auto_scroll_active = False
+                    update_event.set()
             elif ch == curses.KEY_UP:
+                logging.debug(f"KEY_UP: current line is {current_line}")
                 if current_line > 0:
                     current_line -= 1
                     auto_scroll_active = False
+                    update_event.set()
             elif ch == ord("q"):
                 exit_event.set()
             elif ch == -1 and auto_scroll_active:  # No input and autoscroll is active
@@ -149,11 +202,13 @@ async def main_loop(stdscr, commands):
         return_code = await run_command(
             command, pad, pad_line
         )  # This function now returns the return code
+        temp_logger.debug(f"return code: {return_code} from cmd {command}")
         cmd_window.refresh()
         if return_code != 0:  # Check if the return code is not zero
             logging.error(
                 f"Command '{command}' failed with return code {return_code}. Stopping execution of further commands."
             )
+            render_command_header(cmd_window, command, failed=True)
             update_event.set()
             break  # Stop executing further commands
 
