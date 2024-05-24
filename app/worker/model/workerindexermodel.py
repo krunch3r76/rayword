@@ -16,6 +16,14 @@ import bz2
 from typing import Union
 from .workerdbconnection import create_worker_db_connection
 
+
+# Set up logging
+logging.basicConfig(
+    # filename="debug.log",
+    # filemode="w",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 IP_TO_GUTENBERG_TEXTS = "69.55.231.8"
 
 
@@ -47,7 +55,7 @@ class WorkerIndexerModel:
             self.path_prefix = path_prefix
 
         # Create the connecton
-        self.worker_db_connection = create_worker_db_connection(in_memory=True)
+        self.worker_db_connection = create_worker_db_connection(in_memory=False)
 
         # Insert records
         self.start_transaction()
@@ -201,8 +209,11 @@ class WorkerIndexerModel:
         # Function to process a batch of words and delete them
         def process_batch(batch_word_ids):
             self.delete_word_positions_by_ids(batch_word_ids)
-            with self.cursor_context() as cursor:
-                cursor.execute("VACUUM")
+            try:
+                with self.cursor_context() as cursor:
+                    cursor.execute("VACUUM")
+            except sqlite3.OperationalError:
+                logging.debug("VACUUM failed")
 
         # Function to fetch a batch of data
         def fetch_batch(last_word_id=None):

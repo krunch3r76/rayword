@@ -40,9 +40,9 @@ provider:
         outbound_urls: ["https://pypi.dev.golem.network","http://69.55.231.8" ]
 
         # Minimal values of parameters offered by Golem provider 
-        min_mem_gib: 6
+        min_mem_gib: 12
         min_cpu_threads: 1
-        min_storage_gib: 15
+        min_storage_gib: 30
 
         # Maximal values of parameters offered by Golem provider
         #max_cpu_threads: null
