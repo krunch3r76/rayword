@@ -8,6 +8,7 @@ from typing import List, Dict, Tuple
 
 from app.task_generator import Task
 from app.worker.execute_remote_word_search import execute_remote_word_search
+from .log_memory_and_disk_usage import log_memory_and_disk_usage
 
 # from app.worker.wordsearch import WordSearcher
 
@@ -53,7 +54,7 @@ class TaskSubmitter:
 
         logging.debug(f"Number of futures: {len(futures)}")
         searchResults_compressed = ray.get(futures)
-
+        log_memory_and_disk_usage()
         # Decompress and deserialize searchResults
         searchResults = [
             json.loads(bz2.decompress(result)) for result in searchResults_compressed

@@ -12,7 +12,7 @@ commands = [
     "echo 'Hello, worlds!'",
     "rm -rf app/output/*",
     "python3 main/update_or_insert_paths.py",
-    "python3 main/prepare_unsearched_paths_json.py golem-cluster.yaml --batch-size 100",
+    "python3 main/prepare_unsearched_paths_json.py golem-cluster.yaml --batch-size 1000",
     # "unbuffer ray up golem-cluster.yaml --yes --redirect-command-output --use-normal-shells",
     # "ray up golem-cluster.yaml --yes > >(cat)",
     "ray up golem-cluster.yaml --yes",

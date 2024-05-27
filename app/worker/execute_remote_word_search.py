@@ -1,6 +1,11 @@
 import ray
 import logging
+import psutil
+import threading
+import time
+import os
 
+from .resourcemonitor import ResourceMonitor
 
 # runtime_env = {"pip": ["requests", "nltk"]}
 # ray.init(runtime_env=runtime_env)
@@ -28,158 +33,36 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
             format="%(filename)s:%(lineno)d - %(levelname)s - %(message)s",
         )
 
-    exclusions = {
-        "a",
-        "about",
-        "above",
-        "across",
-        "after",
-        "again",
-        "against",
-        "all",
-        "am",
-        "an",
-        "and",
-        "any",
-        "are",
-        "as",
-        "at",
-        "be",
-        "because",
-        "been",
-        "before",
-        "being",
-        "below",
-        "beneath",
-        "beside",
-        "between",
-        "beyond",
-        "both",
-        "but",
-        "by",
-        "can",
-        "could",
-        "did",
-        "do",
-        "does",
-        "doing",
-        "down",
-        "during",
-        "each",
-        "either",
-        "enough",
-        "even",
-        "ever",
-        "every",
-        "few",
-        "for",
-        "from",
-        "further",
-        "had",
-        "has",
-        "have",
-        "having",
-        "he",
-        "her",
-        "here",
-        "hers",
-        "herself",
-        "him",
-        "himself",
-        "his",
-        "how",
-        "i",
-        "if",
-        "in",
-        "into",
-        "is",
-        "it",
-        "its",
-        "itself",
-        "just",
-        "like",
-        "me",
-        "might",
-        "mine",
-        "more",
-        "most",
-        "much",
-        "must",
-        "my",
-        "myself",
-        "neither",
-        "no",
-        "nor",
-        "not",
-        "of",
-        "off",
-        "on",
-        "once",
-        "only",
-        "or",
-        "other",
-        "our",
-        "ours",
-        "ourselves",
-        "out",
-        "over",
-        "own",
-        "same",
-        "she",
-        "should",
-        "since",
-        "so",
-        "some",
-        "such",
-        "than",
-        "that",
-        "the",
-        "their",
-        "theirs",
-        "them",
-        "themselves",
-        "then",
-        "there",
-        "these",
-        "they",
-        "this",
-        "those",
-        "through",
-        "to",
-        "too",
-        "toward",
-        "towards",
-        "under",
-        "until",
-        "up",
-        "upon",
-        "us",
-        "used",
-        "very",
-        "was",
-        "we",
-        "were",
-        "what",
-        "when",
-        "where",
-        "which",
-        "while",
-        "who",
-        "whom",
-        "why",
-        "will",
-        "with",
-        "would",
-        "you",
-        "your",
-        "yours",
-        "yourself",
-        "yourselves",
-    }
+    resource_monitor = ResourceMonitor()
+
+    EXCLUSIONS_FILE = "/root/app/worker/exclusions.txt"
+    current_directory = os.getcwd()
+    try:
+        with open(EXCLUSIONS_FILE, "r") as file:
+            exclusions = {line.strip() for line in file}
+        logging.debug(
+            f"Loaded exclusions file '{EXCLUSIONS_FILE}' from directory '{current_directory}'"
+        )
+    except FileNotFoundError:
+        logging.error(
+            f"Exclusions file '{EXCLUSIONS_FILE}' not found in directory '{current_directory}'."
+        )
+        exclusions = set()
+
     word_searcher = WordSearcher(
         paths_table, path_prefix=path_prefix, exclude_words=exclusions
     )
+
     word_search_results = word_searcher.perform_search()
+
+    resource_monitor.stop()
+
+    logging.debug(
+        f"MAX MEMORY USAGE: {resource_monitor.max_memory_usage / (1024 * 1024)} MB"
+    )
+    logging.debug(
+        f"MAX DISK USAGE: {resource_monitor.max_disk_usage / (1024 * 1024)} MB"
+    )
     return word_search_results.to_compressed_json()
 
     # return perform_word_search(words_table, paths_table, path_prefix)

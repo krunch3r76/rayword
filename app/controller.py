@@ -3,6 +3,9 @@ from .task_submitter import TaskSubmitter
 from .task_generator import TaskGenerator
 import logging
 import os
+import psutil
+import subprocess
+from .log_memory_and_disk_usage import log_memory_and_disk_usage
 
 
 class Controller:
@@ -64,6 +67,8 @@ class Controller:
             SearchHistory table
             Paths table (is_unreachable)
         """
+        logging.debug(f"\033[1;33mHello from controller with pid {os.getpid()}\033[0m")
+        log_memory_and_disk_usage()
         task_generator = TaskGenerator(batch_size=self.batch_size)
         task_submitter = TaskSubmitter(self.enable_console_logging)
 
@@ -79,6 +84,7 @@ class Controller:
             set(),
         )
 
+        log_memory_and_disk_usage()
         for searchResult in searchResults:
             search_histories_aggregated.extend(searchResult["paths_searched"])
             word_positions_by_paths = searchResult["word_positions_by_paths"]
@@ -100,3 +106,4 @@ class Controller:
         self.model.insert_search_histories(search_histories_aggregated)
         self.model.insert_search_results(word_indices_aggregated)
         self.model.mark_paths_unreachable(bad_path_ids)
+        log_memory_and_disk_usage()
