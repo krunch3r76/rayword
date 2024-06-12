@@ -6,6 +6,7 @@ import time
 import os
 
 from .resourcemonitor import ResourceMonitor
+from ..log_memory_and_disk_usage import log_memory_and_disk_usage
 
 # runtime_env = {"pip": ["requests", "nltk"]}
 # ray.init(runtime_env=runtime_env)
@@ -33,6 +34,7 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
             format="%(filename)s:%(lineno)d - %(levelname)s - %(message)s",
         )
 
+    log_memory_and_disk_usage()
     resource_monitor = ResourceMonitor()
 
     EXCLUSIONS_FILE = "/root/app/worker/exclusions.txt"

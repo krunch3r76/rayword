@@ -3,16 +3,19 @@
 
 from start_indexing.color_pairs import init_color_pairs
 from start_indexing.parse_ansi_sequences import parse_ansi_sequences
-from start_indexing.render_command_header import render_command_header
-from start_indexing.windows import WrappedWindow, WrappedPad
-import threading
-from queue import Queue, Empty
+
+# from start_indexing.render_command_header import render_command_header
+from view.windows import WrappedWindow, WrappedPad
+from view.cmd_window import CmdWindow
+
+# import threading
+# from queue import Queue, Empty
 
 commands = [
     "echo 'Hello, worlds!'",
     "rm -rf app/output/*",
     "python3 main/update_or_insert_paths.py",
-    "python3 main/prepare_unsearched_paths_json.py golem-cluster.yaml --batch-size 1000",
+    "python3 main/prepare_unsearched_paths_json.py golem-cluster.yaml --batch-size 50",
     # "unbuffer ray up golem-cluster.yaml --yes --redirect-command-output --use-normal-shells",
     # "ray up golem-cluster.yaml --yes > >(cat)",
     "ray up golem-cluster.yaml --yes",
@@ -34,6 +37,7 @@ import logging
 import subprocess
 import signal
 import socket
+import time
 
 # Constants
 CMD_WINDOW_HEIGHT = 2
@@ -44,7 +48,7 @@ logging.basicConfig(
     filename="debug.log",
     filemode="w",
     level=logging.DEBUG,
-    format="%(asctime)s - %(levelname)s - %(message)s",
+    format="%(asctime)s - %(name)s:%(levelname)s - %(message)s",
 )
 
 
@@ -61,6 +65,22 @@ file_handler.setFormatter(
 )
 temp_logger.addHandler(file_handler)
 temp_logger.propagate = False
+
+
+cmd_output_logger = logging.getLogger("cmdout_logger")
+cmd_output_logger.setLevel(logging.DEBUG)  # Set the desired logging level
+file_handler = logging.FileHandler(
+    "cmdout.log", mode="w"
+)  # Set the file to write specific logs
+file_handler.setFormatter(
+    logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    )
+)
+cmd_output_logger.addHandler(file_handler)
+cmd_output_logger.propagate = False
+
+
 update_event = asyncio.Event()
 
 
@@ -97,55 +117,106 @@ async def run_command(command, pad, pad_line):
 
     # Read stdout and stderr concurrently
     await asyncio.gather(
-        read_stream(proc.stdout, pad, pad_line, proc),
-        read_stream(proc.stderr, pad, pad_line, proc),
+        read_lines_from_stream(proc.stdout, pad, pad_line, proc),
+        read_lines_from_stream(proc.stderr, pad, pad_line, proc),
     )
 
     # Wait for the process to finish
-    temp_logger.debug(f"awaiting cmd: {command}")
     return await proc.wait()
 
 
-async def read_stream(stream, pad, pad_line, proc):
+async def read_lines_from_stream(stream, pad, pad_line, proc):
+    """read and process each line from the given stream"""
     while True:
         line = ""
         try:
-            temp_logger.debug("awaiting")
             line = await asyncio.wait_for(stream.readline(), timeout=5.0)
-            temp_logger.debug("awaited")
         except asyncio.TimeoutError:
-            temp_logger.debug("timeout")
-            asleep = is_process_sleeping(proc.pid)
-            temp_logger.debug(f"whether asleep: {asleep}")
             continue
-        if line:
+        if len(line) > 0:
             line = line.decode("utf-8").rstrip()
-            logging.debug(line)
-            await process_data(line, pad, pad_line)
+            cmd_output_logger.debug(line)
+            await print_line_to_ncurses_window(line, pad, pad_line)
         else:
             break  # Exit the loop when no more data is available
 
 
-async def process_data(text, pad, pad_line):
-    lines = text.split("\n")
-    for line in lines:
-        pad_line[0] += 1
-        pad.move(pad_line[0], 0)
-        segments = parse_ansi_sequences(line)
-        for txt, attr in segments:
+async def print_line_to_ncurses_window(line: str, pad, pad_line: list):
+    """reformat all lines for printing to the ncurses pad"""
+
+    def addstr_with_wrap(text_segment, pad, pad_line: list):
+        def find_space_indices(input_string):
+            return [index for index, char in enumerate(input_string) if char == " "]
+
+        def find_highest_less_than(indices, threshold):
+            try:
+                return max(i for i in indices if i < threshold)
+            except ValueError:
+                return None  # Return None or a suitable default value if no valid element is found
+
+        sub_segment = None
+        cols_available = (curses.COLS - 1) - pad.getyx()[1]
+        # temp_logger.debug(f"cols available: {cols_available}")
+        txt = text_segment[0]
+        attr = text_segment[1]
+        if len(txt) <= cols_available:
             pad.addstr(pad_line[0], pad.getyx()[1], txt, attr)
-            update_event.set()
+        else:
+            space_indices = find_space_indices(txt)
+            highest_fit_index = find_highest_less_than(space_indices, cols_available)
+            if highest_fit_index is not None:
+                fitted = txt[:highest_fit_index]
+                remaining = txt[highest_fit_index + 1 :]
+                pad.addstr(pad_line[0], pad.getyx()[1], fitted, attr)
+                sub_segment = (
+                    remaining,
+                    attr,
+                )
+            else:
+                fitted = txt[:cols_available]
+                remaining = txt[cols_available:]
+                pad.addstr(pad_line[0], pad.getyx()[1], fitted, attr)
+                sub_segment = (remaining, attr)
+        return sub_segment
+
+    line = line.rstrip()  # normalize to remove line ending
+    # temp_logger.debug(f"repr: {repr(line)}")
+    # advance to next line
+    pad.move(pad_line[0], 0)
+    segments = parse_ansi_sequences(line)
+    pad_line[0] += 1
+    # temp_logger.debug(
+    #     f"segment count: {len(segments)} and length of first segment txt: {len(segments[0][0])}"
+    # )
+    for segment in segments:
+        subsegment = addstr_with_wrap(segment, pad, pad_line)
+        while subsegment is not None:
+            temp_logger.debug(f"subsegment: {subsegment}")
+            pad_line[0] += 1
+            try:
+                pad.move(pad_line[0], 0)
+            except:
+                temp_logger.error(f"could not move to {pad_line[0]}, 0")
+                raise
+            subsegment = addstr_with_wrap(subsegment, pad, pad_line)
+        # for txt, attr in segments:
+        #     pad.addstr(pad_line[0], pad.getyx()[1], txt, attr)
+        #     update_event.set()
 
     # Instead of refreshing here, just signal that an update is needed
 
 
-async def handle_user_input_and_auto_scroll(stdscr, pad, pad_line, exit_event):
+async def handle_user_input_and_auto_scroll(
+    stdscr, pad, pad_line, windows_to_refresh, exit_event
+):
     current_line = 0
     auto_scroll_active = (
         True  # This flag is used to determine if the pad should auto-scroll
     )
     stdscr.nodelay(True)  # Non-blocking input
-
+    last_timestamp = time.time()
+    resizing = False
+    resizing_timer = False
     try:
         while not exit_event.is_set():
             ch = stdscr.getch()
@@ -154,62 +225,88 @@ async def handle_user_input_and_auto_scroll(stdscr, pad, pad_line, exit_event):
                     current_line += 1
                     auto_scroll_active = False
                     update_event.set()
+                else:
+                    auto_scroll_active = True
             elif ch == curses.KEY_UP:
-                logging.debug(f"KEY_UP: current line is {current_line}")
+                # logging.debug(f"KEY_UP: current line is {current_line}")
                 if current_line > 0:
                     current_line -= 1
                     auto_scroll_active = False
                     update_event.set()
             elif ch == ord("q"):
                 exit_event.set()
+            elif ch == curses.KEY_RESIZE:
+                if not resizing_timer:
+                    last_timestamp = time.time()
+                    resizing_timer = True
+
+                curses.update_lines_cols()
+                # check if enough time has passed
             elif ch == -1 and auto_scroll_active:  # No input and autoscroll is active
                 # Auto-scroll to the most recent line that fits on screen
-                current_line = max(
-                    0, pad_line[0] - (curses.LINES - CMD_WINDOW_HEIGHT - 1)
-                )
+
+                if pad_line[0] > current_line:
+                    current_line = max(
+                        0, pad_line[0] - (curses.LINES - CMD_WINDOW_HEIGHT - 1)
+                    )
+                    update_event.set()
+
+            if resizing_timer and time.time() - last_timestamp > 0.1:
+                resizing_timer = False
+                for window in windows_to_refresh:
+                    window.resize()
 
             # Refresh logic: only refresh if the update event is set or autoscrolling is active
-            if update_event.is_set() or auto_scroll_active:
+            if update_event.is_set():
                 # Calculate the portion of the pad to show based on the current_line
                 pminrow = max(0, current_line)
                 sminrow = (
-                    CMD_WINDOW_HEIGHT  # Start showing pad just below the command window
+                    CMD_WINDOW_HEIGHT
+                    # Start showing pad just below the command window
                 )
                 smaxrow = curses.LINES - 1  # End at the last line of the screen
 
                 # Perform the refresh to show the appropriate part of the pad
                 pad.refresh(pminrow, 0, sminrow, 0, smaxrow, curses.COLS - 1)
                 update_event.clear()
-
-            await asyncio.sleep(0.05)  # Sleep to reduce CPU usage
+            await asyncio.sleep(0.1)
     finally:
         stdscr.nodelay(False)
 
 
 async def main_loop(stdscr, commands):
-    cmd_window = WrappedWindow(CMD_WINDOW_HEIGHT, curses.COLS, 0, 0)
-    pad = curses.newpad(10000, curses.COLS)
+    # cmd_window = WrappedWindow(CMD_WINDOW_HEIGHT, curses.COLS, 0, 0)
+    curses.curs_set(0)
+    cmd_window = CmdWindow(stdscr, 0, 0)
+    pad = curses.newpad(10000, 1000)
     pad_line = [0]
     exit_event = asyncio.Event()
 
     # Start user input handling task
     user_input_task = asyncio.create_task(
-        handle_user_input_and_auto_scroll(stdscr, pad, pad_line, exit_event)
+        handle_user_input_and_auto_scroll(
+            stdscr, pad, pad_line, [cmd_window], exit_event
+        )
     )
 
     # Execute commands
     for command in commands:
-        render_command_header(cmd_window, command)
+        cmd_window.update_command(command)
+        progress_task = asyncio.create_task(cmd_window.update_progress_meter())
+
+        # render_command_header(cmd_window, command)
         return_code = await run_command(
             command, pad, pad_line
         )  # This function now returns the return code
+        progress_task.cancel()
         temp_logger.debug(f"return code: {return_code} from cmd {command}")
         cmd_window.refresh()
         if return_code != 0:  # Check if the return code is not zero
             logging.error(
                 f"Command '{command}' failed with return code {return_code}. Stopping execution of further commands."
             )
-            render_command_header(cmd_window, command, failed=True)
+            cmd_window.update_command(command, failed=True)
+            # render_command_header(cmd_window, command, failed=True)
             update_event.set()
             break  # Stop executing further commands
 

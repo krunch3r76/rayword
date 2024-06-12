@@ -6,7 +6,7 @@ class WrappedWindow:
     def __init__(self, nlines, ncols, begin_y, begin_x):
         # Creating a new curses window internally
         self.win = curses.newwin(nlines, ncols, begin_y, begin_x)
-        self.width = ncols - 1  # To handle wrapping correctly
+        # self.width = ncols - 1  # To handle wrapping correctly
         self.current_line = 0  # Keep track of the current line for auto text addition
 
     @property
@@ -22,10 +22,10 @@ class WrappedWindow:
         Adds text to the window with automatic line wrapping. Splits lines if they exceed the width.
         """
         if split_words:
-            while len(text) > self.width:
-                part = text[: self.width]
+            while len(text) > self.max_x:
+                part = text[: self.max_x]
                 self.win.addstr(self.current_line, 0, part, attr)
-                text = text[self.width :]
+                text = text[self.max_x :]
                 self.current_line += 1
             if text:
                 self.win.addstr(self.current_line, 0, text, attr)
@@ -34,7 +34,7 @@ class WrappedWindow:
             words = text.split()
             current_line = ""
             for word in words:
-                if len(current_line) + len(word) + 1 > self.width:
+                if len(current_line) + len(word) + 1 > self.max_x:
                     self.win.addstr(self.current_line, 0, current_line, attr)
                     self.current_line += 1
                     current_line = word + " "
@@ -48,12 +48,12 @@ class WrappedWindow:
         """
         Inserts text at a given position and wraps text if necessary.
         """
-        ncols = self.width + 1
+        ncols = self.max_x + 1
         if split_words:
             while len(text) > ncols:
-                part = text[: self.width - x]
+                part = text[: self.max_x - x]
                 self.win.insstr(y, x, part, attr)
-                text = text[self.width - x :]
+                text = text[self.max_x - x :]
                 y += 1
             if text:
                 self.win.insstr(y, x, text, attr)
@@ -61,7 +61,7 @@ class WrappedWindow:
             words = text.split()
             current_line = ""
             for word in words:
-                if len(current_line) + len(word) + 1 > self.width - x + 1:
+                if len(current_line) + len(word) + 1 > self.max_x - x + 1:
                     self.win.insstr(y, x, current_line, attr)
                     y += 1
                     current_line = word + " "
@@ -88,17 +88,17 @@ class WrappedPad:
     def __init__(self, height, width):
         self.pad = curses.newpad(height, width)
         self.height = height
-        self.width = (
+        self.max_x = (
             width - 1
         )  # Reserve one column to prevent automatic wrapping by curses
         self.line = 0
 
     def add_wrapped_text(self, text, attr=curses.A_NORMAL):
         """Add text to the pad with automatic line wrapping."""
-        while len(text) > self.width:
-            part = text[: self.width]
+        while len(text) > self.max_x:
+            part = text[: self.max_x]
             self.pad.addstr(self.line, 0, part, attr)
-            text = text[self.width :]
+            text = text[self.max_x :]
             self.line += 1
         if text:
             self.pad.addstr(self.line, 0, text, attr)

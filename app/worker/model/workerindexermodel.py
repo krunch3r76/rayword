@@ -213,7 +213,8 @@ class WorkerIndexerModel:
                 with self.cursor_context() as cursor:
                     cursor.execute("VACUUM")
             except sqlite3.OperationalError:
-                logging.debug("VACUUM failed")
+                pass
+                # logging.debug("VACUUM failed")
 
         # Function to fetch a batch of data
         def fetch_batch(last_word_id=None):
