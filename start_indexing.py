@@ -127,7 +127,7 @@ async def read_lines_from_stream(stream, pad, proc):
     while True:
         line = ""
         try:
-            line = await asyncio.wait_for(stream.readline(), timeout=5.0)
+            line = await asyncio.wait_for(stream.readline(), timeout=1.0)
         except asyncio.TimeoutError:
             continue
         if len(line) > 0:
@@ -140,71 +140,6 @@ async def read_lines_from_stream(stream, pad, proc):
 
 async def print_line_to_ncurses_window(line: str, pad):
     pad.add_line(line)
-
-
-# async def _print_line_to_ncurses_window(line: str, pad):
-#     """reformat all lines for printing to the ncurses pad"""
-
-#     def addstr_with_wrap(text_segment, pad, pad_line: list):
-#         def find_space_indices(input_string):
-#             return [index for index, char in enumerate(input_string) if char == " "]
-
-#         def find_highest_less_than(indices, threshold):
-#             try:
-#                 return max(i for i in indices if i < threshold)
-#             except ValueError:
-#                 return None  # Return None or a suitable default value if no valid element is found
-
-#         sub_segment = None
-#         cols_available = (curses.COLS - 1) - pad.getyx()[1]
-#         # temp_logger.debug(f"cols available: {cols_available}")
-#         txt = text_segment[0]
-#         attr = text_segment[1]
-#         if len(txt) <= cols_available:
-#             pad.addstr(pad_line[0], pad.getyx()[1], txt, attr)
-#         else:
-#             space_indices = find_space_indices(txt)
-#             highest_fit_index = find_highest_less_than(space_indices, cols_available)
-#             if highest_fit_index is not None:
-#                 fitted = txt[:highest_fit_index]
-#                 remaining = txt[highest_fit_index + 1 :]
-#                 pad.addstr(pad_line[0], pad.getyx()[1], fitted, attr)
-#                 sub_segment = (
-#                     remaining,
-#                     attr,
-#                 )
-#             else:
-#                 fitted = txt[:cols_available]
-#                 remaining = txt[cols_available:]
-#                 pad.addstr(pad_line[0], pad.getyx()[1], fitted, attr)
-#                 sub_segment = (remaining, attr)
-#         return sub_segment
-
-#     line = line.rstrip()  # normalize to remove line ending
-#     # temp_logger.debug(f"repr: {repr(line)}")
-#     # advance to next line
-#     pad.move(pad_line[0], 0)
-#     segments = parse_ansi_sequences(line)
-#     pad_line[0] += 1
-#     # temp_logger.debug(
-#     #     f"segment count: {len(segments)} and length of first segment txt: {len(segments[0][0])}"
-#     # )
-#     for segment in segments:
-#         subsegment = addstr_with_wrap(segment, pad, pad_line)
-#         while subsegment is not None:
-#             temp_logger.debug(f"subsegment: {subsegment}")
-#             pad_line[0] += 1
-#             try:
-#                 pad.move(pad_line[0], 0)
-#             except:
-#                 temp_logger.error(f"could not move to {pad_line[0]}, 0")
-#                 raise
-#             subsegment = addstr_with_wrap(subsegment, pad, pad_line)
-#         # for txt, attr in segments:
-#         #     pad.addstr(pad_line[0], pad.getyx()[1], txt, attr)
-#         #     update_event.set()
-
-#     # Instead of refreshing here, just signal that an update is needed
 
 
 async def handle_user_input_and_auto_scroll(
@@ -227,23 +162,6 @@ async def handle_user_input_and_auto_scroll(
                         auto_scroll_active = True
                     else:
                         update_event.set()
-                # viewable_height, _ = pad._calculate_viewable_width_and_height()
-                # bottom_line = pad._pminrow + viewable_height
-                # logging.debug(
-                #     f"viewable height: {viewable_height}, bottom_line: {bottom_line}, padline: {pad._padline}"
-                # )
-                # if bottom_line + 1 <= pad._padline:
-                #     auto_scroll_active = True
-                #     current_line_offset = 0
-                # else:
-                #     #                 if (
-                #     #                     pad._padline - current_line_offset
-                #     #                     < pad._padline - curses.LINES + CMD_WINDOW_HEIGHT + 1
-                #     #                 ):  # review
-                #     logging.debug(f"current_line_offset = {current_line_offset}")
-                #     current_line_offset -= 1
-                #     auto_scroll_active = False
-                #     update_event.set()
             elif ch == curses.KEY_UP:
                 logging.debug(f"KEY_UP: current line offset is {current_line_offset}")
                 if pad._pminrow - current_line_offset >= 0:
