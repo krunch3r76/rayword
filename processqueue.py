@@ -37,7 +37,7 @@ class ProcessQueue:
 
     def _enqueue_output(self):
         """Helper function to read lines from the subprocess output and enqueue them"""
-        ready_fds, _, _ = select.select([self.stdout_fd, self.stderr_fd], [], [], 0.1)
+        ready_fds, _, _ = select.select([self.stdout_fd, self.stderr_fd], [], [], 0.01)
 
         for fd in ready_fds:
             try:
