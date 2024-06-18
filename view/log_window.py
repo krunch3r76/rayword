@@ -34,8 +34,8 @@ class MyPad:
         # return the top row that would allow the row at _padline to be displayed at the bottom
         # of the pad
         _, viewable_height = self._calculate_viewable_width_and_height()
-        if self._padline > viewable_height - 1:
-            return self._padline - viewable_height + 1
+        if self._padline - 1 > viewable_height:
+            return self._padline - viewable_height + 2  # review why +2?
         else:
             return 0
 
@@ -58,6 +58,7 @@ class MyPad:
 
         # logging.debug(f"refresh coords: {_compute_refresh_coordinates()}")
         coords = _compute_refresh_coordinates(toprow)
+        # logging.debug(f"refreshing using {coords}")
         self._win.refresh(
             coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]
         )
@@ -65,8 +66,8 @@ class MyPad:
     def _calculate_viewable_width_and_height(self):
         """not relevant to pads but useful in general for windows"""
         screen_width, screen_height = self._stdscr.getmaxyx()
-        drawable_height = screen_height - self._upper_left_y
-        drawable_width = screen_width - self._upper_left_x
+        drawable_height = screen_height - 1 - self._upper_left_y
+        drawable_width = screen_width - 1 - self._upper_left_x
         viewable_height = min(self._height, drawable_height)
         viewable_width = min(self._width, drawable_width)
         return viewable_height, viewable_width
