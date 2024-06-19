@@ -24,7 +24,7 @@ class MyPad:
 
         # self._pminrow = 0
         self._pmincol = 0
-        self._padline = 0  # cursor
+        self._padline = 0  # cursor 1-based indicating with line to which to write
         self._padcol = 0
         self._win = curses.newpad(nlines, ncols)
         self.refresh()
@@ -33,18 +33,18 @@ class MyPad:
     def _pminrow(self):
         # return the top row that would allow the row at _padline to be displayed at the bottom
         # of the pad
-        _, viewable_height = self._calculate_viewable_width_and_height()
-        if self._padline - 1 > viewable_height:
-            return self._padline - viewable_height + 2  # review why +2?
+        viewable_height, viewable_width = self._calculate_viewable_width_and_height()
+        if self._padline > viewable_height:
+            return self._padline - viewable_height
         else:
             return 0
 
-    def refresh(self, toprow=None):
+    def refresh(self, topline=None):
         # toprow overrides self._pminrow
-        def _compute_refresh_coordinates(toprow):
+        def _compute_refresh_coordinates(topline):
             # calculate the coordinates for a call to refresh
-            if toprow is not None:
-                pminrow = toprow
+            if topline is not None:
+                pminrow = topline - 1
             else:
                 pminrow = self._pminrow
             return (
@@ -57,7 +57,7 @@ class MyPad:
             )
 
         # logging.debug(f"refresh coords: {_compute_refresh_coordinates()}")
-        coords = _compute_refresh_coordinates(toprow)
+        coords = _compute_refresh_coordinates(topline)
         # logging.debug(f"refreshing using {coords}")
         self._win.refresh(
             coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]
@@ -65,9 +65,9 @@ class MyPad:
 
     def _calculate_viewable_width_and_height(self):
         """not relevant to pads but useful in general for windows"""
-        screen_width, screen_height = self._stdscr.getmaxyx()
-        drawable_height = screen_height - 1 - self._upper_left_y
-        drawable_width = screen_width - 1 - self._upper_left_x
+        screen_height, screen_width = self._stdscr.getmaxyx()
+        drawable_height = screen_height - self._upper_left_y
+        drawable_width = screen_width - self._upper_left_x
         viewable_height = min(self._height, drawable_height)
         viewable_width = min(self._width, drawable_width)
         return viewable_height, viewable_width
@@ -87,7 +87,7 @@ class MyPad:
         """write the text with the given attribute to the pad line cursor
         returning the next segment that would not fit the effective window width"""
 
-        if segment[0] == "''":
+        if segment[0] == "":
             return
 
         def find_indices_to_spaces(text) -> list:
@@ -136,7 +136,7 @@ class MyPad:
         else:
             fitted = text
         # logging.debug(f"fitted is of type {type(fitted)} and fitted is {repr(fitted)}")
-        self._win.addstr(self._padline, self._pmincol + self._padcol, fitted, attr)
+        self._win.addstr(self._padline - 1, self._pmincol + self._padcol, fitted, attr)
         self._padcol += len(fitted)
         return subsegment
 

@@ -42,7 +42,7 @@ class ProcessQueue:
         for fd in ready_fds:
             try:
                 if fd == self.stdout_fd:
-                    data = os.read(self.stdout_fd, 1024).decode()
+                    data = os.read(self.stdout_fd, 1024).decode(errors="replace")
                     self.stdout_buffer += data
                     while "\n" in self.stdout_buffer:
                         line, self.stdout_buffer = self.stdout_buffer.split("\n", 1)
@@ -54,7 +54,7 @@ class ProcessQueue:
                         line, self.stderr_buffer = self.stderr_buffer.split("\n", 1)
                         self._queue.put_nowait(line + "\n")
             except UnicodeDecodeError:
-                pass
+                raise
 
     def get_nowait(self):
         """Return a line from a queue or throw one of two exceptions

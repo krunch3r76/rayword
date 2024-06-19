@@ -49,6 +49,7 @@ class Controller:
         self.from_view = Queue()
         self.to_view = Queue()
         self.view = View(self.from_view, self.to_view)
+        self._outputfile = open("output.txt", "w")
 
     def __call__(self):
         last_return_code = 0
@@ -72,6 +73,7 @@ class Controller:
                     # self.view.receive_signal({"signal": "cmdend", "msg": rc})
                 else:
                     self.to_view.put_nowait({"signal": "cmdout", "msg": line})
+                    self._outputfile.write(line + "\n")
                     # self.view.receive_signal({"signal": "cmdout", "msg": line})
                 try:
                     signal_from_view = self.from_view.get_nowait()
@@ -103,3 +105,4 @@ class Controller:
 
         def __del__(self):
             del self.view
+            self._outputfile.close()
