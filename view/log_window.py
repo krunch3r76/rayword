@@ -30,6 +30,11 @@ class MyPad:
         self.refresh()
 
     @property
+    def _ncols(self):
+        nlines, ncols = self._win.getmaxyx()
+        return ncols
+
+    @property
     def _pminrow(self):
         # return the top row that would allow the row at _padline to be displayed at the bottom
         # of the pad
@@ -83,61 +88,61 @@ class MyPad:
     def _advance_line_cursor(self):
         self._padline += 1
 
-    def _write_and_wrap_segment(self, segment):
-        """write the text with the given attribute to the pad line cursor
+    def _write_and_wrap_segment(self, segment, wrap=False, truncate=False):
+        """Write the text with the given attribute to the pad line cursor
         returning the next segment that would not fit the effective window width"""
 
         if segment[0] == "":
             return
 
-        def find_indices_to_spaces(text) -> list:
-            return [index for index, char in enumerate(text) if char == " "]
-
-        def find_highest_less_than(indices, threshold):
-            try:
-                return max(i for i in indices if i < threshold)
-            except ValueError:
-                pass
-            return None
-
-        # error check that segment is the right type?
-
         text = segment[0]
         attr = segment[1]
         subsegment = None
-        fitted = None
-        if len(text) + self._padcol > self._width:
-            indices_to_delimiters = find_indices_to_spaces(text)
-            if len(indices_to_delimiters) > 0:
-                index_to_last_space_for_fit = find_highest_less_than(
-                    indices_to_delimiters, self._width - 1 - self._padcol
-                )
-                if index_to_last_space_for_fit is not None:
-                    logging.debug(
-                        f"index to last sapce for fit: {index_to_last_space_for_fit}"
-                    )
-                    fitted = text[:index_to_last_space_for_fit]
-                    remaining = text[index_to_last_space_for_fit + 1 :]
-                    if len(remaining) > 0:
-                        subsegment = (
-                            remaining,
-                            attr,
-                        )
-                else:
-                    fitted = text[: self._width]
-                    remaining = text[self._width + 1 :]
-                    if len(remaining.strip()) > 0:
-                        subsegment = (
-                            remaining.lstrip(),
-                            attr,
-                        )
-            else:
-                fitted = text
+        _, viewable_width = self._calculate_viewable_width_and_height()
+
+        # Always truncate if the line exceeds ncols
+        if len(text) + self._padcol > self._ncols:
+            fitted = text[: self._ncols - self._padcol]
+            subsegment = (
+                (text[self._ncols - self._padcol :], attr)
+                if len(text) > self._ncols - self._padcol
+                else None
+            )
         else:
             fitted = text
-        # logging.debug(f"fitted is of type {type(fitted)} and fitted is {repr(fitted)}")
-        self._win.addstr(self._padline - 1, self._pmincol + self._padcol, fitted, attr)
-        self._padcol += len(fitted)
+
+        # Truncate to viewable width if the truncate flag is set
+        if truncate and len(fitted) + self._padcol > viewable_width:
+            fitted = fitted[: viewable_width - self._padcol]
+            subsegment = None
+
+        # Handle wrapping if the wrap flag is set and the text is not truncated
+        if wrap and len(fitted) + self._padcol > viewable_width:
+            indices_to_delimiters = [
+                index for index, char in enumerate(fitted) if char == " "
+            ]
+            indices_to_delimiters.append(len(fitted))
+
+            fitting_indices = [
+                i for i in indices_to_delimiters if i <= viewable_width - self._padcol
+            ]
+
+            if fitting_indices:
+                index_to_last_space_for_fit = max(fitting_indices)
+                remaining = fitted[index_to_last_space_for_fit + 1 :]
+                fitted = fitted[:index_to_last_space_for_fit]
+                subsegment = (remaining, attr) if remaining else None
+            else:
+                remaining = fitted[viewable_width - self._padcol :]
+                fitted = fitted[: viewable_width - self._padcol]
+                subsegment = (remaining, attr) if remaining else None
+
+        if fitted:
+            self._win.addstr(
+                self._padline - 1, self._pmincol + self._padcol, fitted, attr
+            )
+            self._padcol += len(fitted)
+
         return subsegment
 
     def add_line(self, line, attribute_segmenter=parse_ansi_sequences):
@@ -165,6 +170,7 @@ class MyPad:
             if segment[0] == "":
                 continue
             subsegment = self._write_and_wrap_segment(segment)
+            logging.debug(f"got subsegment: {subsegment}")
             while subsegment is not None:
                 self._padcol = 0
                 self._advance_line_cursor()
@@ -194,3 +200,6 @@ class LogWindow(MyPad):
         super().__init__(
             stdscr, upper_left_y, upper_left_x, height, width, nlines, ncols
         )
+
+    def _write_and_wrap_segment(self, segment):
+        return super()._write_and_wrap_segment(segment, wrap=True)

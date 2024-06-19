@@ -58,9 +58,9 @@ class View:
                 self.current_line_offset += 1
                 self.auto_scroll_active = False
         if not self.auto_scroll_active:
-            logging.debug(
-                f"refresh({self._logwindow._pminrow} - {self.current_line_offset}"
-            )
+            # logging.debug(
+            #     f"refresh({self._logwindow._pminrow} - {self.current_line_offset}"
+            # )
             self._logwindow.refresh(self._logwindow._pminrow - self.current_line_offset)
         else:
             self._logwindow.refresh()
