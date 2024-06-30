@@ -15,6 +15,6 @@ controller = Controller()
 try:
     controller()
 except Exception as e:
-    del controller
     logging.debug(f"an exception {e} of type {type(e)} occurred")
     logging.debug(traceback.format_exc())
+    del controller

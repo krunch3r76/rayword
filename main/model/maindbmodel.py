@@ -66,6 +66,15 @@ class MainModel:
                 # Log or handle the exception
                 pass
 
+    def search_words(self, input_word):
+        query = "SELECT word FROM Words WHERE word LIKE ? ORDER BY word"
+        like_pattern = f"{input_word}%"
+        with self.db_connection as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (like_pattern,))
+            results = cursor.fetchall()
+            return [row[0] for row in results]
+
     def lookup_path_for_text_number(self, text_number):
         """get the path field on Paths for a given text number"""
         with self.CursorContextManager(self, use_row_factory=False) as cursor:
@@ -344,3 +353,54 @@ class MainModel:
                     excluded_count += 1
 
         return random_record
+
+    def get_paths_for_word(self, word):
+        """
+        Retrieve paths, corresponding text numbers, and offsets for instances of the given word.
+
+        Args:
+            word (str): The word to search for.
+
+        Returns:
+            list: A list of tuples containing (path, text_number, offsets) for the given word.
+        """
+        # Step 1: Get the word_id for the given word
+        word_id = self.get_word_id(word)
+        if not word_id:
+            return []  # No such word in the database
+
+        # Step 2: Get the text_numbers and offsets from WordIndices for the given word_id
+        query = "SELECT text_number, word_index FROM WordIndices WHERE word_id = ?"
+        with self.CursorContextManager(self, use_row_factory=False) as cursor:
+            cursor.execute(query, (word_id,))
+            word_indices = cursor.fetchall()
+
+        if not word_indices:
+            return []  # No text numbers found for the given word_id
+
+        # Step 3: Get the paths for the found text_numbers from the paths_db.Paths table
+        text_numbers = [row[0] for row in word_indices]
+        placeholders = ",".join("?" for _ in text_numbers)
+        query = f"SELECT path, text_number FROM paths_db.Paths WHERE text_number IN ({placeholders})"
+        with self.CursorContextManager(self, use_row_factory=False) as cursor:
+            cursor.execute(query, text_numbers)
+            path_results = cursor.fetchall()
+
+        # Step 4: Consolidate offsets for each (path, text_number)
+        path_dict = {}
+        for path, text_number in path_results:
+            if (path, text_number) not in path_dict:
+                path_dict[(path, text_number)] = []
+
+        for text_number, word_index in word_indices:
+            for path, tn in path_results:
+                if tn == text_number:
+                    path_dict[(path, tn)].append(word_index)
+
+        # Step 5: Transform the dictionary into the desired output format
+        results = [
+            (path, text_number, offsets)
+            for (path, text_number), offsets in path_dict.items()
+        ]
+
+        return results
