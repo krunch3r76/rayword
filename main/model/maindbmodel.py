@@ -5,6 +5,7 @@ import sqlite3
 
 from .maindbconnection import create_main_db_connection
 from .pathsdbconnection import create_paths_db_connection
+from .gutenberg_extractor import extract_title_and_authors
 
 logger = logging.getLogger()
 
@@ -354,15 +355,16 @@ class MainModel:
 
         return random_record
 
-    def get_paths_for_word(self, word):
+    def get_ebook_details_for_word(self, word, gutenberg_index_path):
         """
-        Retrieve paths, corresponding text numbers, and offsets for instances of the given word.
+        Retrieve paths, corresponding text numbers, offsets, titles, and authors for instances of the given word.
 
         Args:
             word (str): The word to search for.
+            gutenberg_index_path (str): The path to the Project Gutenberg index file.
 
         Returns:
-            list: A list of tuples containing (path, text_number, offsets) for the given word.
+            list: A list of dictionaries containing text number, details with path, offsets, title, and authors for the given word.
         """
         # Step 1: Get the word_id for the given word
         word_id = self.get_word_id(word)
@@ -392,15 +394,25 @@ class MainModel:
             if (path, text_number) not in path_dict:
                 path_dict[(path, text_number)] = []
 
+        offset_count = 0
         for text_number, word_index in word_indices:
+            offset_count += 1
             for path, tn in path_results:
                 if tn == text_number:
                     path_dict[(path, tn)].append(word_index)
 
         # Step 5: Transform the dictionary into the desired output format
-        results = [
-            (path, text_number, offsets)
-            for (path, text_number), offsets in path_dict.items()
-        ]
+        results = []
+        for (path, text_number), offsets in path_dict.items():
+            title, authors = extract_title_and_authors(
+                gutenberg_index_path, text_number
+            )
+            details = {
+                "path": path,
+                "offsets": offsets,
+                "title": title,
+                "authors": authors,
+            }
+            results.append({"textnum": text_number, "details": details})
 
-        return results
+        return results, offset_count

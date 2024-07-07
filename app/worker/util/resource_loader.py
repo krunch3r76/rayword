@@ -8,9 +8,20 @@ import uuid
 import tempfile
 from pathlib import Path
 
-
+# Configure the root logger
+# logging.basicConfig(
+#     level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s"
+# )
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
+
+# Add a console handler to the custom logger if not already present
+if not logger.handlers:
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
 
 
 class URLContentFetcher:

@@ -1,10 +1,13 @@
 # view/view.py
 import curses
+import curses.panel
 from queue import Queue
 import queue
 from .cmd_window import CmdWindow
 from .log_window import LogWindow
-from .mywindow import MyWindowLineBuffered, TextEntryBox
+from .textentry import TextEntryBox
+from .selectable_window import MyWindowSelectable
+from .selectable_window import MyWindowLineBuffered, PanelManager
 import logging
 from view.color_pairs import init_color_pairs
 from enum import Enum, auto
@@ -14,6 +17,7 @@ class View:
     class ViewMode(Enum):
         LOG = auto()
         BROWSER = auto()
+        PANEL = auto()
 
     def __init__(self, to_controller: Queue, from_controller: Queue):
         self._stdscr = curses.initscr()
@@ -31,14 +35,24 @@ class View:
         init_color_pairs()
         self._cmdwindow.clear()
         self._logwindow.clear()
-        self._wordwin = MyWindowLineBuffered(self._stdscr, 3, upper_left_x=1)
+        self._wordwin = MyWindowSelectable(self._stdscr, 2, upper_left_x=1, boxed=False)
         self.auto_scroll_active = True
         self._wordentrywin = TextEntryBox(
-            self._stdscr, upper_left_y=0, upper_left_x=0, height=3
+            self._stdscr, upper_left_y=0, upper_left_x=0, height=2, boxed=False
         )
         self._stdscr.refresh()
         self._wordentrywin.refresh()
         self._current_view = View.ViewMode.BROWSER
+        self.current_word = ""
+        # self.word_context_window = MyWindowLineBuffered(
+        #     self._stdscr,
+        #     upper_left_y=5,
+        #     upper_left_x=20,
+        #     height=20,
+        #     width=60,
+        #     boxed=True,
+        # )
+        self.panel_manager = PanelManager(self._stdscr)
 
     def _process_signal(self, signal: dict):
         # logging.debug(signal)
@@ -68,9 +82,29 @@ class View:
             self._wordwin.refresh()
         elif signal["signal"] == "wordinfos":
             pass
-            # logging.debug(signal["msg"])
+        elif signal["signal"] == "next word result":
+            # self.word_context_window.refresh()
+            details = signal["msg"]["detail"]["text"]
+            index = signal["msg"]["index"]
+            newset = signal["msg"]["newset"]
+            if newset:
+                self.panel_manager.reset()
+            if (
+                index > len(self.panel_manager.panels) - 1
+                or len(self.panel_manager.panels) == 0
+            ):
+                self.panel_manager.add_panel(
+                    upper_left_y=5, upper_left_x=20, height=10, width=40, boxed=True
+                )
+                if index > 0:
+                    self.panel_manager.switch_panel(index)
 
-    def _update_viewmode(self):
+            for line in details:
+                self.panel_manager.add_line_to_current_panel(line)
+
+            self.panel_manager.draw_panels()
+
+    def _update_browsermode(self):
         # refresh view
         # check for inputs
         asciicode = self._stdscr.getch()
@@ -89,6 +123,8 @@ class View:
                     "msg": self._wordwin._lines[self._wordwin._selected_line_index],
                 }
             )
+            self._current_view = View.ViewMode.PANEL
+
         elif 0 <= asciicode <= 255:
             try:
                 self._wordentrywin.process_ascii(asciicode)
@@ -150,11 +186,39 @@ class View:
         if refresh_event:
             self._wordwin.refresh()
 
+    def _update_panelmode(self):
+        asciicode = self._stdscr.getch()
+        refresh_event = False
+        if asciicode == -1:
+            refresh_event = True
+        elif asciicode == curses.KEY_UP:
+            self.panel_manager.scroll_up()
+        elif asciicode == curses.KEY_DOWN:
+            self.panel_manager.scroll_down()
+
+        if refresh_event:
+            refresh_event = False
+
+        try:
+            next_signal = self.from_controller.get_nowait()
+        except queue.Empty:
+            next_signal = None
+            pass
+        else:
+            self._process_signal(next_signal)
+
+        if refresh_event:
+            pass
+            # self._wordwin.refresh()
+            # self._wordentrywin.refresh()
+
     def update(self):
         if self._current_view == View.ViewMode.BROWSER:
-            self._update_viewmode()
+            self._update_browsermode()
         elif self._current_view == View.ViewMode.LOG:
             self._update_logmode()
+        elif self._current_view == View.ViewMode.PANEL:
+            self._update_panelmode()
         else:
             raise Exception("Unknown view")
 

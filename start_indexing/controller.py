@@ -52,9 +52,71 @@ class Controller:
         self.from_view = Queue()
         self.to_view = Queue()
         self.view = View(self.from_view, self.to_view)
-        # self._outputfile = open("output.txt", "w")
-        # self.cmds = [["cat", "somewords.txt"]]
+        self._outputfile = open("output.txt", "w")
+        self.cmds = [["cat", "somewords.txt"]]
         self.model = MainModel("./data/main.db", "./data/paths.db")
+        self.result_generator = None
+        self.result_word = ""
+
+    def daisy_chain_offsets(self, ebook_details):
+        # Flatten the list of details with offsets from all ebook_detail objects
+        all_details = []
+        for detail in ebook_details:
+            for offset in detail["details"]["offsets"]:
+                all_details.append(
+                    {
+                        "path": detail["details"]["path"],
+                        "title": detail["details"]["title"],
+                        "authors": detail["details"]["authors"],
+                        "offset": offset,
+                    }
+                )
+
+        IP_TO_GUTENBERG_TEXTS = "69.55.231.8"
+        # Generator loop
+        index = 0
+        num_details = len(all_details)
+        cache = {}
+        consecutive_timeouts = 0
+        import re
+
+        pattern = r"\r?\n"
+        while True:
+            cache_index = index % num_details
+            detail = all_details[cache_index]
+
+            if cache_index in cache:
+                # Retrieve from cache
+                cached_detail = cache[cache_index]
+                consecutive_timeouts = 0  # Reset timeouts on successful retrieval
+            else:
+                # Generate new entry
+                url = f"http://{IP_TO_GUTENBERG_TEXTS}{detail['path']}"
+                logging.debug(url)
+                content, timedout = load_resource(url)
+
+                if timedout:
+                    consecutive_timeouts += 1
+                    if consecutive_timeouts >= num_details:
+                        raise Exception("All indices have timed out.")
+                    continue  # Skip incrementing the index and try the next one
+
+                extracted_text = extract_sentence_with_context(
+                    content, detail["offset"]
+                )
+                cached_detail = {
+                    "index": index,  # This is the index that will be returned
+                    "path": detail["path"],
+                    "title": detail["title"],
+                    "authors": detail["authors"],
+                    "offset": detail["offset"],
+                    "text": re.split(pattern, extracted_text),
+                }
+                cache[cache_index] = cached_detail
+                consecutive_timeouts = 0  # Reset timeouts on successful download
+
+            yield index, cached_detail
+            index += 1
 
     def _process_signal_from_view(self, signal_from_view):
         signal_quit = False
@@ -64,35 +126,55 @@ class Controller:
             wordlist = self.model.search_words(signal_from_view["msg"])
             self.to_view.put_nowait({"signal": "wordlist", "msg": wordlist})
         elif signal_from_view["signal"] == "lookupword":
-            IP_TO_GUTENBERG_TEXTS = "69.55.231.8"
+            newset = False
             word = signal_from_view["msg"]
-            wordinfos = self.model.get_paths_for_word(word)
+            if self.result_word != word:
+                ebook_details, offset_count = self.model.get_ebook_details_for_word(
+                    word, "./data/GUTINDEX.ALL"
+                )
+                self.result_word = word
+                newset = True
+                self.result_generator = self.daisy_chain_offsets(ebook_details)
+            # logging.debug(ebook_details)
+
+            # logging.debug(f"{ebook_details}")
+            # logging.debug(f"total count: {offset_count}")
             # path, textnum, offsets
-            textnum_to_text_to_offsets = []
-            for path, textnum, offsets in wordinfos:
-                text, timedout = load_resource("http://" + IP_TO_GUTENBERG_TEXTS + path)
-                if text is not None:
-                    textnum_to_text_to_offsets.append(
-                        (
-                            textnum,
-                            text,
-                            offsets,
-                        )
-                    )
-            textnum_to_contexts = []
-            for textnum, text, offsets in textnum_to_text_to_offsets:
-                for offset in offsets:
-                    context = extract_sentence_with_context(text, offset)
-                    textnum_to_contexts.append(
-                        (
-                            textnum,
-                            context,
-                        )
-                    )
-            for textnum, context in textnum_to_contexts:
-                logging.debug(context)
-                logging.debug("N E X T")
-            self.to_view.put_nowait({"signal": "wordinfos", "msg": textnum_to_contexts})
+            index, cached_detail = next(self.result_generator)
+            self.to_view.put_nowait(
+                {
+                    "signal": "next word result",
+                    "msg": {"index": index, "detail": cached_detail, "newset": newset},
+                }
+            )
+            # textnum_to_text_to_offsets = []
+            # for path, textnum, offsets in wordinfos:
+            #     text, timedout = load_resource("http://" + IP_TO_GUTENBERG_TEXTS + path)
+            #     if text is not None:
+            #         textnum_to_text_to_offsets.append(
+            #             (
+            #                 textnum,
+            #                 text,
+            #                 offsets,
+            #             )
+            #         )
+            # textnum_to_contexts = []
+            # for textnum, text, offsets in textnum_to_text_to_offsets:
+            #     for offset in offsets:
+            #         context = extract_sentence_with_context(text, offset)
+            #         textnum_to_contexts.append(
+            #             (
+            #                 textnum,
+            #                 context,
+            #             )
+            #         )
+            # for textnum, context in textnum_to_contexts:
+            #     logging.debug(context)
+            #     logging.debug(f"text number: {textnum}")
+            #     title, authors = extract_title_and_authors("GUTINDEX.ALL", textnum)
+            #     logging.debug(f"title: {title}\n--\nautors: {authors}")
+            #     logging.debug("N E X T")
+            # self.to_view.put_nowait({"signal": "wordinfos", "msg": textnum_to_contexts})
         return signal_quit
 
     def __call__(self):
