@@ -12,6 +12,7 @@ class MyWindow:
         height: int = None,
         width: int = None,
         boxed: bool = False,
+        padding: int = 0,
     ):
         """
         Initialize the window with the given parameters.
@@ -33,7 +34,9 @@ class MyWindow:
         )
         self._width = width if width is not None else screen_width - self._upper_left_x
         self._boxed = boxed
-
+        self.padding = padding
+        if self._boxed:
+            self.padding += 1
         self._win = curses.newwin(
             *self._actual_height_and_width,
             self._upper_left_y,
@@ -58,9 +61,8 @@ class MyWindow:
         viewable_height = min(self._height, drawable_height)
         viewable_width = min(self._width, drawable_width)
 
-        if self._boxed:
-            viewable_height -= 2
-            viewable_width -= 2
+        viewable_height -= 2 * self.padding
+        viewable_width -= 2 * self.padding
 
         return viewable_height, viewable_width
 
@@ -74,10 +76,7 @@ class MyWindow:
         - tuple: A tuple containing the actual height and width.
         """
         viewable_height, viewable_width = self._viewable_height_and_width
-        if self._boxed:
-            return viewable_height + 2, viewable_width + 2
-        else:
-            return viewable_height, viewable_width
+        return viewable_height + 2 * self.padding, viewable_width + 2 * self.padding
 
     def refresh(self, clear=False):
         """
@@ -137,9 +136,8 @@ class MyWindow:
         if y_offset >= max_height:
             raise ValueError("Line written outside of boundaries")
 
-        if self._boxed:
-            y_offset += 1
-            x_offset += 1
+        y_offset += 2 * self.padding
+        x_offset += 2 * self.padding
 
         words = line.split()
         current_line = ""
@@ -180,9 +178,8 @@ class MyWindow:
         if y_offset >= max_height or x_offset >= max_width:
             raise ValueError("Line written outside of boundaries")
 
-        if self._boxed:
-            y_offset += 1
-            x_offset += 1
+        y_offset += self.padding
+        x_offset += self.padding
 
         available_width = max_width - x_offset
         truncated_line = line[:available_width]

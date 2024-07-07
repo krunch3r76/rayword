@@ -15,6 +15,7 @@ class MyWindowLineBuffered(MyWindow):
         width: int = None,
         boxed: bool = False,
         scrolling: bool = False,
+        padding: int = 0,
     ):
         """
         Initialize a line-buffered window with the given parameters.
@@ -27,7 +28,9 @@ class MyWindowLineBuffered(MyWindow):
         - width: The width of the window.
         - boxed: Boolean indicating whether the window should have a border.
         """
-        super().__init__(stdscr, upper_left_y, upper_left_x, height, width, boxed)
+        super().__init__(
+            stdscr, upper_left_y, upper_left_x, height, width, boxed, padding
+        )
         self._lines = []
         self._current_line_index = -1
         self._scrolling = scrolling
@@ -42,11 +45,11 @@ class MyWindowLineBuffered(MyWindow):
         Returns:
         - int: The index of the bottom visible line.
         """
+        logging.debug("WTF")
         viewable_height, _ = self._viewable_height_and_width
         if self._current_line_index >= viewable_height:
             invisible_portion = self._height - viewable_height
-            if self._boxed:
-                invisible_portion -= 2  # Account for boxed borders
+            invisible_portion -= self.padding * 2
             return self._current_line_index - invisible_portion
         else:
             return self._current_line_index
@@ -121,6 +124,7 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         width: int = None,
         boxed: bool = False,
         scrolling: bool = False,
+        padding: int = 1,
     ):
         """
         Initialize a line-buffered window with wrapped line handling.
@@ -135,8 +139,9 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         - scrolling: Boolean indicating whether the window should support scrolling.
         """
         super().__init__(
-            stdscr, upper_left_y, upper_left_x, height, width, boxed, scrolling
+            stdscr, upper_left_y, upper_left_x, height, width, boxed, scrolling, padding
         )
+        logging.debug(f"boxed: {self._boxed} padding: {self.padding}")
         self._wrapped_lines = []
 
     def _wrap_lines(self):
@@ -182,13 +187,14 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         Calculate and return the index of the bottom visible line for wrapped lines.
         """
         viewable_height, _ = self._viewable_height_and_width
-        if self._current_line_index >= viewable_height:
-            invisible_portion = len(self._wrapped_lines) - viewable_height
-            if self._boxed:
-                invisible_portion -= 2
-            return self._current_line_index - invisible_portion
-        else:
-            return self._current_line_index
+        return self._current_line_index
+
+        # if self._current_line_index >= viewable_height:
+        #     invisible_portion = len(self._wrapped_lines) - viewable_height
+        #     invisible_portion -= 2 * self.padding
+        #     return self._current_line_index - invisible_portion
+        # else:
+        #     return self._current_line_index
 
     @property
     def _top_line_index(self):
@@ -205,7 +211,6 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         Refresh the window, drawing the wrapped lines.
         """
-        logging.debug("REFRESH")
         self.clear()
         for i, line in enumerate(
             self._wrapped_lines[self._top_line_index : self._bottom_line_index + 1]
@@ -230,9 +235,8 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         if y_offset >= max_height:
             raise ValueError("Line written outside of boundaries")
 
-        if self._boxed:
-            y_offset += 1
-            x_offset += 1
+        y_offset += self.padding
+        x_offset += self.padding
 
         self._win.move(y_offset, x_offset)
         self._win.insstr(line, attr)
@@ -251,9 +255,16 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         Scroll the view down by one line.
         """
+        logging.debug(
+            f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
+        )
         if self._current_line_index < len(self._wrapped_lines) - 1:
             self._current_line_index += 1
             self.refresh()
+
+        logging.debug(
+            f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
+        )
 
 
 # class PanelWindowLineBuffered(MyWindowLineBufferedWrapped):
