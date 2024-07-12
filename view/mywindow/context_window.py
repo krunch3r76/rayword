@@ -1,0 +1,83 @@
+# context_window.py
+
+from .mywindow import MyWindow
+from .line_buffered_window import MyWindowLineBufferedWrapped
+import logging
+
+"""
+    window for displaying the result of a text extraction
+
+    ----------------------------------------
+    |                                # / # |
+    | <text>                               |
+    |---------------------------------------
+    | <source>                             |
+    | <authors                             |
+    ----------------------------------------
+"""
+
+
+class ContextWindow:
+    def __init__(self, stdscr, upper_left_y, upper_left_x, height, width):
+        self.stdscr = stdscr
+        self.upper_left_y = upper_left_y
+        self.upper_left_x = upper_left_x
+
+        HEIGHT_STATUS_LINE = 1
+        HEIGHT_SOURCE_WINDOW = 4
+        HEIGHT_TEXT_WINDOW = height - HEIGHT_STATUS_LINE - HEIGHT_SOURCE_WINDOW
+        try:
+            self.count_window = MyWindow(
+                self.stdscr,
+                upper_left_y,
+                upper_left_x,
+                height=HEIGHT_STATUS_LINE,
+                width=width,
+                x_padding=1,
+                boxed=False,
+            )
+        except Exception as e:
+            logging.debug(f"{e}")
+            raise e
+        self.count_window.refresh()
+        self.text_window = MyWindowLineBufferedWrapped(
+            self.stdscr,
+            upper_left_y + HEIGHT_STATUS_LINE,
+            upper_left_x,
+            width=width,
+            height=HEIGHT_TEXT_WINDOW,
+            padding=1,
+            boxed=True,
+        )
+        self.source_window = MyWindow(
+            self.stdscr,
+            upper_left_y + HEIGHT_STATUS_LINE + HEIGHT_TEXT_WINDOW + 4,
+            upper_left_x,
+            height=HEIGHT_SOURCE_WINDOW,
+            width=width,
+            x_padding=1,
+            boxed=False,
+        )
+        self.source_window._add_line("test", 0)
+        # self.source_window = None
+
+    def add_line(self, line):
+        self.text_window.add_line(line)
+
+    def clear(self):
+        self.count_window.clear()
+        self.text_window.clear()
+        self.source_window.clear()
+        # TODO source_window
+
+    def refresh(self):
+        self.count_window.refresh()
+        self.text_window.refresh()
+        self.source_window.refresh()
+        # TODO source_window
+
+    def scroll_up(self):
+        self.text_window.scroll_up()
+
+    def scroll_down(self):
+        self.text_window.scroll_down()

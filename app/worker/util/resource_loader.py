@@ -9,9 +9,9 @@ import tempfile
 from pathlib import Path
 
 # Configure the root logger
-# logging.basicConfig(
-#     level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s"
-# )
+logging.basicConfig(
+    level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -243,6 +243,8 @@ def load_resource(url, max_retries=3):
         fetcher = URLContentFetcher(url, str(temp_zip_path), max_retries)
         if fetcher():
             logger.debug(f"URL fetching failed for {url}")
+            # try alternate path
+
             return None, True
 
         if temp_zip_path.exists():

@@ -365,6 +365,9 @@ class MainModel:
 
         Returns:
             list: A list of dictionaries containing text number, details with path, offsets, title, and authors for the given word.
+
+            { textnum: <int>, details: path: <str>, offsets: <list<int>>, title: <str>, authors: <str> }
+
         """
         # Step 1: Get the word_id for the given word
         word_id = self.get_word_id(word)

@@ -12,7 +12,9 @@ class MyWindow:
         height: int = None,
         width: int = None,
         boxed: bool = False,
-        padding: int = 0,
+        padding=None,
+        x_padding: int = 0,
+        y_padding: int = 0,
     ):
         """
         Initialize the window with the given parameters.
@@ -34,9 +36,14 @@ class MyWindow:
         )
         self._width = width if width is not None else screen_width - self._upper_left_x
         self._boxed = boxed
-        self.padding = padding
+        self.y_padding = y_padding
+        self.x_padding = x_padding
+
+        if padding is not None:
+            self.y_padding, self.x_padding = padding, padding
         if self._boxed:
-            self.padding += 1
+            self.y_padding += 1
+            self.x_padding += 1
         self._win = curses.newwin(
             *self._actual_height_and_width,
             self._upper_left_y,
@@ -49,7 +56,7 @@ class MyWindow:
     @property
     def _viewable_height_and_width(self):
         """
-        Calculate and return the viewable height and width of the window,
+        Calculate and return the viewable / writable height and width of the window,
         accounting for borders if the window is boxed.
 
         Returns:
@@ -61,8 +68,16 @@ class MyWindow:
         viewable_height = min(self._height, drawable_height)
         viewable_width = min(self._width, drawable_width)
 
-        viewable_height -= 2 * self.padding
-        viewable_width -= 2 * self.padding
+        # logging.debug(f"screen_height: {screen_height}, screen_width: {screen_width}")
+        # logging.debug(
+        #     f"drawable_height: {drawable_height}, drawable_width: {drawable_width}"
+        # )
+        # logging.debug(
+        #     f"viewable_height: {viewable_height}, vieable_width: {viewable_width}"
+        # )
+        # logging.debug(f"viewable_height before adjustment is: {viewable_height}")
+        # viewable_height -= 2 * self.y_padding
+        # viewable_width -= 2 * self.x_padding
 
         return viewable_height, viewable_width
 
@@ -76,7 +91,7 @@ class MyWindow:
         - tuple: A tuple containing the actual height and width.
         """
         viewable_height, viewable_width = self._viewable_height_and_width
-        return viewable_height + 2 * self.padding, viewable_width + 2 * self.padding
+        return viewable_height + 2 * self.y_padding, viewable_width + 2 * self.x_padding
 
     def refresh(self, clear=False):
         """
@@ -133,11 +148,11 @@ class MyWindow:
         """
         max_height, max_width = self._viewable_height_and_width
 
+        y_offset += self.y_padding
+        x_offset += self.x_padding
+
         if y_offset >= max_height:
             raise ValueError("Line written outside of boundaries")
-
-        y_offset += 2 * self.padding
-        x_offset += 2 * self.padding
 
         words = line.split()
         current_line = ""
@@ -166,8 +181,8 @@ class MyWindow:
 
         Parameters:
         - line (str): The line to be added.
-        - y_offset (int): The y-coordinate offset.
-        - x_offset (int): The x-coordinate offset. Default is 0.
+        - y_offset (int): The y-coordinate offset (within window).
+        - x_offset (int): The x-coordinate offset. (within window) Default is 0.
         - attr (int): Text attributes (e.g., color). Default is curses.A_NORMAL.
 
         Raises:
@@ -175,11 +190,13 @@ class MyWindow:
         """
         max_height, max_width = self._viewable_height_and_width
 
-        if y_offset >= max_height or x_offset >= max_width:
-            raise ValueError("Line written outside of boundaries")
+        y_offset += self.y_padding
+        x_offset += self.x_padding
 
-        y_offset += self.padding
-        x_offset += self.padding
+        if y_offset > max_height or x_offset > max_width:
+            raise ValueError(
+                f"Line written outside of boundaries: y_offset: {y_offset}, x_offset: {x_offset} max_height: {max_height} max_width: {max_width}"
+            )
 
         available_width = max_width - x_offset
         truncated_line = line[:available_width]

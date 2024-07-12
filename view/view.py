@@ -3,11 +3,8 @@ import curses
 import curses.panel
 from queue import Queue
 import queue
-from .cmd_window import CmdWindow
-from .log_window import LogWindow
-from .textentry import TextEntryBox
-from .selectable_window import MyWindowSelectable
-from .selectable_window import MyWindowLineBuffered, PanelManager
+from .mywindow import LogWindow, TextEntryBox, MyWindowSelectable, CmdWindow
+from .panel_manager import PanelManager
 import logging
 from view.color_pairs import init_color_pairs
 from enum import Enum, auto
@@ -94,7 +91,7 @@ class View:
                 or len(self.panel_manager.panels) == 0
             ):
                 self.panel_manager.add_panel(
-                    upper_left_y=5, upper_left_x=20, height=10, width=40, boxed=True
+                    upper_left_y=5, upper_left_x=20, height=30, width=40
                 )
                 if index > 0:
                     self.panel_manager.switch_panel(index)
@@ -195,7 +192,13 @@ class View:
             self.panel_manager.scroll_up()
         elif asciicode == curses.KEY_DOWN:
             self.panel_manager.scroll_down()
-
+        elif asciicode == curses.KEY_RIGHT:
+            self.to_controller.put_nowait(
+                {
+                    "signal": "lookupword",
+                    "msg": self._wordwin._lines[self._wordwin._selected_line_index],
+                }
+            )
         if refresh_event:
             refresh_event = False
 
