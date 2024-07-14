@@ -3,7 +3,11 @@ import curses
 import curses.panel
 from queue import Queue
 import queue
-from .mywindow import LogWindow, TextEntryBox, MyWindowSelectable, CmdWindow
+from .log_window_group import LogWindowGroup
+from .mywindow import (
+    TextEntryBox,
+    MyWindowSelectable,
+)
 from .panel_manager import PanelManager
 import logging
 from view.color_pairs import init_color_pairs
@@ -15,58 +19,49 @@ class View:
         LOG = auto()
         BROWSER = auto()
         PANEL = auto()
+        PROMPT = auto()
 
     def __init__(self, to_controller: Queue, from_controller: Queue):
-        self._stdscr = curses.initscr()
-        curses.curs_set(0)
-        self.to_controller = to_controller
-        self.from_controller = from_controller
-        curses.noecho()
-        curses.cbreak()
-        self._stdscr.keypad(True)
-        curses.start_color()
-        self._stdscr.nodelay(True)
-        self._cmdwindow = CmdWindow(self._stdscr, 0, 0)
-        screen_height, screen_width = self._stdscr.getmaxyx()
-        self._logwindow = LogWindow(self._stdscr, 2, 0, screen_height - 2, screen_width)
-        init_color_pairs()
-        self._cmdwindow.clear()
-        self._logwindow.clear()
-        self._wordwin = MyWindowSelectable(self._stdscr, 2, upper_left_x=1, boxed=False)
-        self.auto_scroll_active = True
-        self._wordentrywin = TextEntryBox(
-            self._stdscr, upper_left_y=0, upper_left_x=0, height=2, boxed=False
-        )
-        self._stdscr.refresh()
-        self._wordentrywin.refresh()
-        self._current_view = View.ViewMode.BROWSER
-        self.current_word = ""
-        # self.word_context_window = MyWindowLineBuffered(
-        #     self._stdscr,
-        #     upper_left_y=5,
-        #     upper_left_x=20,
-        #     height=20,
-        #     width=60,
-        #     boxed=True,
-        # )
-        self.panel_manager = PanelManager(self._stdscr)
+        try:
+            self._stdscr = curses.initscr()
+            curses.curs_set(0)
+            self.to_controller = to_controller
+            self.from_controller = from_controller
+            curses.noecho()
+            curses.cbreak()
+            self._stdscr.keypad(True)
+            curses.start_color()
+            self._stdscr.nodelay(True)
+            init_color_pairs()
+
+            self.log_window_group = LogWindowGroup(self._stdscr)
+            self._wordwin = MyWindowSelectable(
+                self._stdscr, 2, upper_left_x=1, boxed=False
+            )
+            #        self.prompt_window =
+            self.auto_scroll_active = True
+            self._wordentrywin = TextEntryBox(
+                self._stdscr, upper_left_y=0, upper_left_x=0, height=2, boxed=False
+            )
+            self._stdscr.refresh()
+            self._wordentrywin.refresh()
+            self._current_view = View.ViewMode.PROMPT
+            self.current_word = ""
+            self.panel_manager = PanelManager(self._stdscr)
+        except Exception as e:
+            logging.debug(f"\n\nexception: {e}\n\n")
+            raise
 
     def _process_signal(self, signal: dict):
-        # logging.debug(signal)
+        # highlest level signal processing for all windows visible or not
         if signal["signal"] == "cmdstart":
-            pass
-            # self._cmdwindow.update_command(signal["msg"])
-            # print(signal["msg"])
+            self.log_window_group.update_cmd_line(signal["msg"])
         elif signal["signal"] == "cmdend":
             pass
             # print(f"return code: {signal['msg']}")
         elif signal["signal"] == "cmdout":
             line = signal["msg"]
-            # self._logwindow.add_line(line)
-
-            # self._stdscr.addstr(signal["msg"])
-            pass
-            # print(f"msg: {signal['msg']}")
+            self.log_window_group.add_log_line(line)
         elif signal["signal"] == "addword":
             line = signal["msg"]
             self._wordwin.add_line(line)
@@ -80,10 +75,11 @@ class View:
         elif signal["signal"] == "wordinfos":
             pass
         elif signal["signal"] == "next word result":
-            # self.word_context_window.refresh()
-            details = signal["msg"]["detail"]["text"]
+            text = signal["msg"]["detail"]["text"]
+            authors = signal["msg"]["detail"]["authors"]
             index = signal["msg"]["index"]
             newset = signal["msg"]["newset"]
+            title = signal["msg"]["detail"]["title"]
             if newset:
                 self.panel_manager.reset()
             if (
@@ -96,8 +92,10 @@ class View:
                 if index > 0:
                     self.panel_manager.switch_panel(index)
 
-            for line in details:
+            for line in text:
                 self.panel_manager.add_line_to_current_panel(line)
+
+            self.panel_manager.add_title_and_authors(title, authors)
 
             self.panel_manager.draw_panels()
 
@@ -161,17 +159,17 @@ class View:
         if ch == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
         elif ch == curses.KEY_UP:
-            self._logwindow.scroll_up()
+            self.log_window_group.scroll_log_up()
             self.auto_scroll_active = False
             refresh_event = True
         elif ch == curses.KEY_DOWN:
-            self._logwindow.scroll_down()
+            self.log_window_group.scroll_log_down()
             self.auto_scroll_active = False
         elif ch == -1:
             refresh_event = True
-        if refresh_event:
-            # self._logwindow.refresh()
-            refresh_event = False
+        # if refresh_event:
+        #     # self._logwindow.refresh()
+        #     refresh_event = False
 
         try:
             next_signal = self.from_controller.get_nowait()
@@ -181,7 +179,16 @@ class View:
             self._process_signal(next_signal)
 
         if refresh_event:
-            self._wordwin.refresh()
+            self.log_window_group.refresh_all_log()
+
+    def _update_promptmode(self):
+        asciicode = self._stdscr.getch()
+        if asciicode == ord("q"):
+            self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
+        elif asciicode in (curses.KEY_ENTER, 10, 13):
+            self._current_view = View.ViewMode.LOG
+            self.to_controller.put_nowait({"signal": "cmd", "msg": "start ray"})
+        self.log_window_group.refresh_prompt_window()
 
     def _update_panelmode(self):
         asciicode = self._stdscr.getch()
@@ -222,6 +229,8 @@ class View:
             self._update_logmode()
         elif self._current_view == View.ViewMode.PANEL:
             self._update_panelmode()
+        elif self._current_view == View.ViewMode.PROMPT:
+            self._update_promptmode()
         else:
             raise Exception("Unknown view")
 

@@ -2,6 +2,7 @@
 
 from .mywindow import MyWindow
 from .line_buffered_window import MyWindowLineBufferedWrapped
+from .source_window import SourceWindow
 import logging
 
 """
@@ -18,6 +19,12 @@ import logging
 
 
 class ContextWindow:
+    """
+    +count_window: MyWindow
+    +text_window: MyWindowLineBufferedWrapped
+    +source_window: SourceWindow
+    """
+
     def __init__(self, stdscr, upper_left_y, upper_left_x, height, width):
         self.stdscr = stdscr
         self.upper_left_y = upper_left_y
@@ -49,7 +56,7 @@ class ContextWindow:
             padding=1,
             boxed=True,
         )
-        self.source_window = MyWindow(
+        self.source_window = SourceWindow(
             self.stdscr,
             upper_left_y + HEIGHT_STATUS_LINE + HEIGHT_TEXT_WINDOW + 4,
             upper_left_x,
@@ -58,8 +65,9 @@ class ContextWindow:
             x_padding=1,
             boxed=False,
         )
-        self.source_window._add_line("test", 0)
-        # self.source_window = None
+
+    def add_source(self, line):
+        self.source_window.add_line(line)
 
     def add_line(self, line):
         self.text_window.add_line(line)

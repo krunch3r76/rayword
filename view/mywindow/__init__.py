@@ -5,3 +5,4 @@ from .line_buffered_window import MyWindowLineBuffered, MyWindowLineBufferedWrap
 from .selectable_window import MyWindowSelectable
 from .context_window import ContextWindow
 from .mywindow import MyWindow
+from .prompt_window import PromptWindow

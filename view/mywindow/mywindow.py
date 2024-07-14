@@ -221,3 +221,9 @@ class MyWindow:
             self._add_line_truncated(line, y_offset, x_offset, attr)
         else:
             self._add_line_wrapped(line, y_offset, x_offset, attr)
+
+    def add_line(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL, wrapped=True):
+        if wrapped:
+            self._add_line_wrapped(line, y_offset, x_offset, attr)
+        else:
+            self._add_line_truncated(line, y_offset, x_offset, attr)

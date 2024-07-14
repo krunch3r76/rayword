@@ -1,5 +1,6 @@
 from .mywindow import ContextWindow
 import curses
+import logging
 
 
 class PanelManager:
@@ -17,6 +18,15 @@ class PanelManager:
         if self.panels:
             self.panels[self.current_panel_index].add_line(line)
             # self.panels[self.current_panel_index].refresh()
+
+    def add_title_and_authors(self, title, authors):
+        if self.panels:
+            logging.debug(authors)
+            for line in title.splitlines():
+                self.panels[self.current_panel_index].add_source(line)
+
+            for line in authors.splitlines():
+                self.panels[self.current_panel_index].add_source(line)
 
     def clear_current_panel(self):
         if self.panels:

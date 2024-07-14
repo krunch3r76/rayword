@@ -18,10 +18,19 @@ class MyPad:
         self._stdscr = stdscr
         self._upper_left_y = upper_left_y
         self._upper_left_x = upper_left_x
+        screen_height, screen_width = self._stdscr.getmaxyx()
         self._height = height
         self._width = width
+
+        if self._upper_left_y + self._height > screen_height:
+            raise Exception("height of window cannot exceed screen height")
+        logging.debug(
+            f"upper_left_y is {self._upper_left_y} and height is {self._height}"
+        )
         self._pmincol = 0
-        self._padline = 0  # cursor 1-based indicating with line to which to write
+        self._padline = (
+            0  # cursor 1-based indicating with line on virtual pad to which to write
+        )
         self._padline_at_keyup = 0
         self.__curcol = 0
         self._win = curses.newpad(nlines, ncols)
@@ -31,6 +40,7 @@ class MyPad:
             1  # the viewable line number of the pad that is on the first row
         )
         self.refresh()
+        logging.debug("Hello from MyPad")
 
     @property
     def _curcol(self):
@@ -167,24 +177,19 @@ class MyPad:
         if line == "":
             return
 
-        logging.debug(f"adding line: {repr(line)}")
-
         if attribute_segmenter is None:
             segments = [(line, None)]
         else:
             segments = attribute_segmenter(line)
 
-        logging.debug(f"adding segments: {segments}")
         self._curcol = 0
         for segment in segments:
             if segment[0] == "":
                 continue
             subsegment = self._write_segment(segment)
-            logging.debug(f"got subsegment: {subsegment}")
             while subsegment is not None:
                 self._curcol = 0
                 self._advance_line_cursor()
-                logging.debug(f"adding subsegment: {subsegment}")
                 subsegment = self._write_segment(subsegment)
 
     def scroll_up(self):
@@ -222,34 +227,6 @@ class MyPad:
             # self.refresh(self._pminrow - self._current_line_offset)
         else:
             self.refresh()
-
-        # self.refresh()
-
-
-# class MyPadBuffered(MyPad):
-#     """a subclass that implements an internal buffer and line selection"""
-
-#     def __init__(
-#         self,
-#         stdscr,
-#         upper_left_y,
-#         upper_left_x,
-#         height,
-#         width,
-#         nlines=10000,
-#         ncols=1000,
-#     ):
-#         super().__init__(
-#             stdscr, upper_left_y, upper_left_x, height, width, nlines, ncols
-#         )
-#         self._linebuffer = []
-
-#     def add_line(self, line, attribute_segmenter=parse_ansi_sequences):
-#         self._linebuffer.append(line)
-#         super().add_line(line, attribute_segmenter)
-
-#     def _write_segment(self, segment, truncate=True):
-#         super().add_line(segment, truncate)
 
 
 class MyPadWrapped(MyPad):

@@ -43,7 +43,6 @@ class MyWindowLineBuffered(MyWindow):
         Returns:
         - int: The index of the bottom visible line.
         """
-        logging.debug("WTF")
         viewable_height, _ = self._viewable_height_and_width
         if self._current_line_index >= viewable_height:
             invisible_portion = self._height - viewable_height
