@@ -52,6 +52,8 @@ class MyWindow:
 
         if self._boxed:
             self._win.box()
+        self.visible = True
+        self.overlay_win = None
 
     @property
     def _viewable_height_and_width(self):
@@ -100,6 +102,8 @@ class MyWindow:
         Parameters:
         - clear (bool): If True, clear the window before refreshing. Default is False.
         """
+        if not self.visible:
+            return
         if clear:
             self.clear()
         if self._boxed:
@@ -128,7 +132,8 @@ class MyWindow:
         """
         Resize the window without clearing its content.
         """
-        available_lines, available_cols = self._actual_height_and_width
+        curses.update_lines_cols()
+        available_lines, available_cols = self._viewable_height_and_width
         self._win.erase()
         self._win.resize(available_lines, available_cols)
         self.refresh()
@@ -227,3 +232,20 @@ class MyWindow:
             self._add_line_wrapped(line, y_offset, x_offset, attr)
         else:
             self._add_line_truncated(line, y_offset, x_offset, attr)
+
+    def hide(self):
+        self.visible = False
+        # Create an overlay window to hide the main window
+        self.overlay_win = curses.newwin(
+            self._height, self._width, self._upper_left_y, self._upper_left_x
+        )
+        self.overlay_win.clear()
+        self.overlay_win.refresh()
+
+    def show(self):
+        self.visible = True
+        # Clear the overlay window and delete it
+        if self.overlay_win:
+            self.overlay_win.clear()
+            self.overlay_win = None
+        self.refresh()

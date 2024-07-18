@@ -1,6 +1,7 @@
 # log_window_group.py
 # manage the log view
 from .mywindow import PromptWindow, LogWindow, CmdWindow
+import curses
 
 
 class LogWindowGroup:
@@ -15,6 +16,7 @@ class LogWindowGroup:
             boxed=True,
             padding=1,
         )
+        self.add_lines_to_prompt_window()
 
         BOTTOM_PADDING = 2
         TOP_PADDING = 2
@@ -30,6 +32,30 @@ class LogWindowGroup:
         self.cmd_window = CmdWindow(self.stdscr, 0, 0)
         self.log_windows = [self.log_window, self.cmd_window]
 
+    def add_lines_to_prompt_window(self):
+        # consider making prompt_window remember this internally and just rewrite on refresh
+        self.prompt_window.add_line("Press enter to start ray")
+        self.prompt_window.refresh()
+
+    def hide(self):
+        for window in self.log_windows:
+            window.hide()
+        self.prompt_window.hide()
+
+    def show(self, include_prompt_window=False):
+        for window in self.log_windows:
+            window.show()
+        self.prompt_window.show()
+
+    def clear(self):
+        for window in self.log_windows:
+            window.clear()
+        self.prompt_window.clear()
+
+    def resize(self):
+        for window in self.log_windows:
+            window.resize()
+
     def refresh_all_log(self):
         for window in self.log_windows:
             window.refresh()
@@ -44,6 +70,9 @@ class LogWindowGroup:
         self.logwindow.scroll_down()
 
     def refresh_prompt_window(self):
+        pass
+        self.prompt_window.clear()
+        self.add_lines_to_prompt_window()
         self.prompt_window.refresh()
 
     def update_cmd_line(self, line):

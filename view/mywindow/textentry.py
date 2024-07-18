@@ -1,5 +1,6 @@
 from .mywindow import MyWindow
 import curses
+import logging
 
 
 class TextEntryBox(MyWindow):
@@ -25,6 +26,7 @@ class TextEntryBox(MyWindow):
         )
 
     def refresh(self):
+        logging.debug(f"text entry box refreshd")
         self._add_line(self._textbuffer)
         self._stdscr.refresh()
         super().refresh()
@@ -37,3 +39,8 @@ class TextEntryBox(MyWindow):
     def backspace(self):
         self._textbuffer = self._textbuffer[:-1]
         self.refresh()
+
+    def clear(self):
+        super().clear()
+        super().refresh()
+        logging.debug(f"text entry box cleared")

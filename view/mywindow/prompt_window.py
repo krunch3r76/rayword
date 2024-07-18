@@ -36,3 +36,7 @@ class PromptWindow(MyWindow):
         except:
             pass
         self.y_offset += 1
+
+    def clear(self):
+        self.y_offset = 0
+        super().clear()

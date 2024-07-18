@@ -49,11 +49,13 @@ class Controller:
             ["python3", "main/import_ray_results.py"],
             ["ray", "down", "golem-cluster.yaml", "--yes"],
         ]
+        self.signal_start = False
+        self.cmds_started = False
         self.from_view = Queue()
         self.to_view = Queue()
         self.view = View(self.from_view, self.to_view)
         self._outputfile = open("output.txt", "w")
-        self.cmds = [["cat", "somewords.txt"]]
+        # self.cmds = [["cat", "somewords.txt"]]
         self.model = MainModel("./data/main.db", "./data/paths.db")
         self.result_generator = None
         self.result_word = ""
@@ -147,37 +149,16 @@ class Controller:
                     "msg": {"index": index, "detail": cached_detail, "newset": newset},
                 }
             )
-            # textnum_to_text_to_offsets = []
-            # for path, textnum, offsets in wordinfos:
-            #     text, timedout = load_resource("http://" + IP_TO_GUTENBERG_TEXTS + path)
-            #     if text is not None:
-            #         textnum_to_text_to_offsets.append(
-            #             (
-            #                 textnum,
-            #                 text,
-            #                 offsets,
-            #             )
-            #         )
-            # textnum_to_contexts = []
-            # for textnum, text, offsets in textnum_to_text_to_offsets:
-            #     for offset in offsets:
-            #         context = extract_sentence_with_context(text, offset)
-            #         textnum_to_contexts.append(
-            #             (
-            #                 textnum,
-            #                 context,
-            #             )
-            #         )
-            # for textnum, context in textnum_to_contexts:
-            #     logging.debug(context)
-            #     logging.debug(f"text number: {textnum}")
-            #     title, authors = extract_title_and_authors("GUTINDEX.ALL", textnum)
-            #     logging.debug(f"title: {title}\n--\nautors: {authors}")
-            #     logging.debug("N E X T")
-            # self.to_view.put_nowait({"signal": "wordinfos", "msg": textnum_to_contexts})
+        elif (
+            signal_from_view["signal"] == "cmd"
+            and signal_from_view["msg"] == "start ray"
+        ):
+            self.signal_start = True
         return signal_quit
 
-    def __call__(self):
+    def run_commands(self):
+        self.cmds_started = True
+        logging.debug("cmds started")
         last_return_code = 0
         signal_quit = False
         for cmd in self.cmds:
@@ -201,8 +182,8 @@ class Controller:
                     break
                     # self.view.receive_signal({"signal": "cmdend", "msg": rc})
                 else:
-                    # self.to_view.put_nowait({"signal": "cmdout", "msg": line})
-                    self.to_view.put_nowait({"signal": "addword", "msg": line.rstrip()})
+                    self.to_view.put_nowait({"signal": "cmdout", "msg": line})
+                    # self.to_view.put_nowait({"signal": "addword", "msg": line.rstrip()})
                     self._outputfile.write(line + "\n")
                     # self.view.receive_signal({"signal": "cmdout", "msg": line})
                 try:
@@ -217,6 +198,7 @@ class Controller:
                 time.sleep(0.01)
             self.to_view.put_nowait({"signal": "wake", "msg": None})
 
+    def __call__(self):
         while True:
             try:
                 signal_from_view = self.from_view.get_nowait()
@@ -226,6 +208,8 @@ class Controller:
                 signal_quit = self._process_signal_from_view(signal_from_view)
                 if signal_quit:
                     break
+                if self.signal_start and not self.cmds_started:
+                    self.run_commands()
             self.view.update()
             time.sleep(0.01)
 

@@ -24,9 +24,9 @@ class MyPad:
 
         if self._upper_left_y + self._height > screen_height:
             raise Exception("height of window cannot exceed screen height")
-        logging.debug(
-            f"upper_left_y is {self._upper_left_y} and height is {self._height}"
-        )
+        # logging.debug(
+        #     f"upper_left_y is {self._upper_left_y} and height is {self._height}"
+        # )
         self._pmincol = 0
         self._padline = (
             0  # cursor 1-based indicating with line on virtual pad to which to write
@@ -39,8 +39,10 @@ class MyPad:
         self._padline_top = (
             1  # the viewable line number of the pad that is on the first row
         )
+        self.visible = True
         self.refresh()
         logging.debug("Hello from MyPad")
+        self.overlay_win = None
 
     @property
     def _curcol(self):
@@ -64,6 +66,29 @@ class MyPad:
         else:
             return 0
 
+    def hide(self):
+        self.visible = False
+        # Create an overlay window to hide the pad
+        self.overlay_win = curses.newwin(
+            self._height, self._width, self._upper_left_y, self._upper_left_x
+        )
+        self.overlay_win.clear()
+        self.overlay_win.refresh()
+
+    def show(self):
+        self.visible = True
+        # Clear the overlay window and delete it
+        if self.overlay_win:
+            self.overlay_win.clear()
+            self.overlay_win = None
+        self.refresh()
+
+    # def hide_pad(self):
+    #     screen_height, screen_width = self._stdscr.getmaxyx()
+    #     self._win.refresh(
+    #         0, 0, screen_height, screen_width, screen_height, screen_width
+    #     )
+
     def clear(self):
         self._win.clear()
 
@@ -72,9 +97,13 @@ class MyPad:
 
         notes: uses _padline_top only if the window has been scrolled
         """
+        if not self.visible:
+            return
 
         # toprow overrides self._pminrow
         def _compute_refresh_coordinates(topline):
+            viewable_height, viewable_width = self._viewable_height_and_width
+
             # Calculate the coordinates for a call to refresh
             if topline is not None:
                 pminrow = topline
@@ -85,8 +114,8 @@ class MyPad:
                 self._pmincol,
                 self._upper_left_y,
                 self._upper_left_x,
-                self._upper_left_y + self._height - 1,
-                self._upper_left_x + self._width - 1,
+                self._upper_left_y + viewable_height - 1,
+                self._upper_left_x + viewable_width - 1,
             )
 
         topline = None
@@ -100,6 +129,10 @@ class MyPad:
         self._win.refresh(
             coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]
         )
+
+    def resize(self):
+        # resize logic to refresh to new dimensions
+        self.refresh()
 
     @property
     def _viewable_height_and_width(self):

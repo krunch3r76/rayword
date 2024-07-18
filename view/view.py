@@ -34,11 +34,12 @@ class View:
             self._stdscr.nodelay(True)
             init_color_pairs()
 
+            # log window group
             self.log_window_group = LogWindowGroup(self._stdscr)
+            # word window
             self._wordwin = MyWindowSelectable(
                 self._stdscr, 2, upper_left_x=1, boxed=False
             )
-            #        self.prompt_window =
             self.auto_scroll_active = True
             self._wordentrywin = TextEntryBox(
                 self._stdscr, upper_left_y=0, upper_left_x=0, height=2, boxed=False
@@ -48,6 +49,7 @@ class View:
             self._current_view = View.ViewMode.PROMPT
             self.current_word = ""
             self.panel_manager = PanelManager(self._stdscr)
+            self.prompt_acknowledged = False
         except Exception as e:
             logging.debug(f"\n\nexception: {e}\n\n")
             raise
@@ -99,10 +101,10 @@ class View:
 
             self.panel_manager.draw_panels()
 
-    def _update_browsermode(self):
+    def _update_browsermode(self, asciicode):
         # refresh view
         # check for inputs
-        asciicode = self._stdscr.getch()
+        # asciicode = self._stdscr.getch()
         refresh_event = False
         if asciicode == -1:
             refresh_event = True
@@ -112,14 +114,19 @@ class View:
                 {"signal": "search", "msg": self._wordentrywin._textbuffer}
             )
         elif asciicode in (curses.KEY_ENTER, 10, 13):
-            self.to_controller.put_nowait(
-                {
-                    "signal": "lookupword",
-                    "msg": self._wordwin._lines[self._wordwin._selected_line_index],
-                }
-            )
-            self._current_view = View.ViewMode.PANEL
-
+            try:
+                self.to_controller.put_nowait(
+                    {
+                        "signal": "lookupword",
+                        "msg": self._wordwin._lines[self._wordwin._selected_line_index],
+                    }
+                )
+                self._current_view = View.ViewMode.PANEL
+            except Exception as e:
+                logging.debug(
+                    f"{e}: len->{len(self._wordwin._lines)} selected_index: -> self._wordwin._selected_line_index"
+                )
+                raise
         elif 0 <= asciicode <= 255:
             try:
                 self._wordentrywin.process_ascii(asciicode)
@@ -153,19 +160,19 @@ class View:
             # self._wordwin.refresh()
             self._wordentrywin.refresh()
 
-    def _update_logmode(self):
-        ch = self._stdscr.getch()
+    def _update_logmode(self, asciicode):
+        # ch = self._stdscr.getch()
         refresh_event = False
-        if ch == ord("q"):
+        if asciicode == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
-        elif ch == curses.KEY_UP:
+        elif asciicode == curses.KEY_UP:
             self.log_window_group.scroll_log_up()
             self.auto_scroll_active = False
             refresh_event = True
-        elif ch == curses.KEY_DOWN:
+        elif asciicode == curses.KEY_DOWN:
             self.log_window_group.scroll_log_down()
             self.auto_scroll_active = False
-        elif ch == -1:
+        elif asciicode == -1:
             refresh_event = True
         # if refresh_event:
         #     # self._logwindow.refresh()
@@ -181,17 +188,20 @@ class View:
         if refresh_event:
             self.log_window_group.refresh_all_log()
 
-    def _update_promptmode(self):
-        asciicode = self._stdscr.getch()
-        if asciicode == ord("q"):
+    def _update_promptmode(self, asciicode):
+        # asciicode = self._stdscr.getch()
+        if asciicode == curses.KEY_RESIZE:
+            self.log_window_group.resize()
+        elif asciicode == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
         elif asciicode in (curses.KEY_ENTER, 10, 13):
             self._current_view = View.ViewMode.LOG
+            self.prompt_acknowledged = True
             self.to_controller.put_nowait({"signal": "cmd", "msg": "start ray"})
         self.log_window_group.refresh_prompt_window()
 
-    def _update_panelmode(self):
-        asciicode = self._stdscr.getch()
+    def _update_panelmode(self, asciicode):
+        # asciicode = self._stdscr.getch()
         refresh_event = False
         if asciicode == -1:
             refresh_event = True
@@ -223,16 +233,43 @@ class View:
             # self._wordentrywin.refresh()
 
     def update(self):
+        asciicode = self._stdscr.getch()
+        if asciicode == curses.KEY_F2:
+            # clear othe rgroup
+            self._wordwin.hide()
+            self._wordentrywin.hide()
+            # self._wordwin.clear()
+            # self._wordentrywin.clear()
+            if self.prompt_acknowledged:
+                self._current_view = View.ViewMode.LOG
+                self.log_window_group.show()
+                # self.log_window_group.refresh_all_log()
+            else:
+                self._current_view = View.ViewMode.PROMPT
+                self.log_window_group.show(include_prompt_window=True)
+                # self.log_window_group.show_all_log()
+                # self.log_window_group.show_prompt_window()
+                # self.log_window_group.refresh_all_log()
+                # self.log_window_group.refresh_prompt_window()
+
+        elif asciicode == curses.KEY_F3:
+            self.log_window_group.hide()
+            # self.log_window_group.clear()
+            self._wordwin.show()
+            self._wordentrywin.show()
+
+            self._current_view = View.ViewMode.BROWSER
         if self._current_view == View.ViewMode.BROWSER:
-            self._update_browsermode()
+            self._update_browsermode(asciicode)
         elif self._current_view == View.ViewMode.LOG:
-            self._update_logmode()
+            self._update_logmode(asciicode)
         elif self._current_view == View.ViewMode.PANEL:
-            self._update_panelmode()
+            self._update_panelmode(asciicode)
         elif self._current_view == View.ViewMode.PROMPT:
-            self._update_promptmode()
+            self._update_promptmode(asciicode)
         else:
             raise Exception("Unknown view")
+        curses.napms(10)
 
     def __del__(self):
         curses.nocbreak()
