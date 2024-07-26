@@ -24,7 +24,7 @@ class Controller:
                 "--batch-size",
                 "50",
             ],
-            ["ray", "up", "golem-cluster.yaml", "--yes"],
+            ["ray", "up", "golem-cluster.yaml", "--yes", "--no-config-cache"],
             [
                 "ray",
                 "rsync-up",
@@ -195,7 +195,7 @@ class Controller:
                     if signal_quit:
                         break
                 self.view.update()
-                time.sleep(0.01)
+                time.sleep(0.001)
             self.to_view.put_nowait({"signal": "wake", "msg": None})
 
     def __call__(self):
@@ -213,6 +213,6 @@ class Controller:
             self.view.update()
             time.sleep(0.01)
 
-        def __del__(self):
-            del self.view
-            self._outputfile.close()
+    def __del__(self):
+        del self.view
+        self._outputfile.close()

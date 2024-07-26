@@ -235,6 +235,7 @@ class View:
     def update(self):
         asciicode = self._stdscr.getch()
         if asciicode == curses.KEY_F2:
+            logging.debug("switching to LOG view")
             # clear othe rgroup
             self._wordwin.hide()
             self._wordentrywin.hide()
@@ -253,6 +254,7 @@ class View:
                 # self.log_window_group.refresh_prompt_window()
 
         elif asciicode == curses.KEY_F3:
+            logging.debug("switching to BROWSER view")
             self.log_window_group.hide()
             # self.log_window_group.clear()
             self._wordwin.show()
@@ -269,7 +271,6 @@ class View:
             self._update_promptmode(asciicode)
         else:
             raise Exception("Unknown view")
-        curses.napms(10)
 
     def __del__(self):
         curses.nocbreak()

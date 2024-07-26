@@ -1,19 +1,16 @@
-import subprocess
 import queue
-import select
-import time
+import subprocess
+import threading
 import os
+import pty
 
 
 class ProcessTerminated(Exception):
-    """Indicate that an empty queue is no longer readable as it will never be filled further"""
-
-    def __init__(self, message="Empty queue and process has terminated"):
-        self.message = message
+    pass
 
 
 class ProcessQueue:
-    """Execute a subprocess and queue its output line by line non-blocking"""
+    """Execute a subprocess and queue its output line by line non-blocking using a pseudo-terminal"""
 
     def __init__(self, cmdline):
         """Initialize ProcessQueue with a shared queue and invoke the function to launch the command
@@ -22,59 +19,55 @@ class ProcessQueue:
             cmdline: a sequence (e.g., list) of text commands representing the full command line to execute
         """
         self._queue = queue.Queue()
+        self.master_fd, self.slave_fd = pty.openpty()  # Create a pseudo-terminal pair
+
         self._process = subprocess.Popen(
             cmdline,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=self.slave_fd,
+            stderr=self.slave_fd,
+            stdin=self.slave_fd,  # Use the slave end of the PTY for stdin
             bufsize=1,
             text=True,
+            close_fds=True,
+            env=os.environ,  # Ensure the subprocess inherits the current environment
         )
-        self.stdout_fd = self._process.stdout.fileno()
-        self.stderr_fd = self._process.stderr.fileno()
-        self.stdout_buffer = ""
-        self.stderr_buffer = ""
+        os.close(self.slave_fd)  # Close the slave end in the parent process
+
         self.return_code = None
+
+        # Start a thread to read from the master end of the PTY
+        threading.Thread(target=self._enqueue_output, daemon=True).start()
 
     def _enqueue_output(self):
         """Helper function to read lines from the subprocess output and enqueue them"""
-        ready_fds, _, _ = select.select([self.stdout_fd, self.stderr_fd], [], [], 0.01)
-
-        for fd in ready_fds:
+        while True:
             try:
-                if fd == self.stdout_fd:
-                    data = os.read(self.stdout_fd, 1024).decode(errors="replace")
-                    self.stdout_buffer += data
-                    while "\n" in self.stdout_buffer:
-                        line, self.stdout_buffer = self.stdout_buffer.split("\n", 1)
-                        self._queue.put_nowait(line + "\n")
-                elif fd == self.stderr_fd:
-                    data = os.read(self.stderr_fd, 1024).decode()
-                    self.stderr_buffer += data
-                    while "\n" in self.stderr_buffer:
-                        line, self.stderr_buffer = self.stderr_buffer.split("\n", 1)
-                        self._queue.put_nowait(line + "\n")
-            except UnicodeDecodeError:
-                raise
+                output = os.read(self.master_fd, 1024).decode()
+                if output == "":
+                    break
+                for line in output.splitlines():
+                    self._queue.put_nowait(line + "\n")
+            except OSError:
+                break
+        os.close(self.master_fd)
 
     def get_nowait(self):
-        """Return a line from a queue or throw one of two exceptions
+        """Return a line from the queue or throw one of two exceptions
 
         Returns:
             A line of text terminated by a newline
 
         Raises:
             queue.Empty: There is currently no line to read from the queue
-            ProcessTerminated: There cannot be any more lines to read from the queue;
-                the process has terminated.
+            ProcessTerminated: There cannot be any more lines to read from the queue; the process has terminated.
         """
-        # First, try to enqueue any new output
-        self._enqueue_output()
+        if self.return_code is None:
+            self.return_code = self._process.poll()
 
         try:
             line = self._queue.get_nowait()
         except queue.Empty as exc:
-            if self._process.poll() is not None:
-                self.return_code = self._process.returncode
+            if self.return_code is not None:
                 raise ProcessTerminated from exc
             raise
         else:
@@ -82,28 +75,11 @@ class ProcessQueue:
 
     def get_return_code(self):
         """Return the return code of the subprocess if it has terminated, else None"""
-        if self._process.poll() is not None:
-            self.return_code = self._process.returncode
+        if self.return_code is None:
+            self.return_code = self._process.poll()
         return self.return_code
 
 
-# Example usage
-if __name__ == "__main__":
-    processQueue = ProcessQueue(
-        cmdline=["/home/golem/.local/bin/golemsp", "run", "--payment-network=testnet"]
-    )
-
-    while True:
-        try:
-            time.sleep(0.01)
-            next_line = processQueue.get_nowait()
-        except queue.Empty:
-            pass
-        except ProcessTerminated:
-            print("Process terminated! and queue is empty")
-            break
-        else:
-            print(next_line, end="")
-
-    return_code = processQueue.get_return_code()
-    print(f"Process exited with return code: {return_code}")
+# Custom exception to handle process termination
+class ProcessTerminated(Exception):
+    pass

@@ -19,7 +19,7 @@ class LogWindowGroup:
         self.add_lines_to_prompt_window()
 
         BOTTOM_PADDING = 2
-        TOP_PADDING = 2
+        TOP_PADDING = 3
         screen_height, screen_width = self.stdscr.getmaxyx()
         self.log_window = LogWindow(
             self.stdscr,
@@ -45,7 +45,8 @@ class LogWindowGroup:
     def show(self, include_prompt_window=False):
         for window in self.log_windows:
             window.show()
-        self.prompt_window.show()
+        if include_prompt_window:
+            self.prompt_window.show()
 
     def clear(self):
         for window in self.log_windows:
@@ -64,10 +65,10 @@ class LogWindowGroup:
         self.log_window.add_line(line)
 
     def scroll_log_up(self):
-        self.logwindow.scroll_up()
+        self.log_window.scroll_up()
 
     def scroll_log_down(self):
-        self.logwindow.scroll_down()
+        self.log_window.scroll_down()
 
     def refresh_prompt_window(self):
         pass
