@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # rayword.py
+# head script
 import json
 from pathlib import Path
 import logging
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     rayword_controller = Controller(rayword_model, batch_size=batch_size)
     rayword_controller(enable_console_logging=ENABLE_CONSOLE_LOGGING)
 
-    # export results to output
+    # export results to output after controller finishes
     # # unreachable paths
     unreachable_path_ids = rayword_model.get_unreachable_paths()
     with open(

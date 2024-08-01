@@ -55,7 +55,7 @@ class WorkerIndexerModel:
             self.path_prefix = path_prefix
 
         # Create the connecton
-        self.worker_db_connection = create_worker_db_connection(in_memory=True)
+        self.worker_db_connection = create_worker_db_connection(in_memory=False)
 
         # Insert records
         self.start_transaction()

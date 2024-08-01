@@ -34,7 +34,7 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
             format="%(filename)s:%(lineno)d - %(levelname)s - %(message)s",
         )
 
-    log_memory_and_disk_usage()
+    # log_memory_and_disk_usage()
     resource_monitor = ResourceMonitor()
 
     EXCLUSIONS_FILE = "/root/app/worker/exclusions.txt"
@@ -60,10 +60,12 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
     resource_monitor.stop()
 
     logging.debug(
-        f"MAX MEMORY USAGE: {resource_monitor.max_memory_usage / (1024 * 1024)} MB"
+        f"""
+MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {resource_monitor.max_memory_usage / (1024 * 1024)} MB"""
     )
     logging.debug(
-        f"MAX DISK USAGE: {resource_monitor.max_disk_usage / (1024 * 1024)} MB"
+        f"""
+MIN/MAX DISK USAGE: {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
     )
     return word_search_results.to_compressed_json()
 

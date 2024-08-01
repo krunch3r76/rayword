@@ -51,7 +51,7 @@ def create_worker_db_connection(in_memory=True):
         conn = sqlite3.connect(":memory:", isolation_level=None)
     else:
         # Generate a unique filename using uuid4
-        db_filename = f"/tmp/worker_indexer_{uuid.uuid4()}.db"
+        db_filename = f"/root/tmp/worker_indexer_{uuid.uuid4()}.db"
         conn = sqlite3.connect(db_filename, isolation_level=None)
 
     create_tables(conn)

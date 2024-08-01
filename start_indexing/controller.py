@@ -12,43 +12,8 @@ from wordbrowser.browse import extract_sentence_with_context
 
 
 class Controller:
-    def __init__(self):
-        self.cmds = [
-            ["echo", "'Hello, worlds!'"],
-            ["rm", "-f", "app/output/*"],
-            ["python3", "main/update_or_insert_paths.py"],
-            [
-                "python3",
-                "main/prepare_unsearched_paths_json.py",
-                "golem-cluster.yaml",
-                "--batch-size",
-                "50",
-            ],
-            ["ray", "up", "golem-cluster.yaml", "--yes", "--no-config-cache"],
-            [
-                "ray",
-                "rsync-up",
-                "golem-cluster.yaml",
-                "./app/input/",
-                "/root/app/input/",
-            ],
-            [
-                "ray",
-                "submit",
-                "golem-cluster.yaml",
-                "./rayword.py",
-                "--enable-console-logging",
-            ],
-            [
-                "ray",
-                "rsync-down",
-                "golem-cluster.yaml",
-                "/root/app/output/",
-                "./app/output",
-            ],
-            ["python3", "main/import_ray_results.py"],
-            ["ray", "down", "golem-cluster.yaml", "--yes"],
-        ]
+    def __init__(self, cmds):
+        self.cmds = cmds
         self.signal_start = False
         self.cmds_started = False
         self.from_view = Queue()

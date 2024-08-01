@@ -25,7 +25,7 @@ class Controller:
         Initializes the Controller with a model and an optional view.
 
         Args:
-            model: The data model for accessing and updating records.
+            model: The head data model for accessing and updating records.
             view: An optional view component for displaying results (currently not implemented).
         """
         self.model = model

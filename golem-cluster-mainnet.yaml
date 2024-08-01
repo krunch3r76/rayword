@@ -112,7 +112,7 @@ file_mounts: {
 cluster_synced_files: []
 
 # List of commands that will be run to initialize the nodes (before `setup_commands`)
-initialization_commands: ["mkdir -p /root/data"]
+initialization_commands: ["mkdir -p /root/data", "mkdir -p /root/tmp"]
 #initialization_commands: [
 #  "pip install endplay",
 #]
