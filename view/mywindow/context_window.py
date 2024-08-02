@@ -63,7 +63,7 @@ class ContextWindow:
             height=HEIGHT_SOURCE_WINDOW,
             width=width,
             x_padding=1,
-            boxed=False,
+            boxed=True,
         )
 
     def add_source(self, line):
@@ -82,7 +82,6 @@ class ContextWindow:
         self.count_window.refresh()
         self.text_window.refresh()
         self.source_window.refresh()
-        # TODO source_window
 
     def scroll_up(self):
         self.text_window.scroll_up()

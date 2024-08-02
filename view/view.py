@@ -15,6 +15,14 @@ from enum import Enum, auto
 
 
 class View:
+    """
+    windows:
+        log_window_group (includes start window): start / log ray session
+        _wordwin: list words from search on wordentrywin
+        _wordentrywin: input search word
+        panel_manager: show results of word searches
+    """
+
     class ViewMode(Enum):
         LOG = auto()
         BROWSER = auto()
@@ -33,7 +41,7 @@ class View:
             curses.start_color()
             self._stdscr.nodelay(True)
             init_color_pairs()
-
+            self.view_changed = False
             # log window group
             self.log_window_group = LogWindowGroup(self._stdscr)
             # word window
@@ -50,9 +58,19 @@ class View:
             self.current_word = ""
             self.panel_manager = PanelManager(self._stdscr)
             self.prompt_acknowledged = False
+            self.log_window_group.refresh_prompt_window()
         except Exception as e:
             logging.debug(f"\n\nexception: {e}\n\n")
             raise
+
+    @property
+    def current_view(self):
+        return self.current_view
+
+    @current_view.setter
+    def current_view(self, newval):
+        self._current_view = newval
+        self.view_changed = True
 
     def _process_signal(self, signal: dict):
         # highlest level signal processing for all windows visible or not
@@ -173,7 +191,8 @@ class View:
             self.log_window_group.scroll_log_down()
             self.auto_scroll_active = False
         elif asciicode == -1:
-            refresh_event = True
+            pass
+            # refresh_event = True
         # if refresh_event:
         #     # self._logwindow.refresh()
         #     refresh_event = False
@@ -184,6 +203,7 @@ class View:
             pass
         else:
             self._process_signal(next_signal)
+            refresh_event = True
 
         if refresh_event:
             self.log_window_group.refresh_all_log()
@@ -195,16 +215,25 @@ class View:
         elif asciicode == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
         elif asciicode in (curses.KEY_ENTER, 10, 13):
-            self._current_view = View.ViewMode.LOG
-            self.prompt_acknowledged = True
-            self.to_controller.put_nowait({"signal": "cmd", "msg": "start ray"})
-        self.log_window_group.refresh_prompt_window()
+            start_signal = self.log_window_group.send_key_to_prompt_window(asciicode)
+            if start_signal:
+                self._current_view = View.ViewMode.LOG
+                self.prompt_acknowledged = True
+                self.to_controller.put_nowait({"signal": "cmd", "msg": "start ray"})
+        elif asciicode != -1:
+            self.log_window_group.send_key_to_prompt_window(asciicode)
+        if self.view_changed:
+            self.log_window_group.refresh_prompt_window()
+            self.view_changed = False
 
     def _update_panelmode(self, asciicode):
         # asciicode = self._stdscr.getch()
         refresh_event = False
         if asciicode == -1:
-            refresh_event = True
+            pass
+            # refresh_event = True
+        elif asciicode == curses.KEY_RESIZE:
+            self.panel_manager.draw_panels()
         elif asciicode == curses.KEY_UP:
             self.panel_manager.scroll_up()
         elif asciicode == curses.KEY_DOWN:
@@ -235,26 +264,17 @@ class View:
     def update(self):
         asciicode = self._stdscr.getch()
         if asciicode == curses.KEY_F2:
-            logging.debug("switching to LOG view")
             # clear othe rgroup
             self._wordwin.hide()
             self._wordentrywin.hide()
-            # self._wordwin.clear()
-            # self._wordentrywin.clear()
             if self.prompt_acknowledged:
                 self._current_view = View.ViewMode.LOG
                 self.log_window_group.show()
-                # self.log_window_group.refresh_all_log()
             else:
                 self._current_view = View.ViewMode.PROMPT
                 self.log_window_group.show(include_prompt_window=True)
-                # self.log_window_group.show_all_log()
-                # self.log_window_group.show_prompt_window()
-                # self.log_window_group.refresh_all_log()
-                # self.log_window_group.refresh_prompt_window()
 
         elif asciicode == curses.KEY_F3:
-            logging.debug("switching to BROWSER view")
             self.log_window_group.hide()
             # self.log_window_group.clear()
             self._wordwin.show()

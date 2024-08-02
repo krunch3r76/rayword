@@ -9,6 +9,15 @@ import logging
 import time
 from app.worker.util.resource_loader import load_resource
 from wordbrowser.browse import extract_sentence_with_context
+import importlib.metadata
+
+
+def get_ray_on_golem_version():
+    try:
+        version = importlib.metadata.version("ray_on_golem")
+    except importlib.metadata.PackageNotFoundError:
+        version = "x.y.z"
+    return version
 
 
 class Controller:
@@ -24,6 +33,15 @@ class Controller:
         self.model = MainModel("./data/main.db", "./data/paths.db")
         self.result_generator = None
         self.result_word = ""
+
+        self.props = {
+            "version": get_ray_on_golem_version(),
+            "texts per worker": None,
+            "network": None,
+            "max workers": None,
+            "total indexable texts": None,
+            "total text count": None,
+        }
 
     def daisy_chain_offsets(self, ebook_details):
         # Flatten the list of details with offsets from all ebook_detail objects

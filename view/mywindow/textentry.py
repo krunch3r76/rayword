@@ -26,7 +26,6 @@ class TextEntryBox(MyWindow):
         )
 
     def refresh(self):
-        logging.debug(f"text entry box refreshd")
         self._add_line(self._textbuffer)
         self._stdscr.refresh()
         super().refresh()
@@ -43,4 +42,3 @@ class TextEntryBox(MyWindow):
     def clear(self):
         super().clear()
         super().refresh()
-        logging.debug(f"text entry box cleared")

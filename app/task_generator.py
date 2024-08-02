@@ -33,7 +33,7 @@ class TaskGenerator:
     batches forming tasks that are ready for further processing.
 
     Attributes:
-        batch_size (int): The number of path records to include in each batch.
+        batch_size (int): The number of path records to include in each task batch.
     """
 
     def __init__(self, batch_size):
@@ -57,6 +57,8 @@ class TaskGenerator:
 
         Yields:
             Task: A Task object representing a batch of work to be processed.
+
+        task object is described as: { path_records: list[dict], path_prefix: str }
         """
         logging.debug(f"Path records count: {len(path_records)}")
         logging.debug(f"Batch size: {self.batch_size}")

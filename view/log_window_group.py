@@ -2,9 +2,18 @@
 # manage the log view
 from .mywindow import PromptWindow, LogWindow, CmdWindow
 import curses
+import logging
 
 
 class LogWindowGroup:
+    """
+    view
+        prompt_window: PromptWindow  -> start dialog box
+        log_windows[]
+            log_window:LogWindow -> show output of command running
+            cmd_window:CmdWindow -> show command running
+    """
+
     def __init__(self, stdscr):
         self.stdscr = stdscr
         self.prompt_window = PromptWindow(
@@ -16,7 +25,6 @@ class LogWindowGroup:
             boxed=True,
             padding=1,
         )
-        self.add_lines_to_prompt_window()
 
         BOTTOM_PADDING = 2
         TOP_PADDING = 3
@@ -31,11 +39,19 @@ class LogWindowGroup:
 
         self.cmd_window = CmdWindow(self.stdscr, 0, 0)
         self.log_windows = [self.log_window, self.cmd_window]
+        # self.add_lines_to_prompt_window()
+        self.refresh_prompt_window()
+
+    def send_key_to_prompt_window(self, asciicode):
+        start_signal = self.prompt_window.handle_key(asciicode)
+        return start_signal
 
     def add_lines_to_prompt_window(self):
         # consider making prompt_window remember this internally and just rewrite on refresh
-        self.prompt_window.add_line("Press enter to start ray")
-        self.prompt_window.refresh()
+
+        # self.prompt_window.add_line("Press enter to start ray")
+        # self.prompt_window.refresh()
+        self.prompt_window.draw()
 
     def hide(self):
         for window in self.log_windows:

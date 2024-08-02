@@ -65,7 +65,7 @@ MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {
     )
     logging.debug(
         f"""
-MIN/MAX DISK USAGE: {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
+MIN/MAX DISK USAGE (/root): {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
     )
     return word_search_results.to_compressed_json()
 

@@ -21,7 +21,6 @@ class PanelManager:
 
     def add_title_and_authors(self, title, authors):
         if self.panels:
-            logging.debug(authors)
             for line in title.splitlines():
                 self.panels[self.current_panel_index].add_source(line)
 
