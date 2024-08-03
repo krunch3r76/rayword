@@ -27,7 +27,8 @@ class SourceWindow(MyWindow):
             x_padding,
             y_padding,
         )
-        self.y_offset = 0  # relative y offset
+        # self.y_offset = 1 if self._boxed else 0  # relative y offset
+        self.y_offset = 0
 
     def add_line(self, line, attr=curses.A_NORMAL):
         try:

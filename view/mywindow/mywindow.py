@@ -55,8 +55,12 @@ class MyWindow:
 
     @property
     def _actual_height_and_width(self):
+        # e.g. writable
         viewable_height, viewable_width = self._viewable_height_and_width
-        return viewable_height + 2 * self.y_padding, viewable_width + 2 * self.x_padding
+        return (
+            viewable_height + 2 * self.y_padding,
+            viewable_width + 2 * self.x_padding,
+        )
 
     def refresh(self, clear=False):
         if not self.visible:
@@ -88,6 +92,7 @@ class MyWindow:
     def _add_line_wrapped(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
         max_height, max_width = self._viewable_height_and_width
         y_offset += self.y_padding
+        y_offset += 1 if self._boxed else 0
         x_offset += self.x_padding
         if y_offset >= max_height:
             raise ValueError("Line written outside of boundaries")
@@ -113,6 +118,7 @@ class MyWindow:
     def _add_line_truncated(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
         max_height, max_width = self._viewable_height_and_width
         y_offset += self.y_padding
+        y_offset += 1 if self._boxed else 0
         x_offset += self.x_padding
         if y_offset > max_height or x_offset > max_width:
             raise ValueError(
@@ -133,6 +139,8 @@ class MyWindow:
             self._add_line_wrapped(line, y_offset, x_offset, attr)
 
     def add_line(self, segments, y_offset, wrapped=False):
+        y_offset += self.y_padding
+        y_offset += 1 if self._boxed else 0
         if not isinstance(segments, list):
             segments = [
                 (
@@ -140,13 +148,11 @@ class MyWindow:
                     curses.A_NORMAL,
                 )
             ]
-            logging.debug(f"-----------adding segments: {segments}")
         x_offset = self.x_padding
         for segment in segments:
             text, attr = segment
             self._add_line_segment(text, y_offset, x_offset, attr, not wrapped)
             x_offset += len(text)
-        self.y_offset += 1
 
     def _add_line_segment(
         self, line, y_offset, x_offset=0, attr=curses.A_NORMAL, truncated=True

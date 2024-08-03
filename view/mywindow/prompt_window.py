@@ -35,7 +35,8 @@ class PromptWindow(MyWindow):
             x_padding,
             y_padding,
         )
-        self.y_offset = y_padding + 1 if boxed else 0  # relative y offset
+        self.y_offset = 0
+        # self.y_offset = y_padding + 1 if boxed else 0  # relative y offset
 
         self.ray_on_golem_version = ray_on_golem_version
         self._text_per_worker = texts_per_worker
@@ -82,11 +83,13 @@ class PromptWindow(MyWindow):
             "max workers": f"Max Workers: {self.max_workers}",
             "total indexable texts": f"Total Indexable Texts: {self.total_indexable_texts}",
             "total text count": f"Total Text Count: {self.total_text_count}",
+            "stub": "F2 : this screen / F3 : word browser",
         }
         return fields
 
     def clear(self):
-        self.y_offset = self.y_padding + 1 if self._boxed else 0
+        self.y_offset = 0
+        # self.y_offset = self.y_padding + 1 if self._boxed else 0
         super().clear()
 
     def draw(self):
@@ -116,6 +119,7 @@ class PromptWindow(MyWindow):
             else:
                 segments = [(field, curses.A_NORMAL)]
             self.add_line(segments, self.y_offset)
+            self.y_offset += 1
         self.refresh()
 
     def handle_key(self, key):
@@ -183,19 +187,3 @@ class PromptWindow(MyWindow):
         field_being_edited = self.field_keys[self.current_field_index]
         logging.debug(f"current field being edited: {field_being_edited}")
         return start_signal
-
-
-def main(stdscr):
-    curses.curs_set(0)  # Hide cursor
-    stdscr.clear()
-    stdscr.refresh()
-
-    prompt_window = PromptWindow(stdscr)
-    prompt_window.draw()
-
-    while True:
-        key = stdscr.getch()
-        if key == ord("q"):
-            break
-        prompt_window.handle_key(key)
-        prompt_window.draw()

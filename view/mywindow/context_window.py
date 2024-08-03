@@ -68,6 +68,7 @@ class ContextWindow:
 
     def add_source(self, line):
         self.source_window.add_line(line)
+        logging.debug(f"adding source {line}")
 
     def add_line(self, line):
         self.text_window.add_line(line)

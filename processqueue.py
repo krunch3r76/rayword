@@ -1,8 +1,8 @@
+import os
+import pty
 import queue
 import subprocess
 import threading
-import os
-import pty
 
 
 class ProcessTerminated(Exception):
@@ -42,7 +42,7 @@ class ProcessQueue:
         """Helper function to read lines from the subprocess output and enqueue them"""
         while True:
             try:
-                output = os.read(self.master_fd, 1024).decode()
+                output = os.read(self.master_fd, 1024).decode(errors="replace")
                 if output == "":
                     break
                 for line in output.splitlines():
