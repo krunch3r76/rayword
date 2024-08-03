@@ -32,11 +32,17 @@ class TextEntryBox(MyWindow):
         # self._stdscr.refresh()
 
     def process_ascii(self, asciicode):
+        if self._textbuffer == "<search word>":
+            self._textbuffer = ""
         self._textbuffer = self._textbuffer + chr(asciicode)
+
         self.refresh()
 
     def backspace(self):
-        self._textbuffer = self._textbuffer[:-1]
+        if self._textbuffer == "<search word>":
+            self._textbuffer = ""
+        else:
+            self._textbuffer = self._textbuffer[:-1]
         self.refresh()
 
     def clear(self):

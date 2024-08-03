@@ -83,6 +83,11 @@ class PromptWindow(MyWindow):
             "max workers": f"Max Workers: {self.max_workers}",
             "total indexable texts": f"Total Indexable Texts: {self.total_indexable_texts}",
             "total text count": f"Total Text Count: {self.total_text_count}",
+            "minimum memory": "Minimum Memory: 12 GiB",
+            "minimum cpu threads": "Minimum CPU threads: 1",
+            "minimum storage": "Minimum Storage: 30 GiB",
+            "max cpu per hour price": "Maximum CPU Per Hour Price: 0.05",
+            "max env per hour price": "Maximum ENV Per Hour Price: 0.005",
             "stub": "F2 : this screen / F3 : word browser",
         }
         return fields

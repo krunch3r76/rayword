@@ -34,6 +34,7 @@ class ContextWindow:
         HEIGHT_SOURCE_WINDOW = 4
         HEIGHT_TEXT_WINDOW = height - HEIGHT_STATUS_LINE - HEIGHT_SOURCE_WINDOW
         try:
+            # count_window
             self.count_window = MyWindow(
                 self.stdscr,
                 upper_left_y,
@@ -47,6 +48,7 @@ class ContextWindow:
             logging.debug(f"{e}")
             raise e
         self.count_window.refresh()
+        # text_window
         self.text_window = MyWindowLineBufferedWrapped(
             self.stdscr,
             upper_left_y + HEIGHT_STATUS_LINE,
@@ -56,6 +58,8 @@ class ContextWindow:
             padding=1,
             boxed=True,
         )
+
+        # source_window
         self.source_window = SourceWindow(
             self.stdscr,
             upper_left_y + HEIGHT_STATUS_LINE + HEIGHT_TEXT_WINDOW + 4,

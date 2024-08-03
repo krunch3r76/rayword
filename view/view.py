@@ -54,7 +54,7 @@ class View:
             )
             self._stdscr.refresh()
             self._wordentrywin.refresh()
-            self._current_view = View.ViewMode.PROMPT
+            self.current_view = View.ViewMode.PROMPT
             self.current_word = ""
             self.panel_manager = PanelManager(self._stdscr)
             self.prompt_acknowledged = False
@@ -65,12 +65,15 @@ class View:
 
     @property
     def current_view(self):
-        return self.current_view
+        return self._current_view
 
     @current_view.setter
     def current_view(self, newval):
         self._current_view = newval
         self.view_changed = True
+        if newval == View.ViewMode.BROWSER:
+            self._wordentrywin._textbuffer = "<search word>"
+            self._wordentrywin.refresh()
 
     def _process_signal(self, signal: dict):
         # highlest level signal processing for all windows visible or not
@@ -139,7 +142,7 @@ class View:
                         "msg": self._wordwin._lines[self._wordwin._selected_line_index],
                     }
                 )
-                self._current_view = View.ViewMode.PANEL
+                self.current_view = View.ViewMode.PANEL
             except Exception as e:
                 logging.debug(
                     f"{e}: len->{len(self._wordwin._lines)} selected_index: -> self._wordwin._selected_line_index"
@@ -217,7 +220,7 @@ class View:
         elif asciicode in (curses.KEY_ENTER, 10, 13):
             start_signal = self.log_window_group.send_key_to_prompt_window(asciicode)
             if start_signal:
-                self._current_view = View.ViewMode.LOG
+                self.current_view = View.ViewMode.LOG
                 self.prompt_acknowledged = True
                 self.to_controller.put_nowait({"signal": "cmd", "msg": "start ray"})
         elif asciicode != -1:
@@ -268,10 +271,10 @@ class View:
             self._wordwin.hide()
             self._wordentrywin.hide()
             if self.prompt_acknowledged:
-                self._current_view = View.ViewMode.LOG
+                self.current_view = View.ViewMode.LOG
                 self.log_window_group.show()
             else:
-                self._current_view = View.ViewMode.PROMPT
+                self.current_view = View.ViewMode.PROMPT
                 self.log_window_group.show(include_prompt_window=True)
 
         elif asciicode == curses.KEY_F3:
@@ -280,14 +283,14 @@ class View:
             self._wordwin.show()
             self._wordentrywin.show()
 
-            self._current_view = View.ViewMode.BROWSER
-        if self._current_view == View.ViewMode.BROWSER:
+            self.current_view = View.ViewMode.BROWSER
+        if self.current_view == View.ViewMode.BROWSER:
             self._update_browsermode(asciicode)
-        elif self._current_view == View.ViewMode.LOG:
+        elif self.current_view == View.ViewMode.LOG:
             self._update_logmode(asciicode)
-        elif self._current_view == View.ViewMode.PANEL:
+        elif self.current_view == View.ViewMode.PANEL:
             self._update_panelmode(asciicode)
-        elif self._current_view == View.ViewMode.PROMPT:
+        elif self.current_view == View.ViewMode.PROMPT:
             self._update_promptmode(asciicode)
         else:
             raise Exception("Unknown view")

@@ -20,7 +20,7 @@ class LogWindowGroup:
             self.stdscr,
             upper_left_y=20,
             upper_left_x=20,
-            height=10,
+            height=20,
             width=40,
             boxed=True,
             padding=1,
