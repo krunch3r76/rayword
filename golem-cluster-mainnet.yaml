@@ -101,7 +101,7 @@ available_node_types:
 file_mounts: {
   ./app: ./app,
   ./constants.py: ./constants.py,
-  ./rayword.py: ./rayword.py
+  ./rayword_executor.py: ./rayword_executor.py
   # <remote_path>: <local_path>
   # "/absolute/path/dir/": ".",
   # "./relative/path/dir/": ".",
