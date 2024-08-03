@@ -53,7 +53,7 @@ class View:
                 self._stdscr, upper_left_y=0, upper_left_x=0, height=2, boxed=False
             )
             self._stdscr.refresh()
-            self._wordentrywin.refresh()
+            # self._wordentrywin.refresh()
             self.current_view = View.ViewMode.PROMPT
             self.current_word = ""
             self.panel_manager = PanelManager(self._stdscr)
@@ -71,9 +71,9 @@ class View:
     def current_view(self, newval):
         self._current_view = newval
         self.view_changed = True
-        if newval == View.ViewMode.BROWSER:
-            self._wordentrywin._textbuffer = "<search word>"
-            self._wordentrywin.refresh()
+        # if newval == View.ViewMode.BROWSER:
+        #     self._wordentrywin._textbuffer = "<search word>"
+        #     self._wordentrywin.refresh()
 
     def _process_signal(self, signal: dict):
         # highlest level signal processing for all windows visible or not

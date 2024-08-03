@@ -14,7 +14,7 @@ class TextEntryBox(MyWindow):
         boxed: bool = True,
     ):
         super().__init__(stdscr, upper_left_y, upper_left_x, height, width, boxed)
-        self._textbuffer = ""
+        self._textbuffer = "<search word>"
         self._stdscr.refresh()  # kludge for display
 
     def _add_line(self, line):
