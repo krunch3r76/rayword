@@ -34,7 +34,7 @@ class MyWindow:
             self.y_padding += 1
             self.x_padding += 1
         self._win = curses.newwin(
-            *self._actual_height_and_width,
+            *self._viewable_height_and_width,
             self._upper_left_y,
             self._upper_left_x,
         )
@@ -55,11 +55,10 @@ class MyWindow:
 
     @property
     def _actual_height_and_width(self):
-        # e.g. writable
         viewable_height, viewable_width = self._viewable_height_and_width
         return (
-            viewable_height + 2 * self.y_padding,
-            viewable_width + 2 * self.x_padding,
+            viewable_height - 2 * self.y_padding,
+            viewable_width - 2 * self.x_padding,
         )
 
     def refresh(self, clear=False):
@@ -92,7 +91,7 @@ class MyWindow:
     def _add_line_wrapped(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
         max_height, max_width = self._viewable_height_and_width
         y_offset += self.y_padding
-        y_offset += 1 if self._boxed else 0
+        # y_offset += 1 if self._boxed else 0
         x_offset += self.x_padding
         if y_offset >= max_height:
             raise ValueError("Line written outside of boundaries")
@@ -118,7 +117,7 @@ class MyWindow:
     def _add_line_truncated(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
         max_height, max_width = self._viewable_height_and_width
         y_offset += self.y_padding
-        y_offset += 1 if self._boxed else 0
+        # y_offset += 1 if self._boxed else 0
         x_offset += self.x_padding
         if y_offset > max_height or x_offset > max_width:
             raise ValueError(
@@ -140,7 +139,7 @@ class MyWindow:
 
     def add_line(self, segments, y_offset, wrapped=False):
         y_offset += self.y_padding
-        y_offset += 1 if self._boxed else 0
+        # y_offset += 0 if self._boxed else 0
         if not isinstance(segments, list):
             segments = [
                 (
@@ -149,6 +148,12 @@ class MyWindow:
                 )
             ]
         x_offset = self.x_padding
+        max_height, max_width = self._viewable_height_and_width
+        if y_offset > max_height - 1 or x_offset > max_width - 1:
+            return
+            # raise ValueError(
+            #     f"Line written outside of boundaries: y_offset: {y_offset}, x_offset: {x_offset} max_height: {max_height} max_width: {max_width}"
+            # )
         for segment in segments:
             text, attr = segment
             self._add_line_segment(text, y_offset, x_offset, attr, not wrapped)
@@ -159,8 +164,9 @@ class MyWindow:
     ):
         if not truncated:
             raise Exception("stylized text as wrapped not currently supported")
-        max_width = self._width - 2 * self.x_padding
-        self._win.addstr(y_offset, x_offset, line[:max_width], attr)
+        max_height, max_width = self._viewable_height_and_width
+        available_width = self._width - 2 * self.x_padding
+        self._win.addstr(y_offset, x_offset, line[:available_width], attr)
 
     def hide(self):
         self.visible = False

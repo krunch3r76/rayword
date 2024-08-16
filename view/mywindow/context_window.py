@@ -62,7 +62,7 @@ class ContextWindow:
         # source_window
         self.source_window = SourceWindow(
             self.stdscr,
-            upper_left_y + HEIGHT_STATUS_LINE + HEIGHT_TEXT_WINDOW + 4,
+            upper_left_y + HEIGHT_STATUS_LINE + HEIGHT_TEXT_WINDOW + 0,
             upper_left_x,
             height=HEIGHT_SOURCE_WINDOW,
             width=width,

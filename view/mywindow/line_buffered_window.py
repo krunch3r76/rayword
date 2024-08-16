@@ -144,7 +144,8 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         Wrap lines to fit within the viewable width of the window.
         """
-        max_width = self._viewable_height_and_width[1]
+        # max_width = self._viewable_height_and_width[1]
+        max_width = self._actual_height_and_width[1]
         self._wrapped_lines = []
         for line in self._lines:
             words = line.split()
@@ -197,7 +198,7 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         Calculate and return the index of the top visible line for wrapped lines.
         """
-        viewable_height, _ = self._viewable_height_and_width
+        viewable_height, _ = self._actual_height_and_width
         if self._current_line_index >= viewable_height:
             return self._bottom_line_index - (viewable_height - 1)
         else:
@@ -209,7 +210,7 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         self.clear()
         for i, line in enumerate(
-            self._wrapped_lines[self._top_line_index : self._bottom_line_index + 1]
+            self._wrapped_lines[self._top_line_index : self._bottom_line_index]
         ):
             self._add_line(line, i)
         if self._boxed:
@@ -226,16 +227,21 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         - x_offset (int): The x-coordinate offset. Default is 0.
         - attr (int): Text attributes (e.g., color). Default is curses.A_NORMAL.
         """
-        max_height, max_width = self._viewable_height_and_width
-
-        if y_offset >= max_height:
-            raise ValueError("Line written outside of boundaries")
+        max_height, max_width = self._actual_height_and_width
 
         y_offset += self.y_padding
         x_offset += self.x_padding
 
-        self._win.move(y_offset, x_offset)
-        self._win.insstr(line, attr)
+        if y_offset >= max_height:
+            raise ValueError("Line written outside of boundaries")
+
+        try:
+            self._win.move(y_offset, x_offset)
+            self._win.insstr(line, attr)
+        except:
+            logging.debug(f"COULD NOT ADD LINE: {line}")
+            # kludge, include logic to not draw lines that would not fit
+            pass
 
     def scroll_up(self):
         """
@@ -251,13 +257,13 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         Scroll the view down by one line.
         """
-        logging.debug(
-            f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
-        )
+        # logging.debug(
+        #     f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
+        # )
         if self._current_line_index < len(self._wrapped_lines) - 1:
             self._current_line_index += 1
             self.refresh()
 
-        logging.debug(
-            f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
-        )
+        # logging.debug(
+        #     f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
+        # )

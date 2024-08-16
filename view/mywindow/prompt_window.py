@@ -3,11 +3,14 @@
 import curses
 from .mywindow import MyWindow
 import logging
+from config import Config
+from queue import Queue
 
 
 class PromptWindow(MyWindow):
     def __init__(
         self,
+        to_controller: Queue,
         stdscr: curses.window,
         upper_left_y: int = 0,
         upper_left_x: int = 0,
@@ -17,13 +20,8 @@ class PromptWindow(MyWindow):
         padding=None,
         x_padding: int = 0,
         y_padding: int = 0,
-        ray_on_golem_version: str = "x.y.z",
-        texts_per_worker: int = 0,
-        network: str = "WHATEVERNETWORK",
-        max_workers: int = 10,
-        total_indexable_texts: int = 1000,
-        total_text_count: int = 10000,
     ):
+        self.to_controller = to_controller
         super().__init__(
             stdscr,
             upper_left_y,
@@ -36,24 +34,61 @@ class PromptWindow(MyWindow):
             y_padding,
         )
         self.y_offset = 0
-        # self.y_offset = y_padding + 1 if boxed else 0  # relative y offset
 
-        self.ray_on_golem_version = ray_on_golem_version
-        self._text_per_worker = texts_per_worker
-        self.texts_per_worker = texts_per_worker
-        self.network = network
-        self.max_workers = max_workers
-        self.total_indexable_texts = 1000
-        self.total_index_texts = total_indexable_texts
-        self.total_text_count = total_text_count
+        # Initialize the fields dictionary with default values
+        self.fields = {
+            "version": "x.y.z",
+            "texts per worker": "-1",
+            "network": "WHATEVERNETWORK",
+            "max workers": "-10",
+            "count indexable texts": "-1000",
+            "count unindexed texts": "-10000",
+            "minimum memory": "-1 GiB",
+            "minimum cpu threads": "-1",
+            "minimum storage": "-1 GiB",
+            "max cpu per hour price": "-0.05",
+            "max env per hour price": "-0.005",
+            "shortcuts": "F2 : this screen / F3 : word browser",
+        }
 
         self.field_keys = list(self.fields.keys())
         self.current_field_index = (
-            0  # Start at the first modifiable field (texts_per_worker)
+            0  # Start at the first modifiable field (texts per worker)
         )
         self._edit_mode = False
         self.select_mode = False
         self.temp_keyboard_input = ""
+        self._config = None
+        self.last_mode_was_edit = False
+        self.pending_config_changes = dict()
+
+    @property
+    def config(self):
+        return self._config
+
+    @config.setter
+    def config(self, config):
+        self._config = config
+        self.update_fields()
+
+    def update_fields(self):
+        if self.config is not None:
+            for key in self.fields:
+                # Replace spaces with underscores for the attribute check
+                attr_key = key.replace(" ", "_")
+
+                # Check if the transformed key (attr_key) is an attribute of the named tuple (self.config)
+                if hasattr(self.config, attr_key):
+                    # Retrieve the value using the transformed key and update the dictionary
+                    self.fields[key] = getattr(self.config, attr_key)
+            self.draw()
+
+    # def update_fields(self, field_dict):
+    #     """Update the fields based on the provided dictionary."""
+    #     for key, value in field_dict.items():
+    #         if key in self.fields:
+    #             self.fields[key] = value
+    #     self.draw()
 
     @property
     def edit_mode(self):
@@ -63,38 +98,14 @@ class PromptWindow(MyWindow):
     def edit_mode(self, newval):
         self._edit_mode = newval
         self.select_mode = False
-
-    @property
-    def texts_per_worker(self):
-        return self._texts_per_worker
-
-    @texts_per_worker.setter
-    def texts_per_worker(self, newval):
-        if isinstance(newval, str):
-            newval = int(newval)
-        self._texts_per_worker = newval
-
-    @property
-    def fields(self):
-        fields = {
-            "version": f"Ray-on-Golem Version: {self.ray_on_golem_version}",
-            "texts per worker": f"Texts per Worker: {self.texts_per_worker}",
-            "network": f"Network: {self.network}",
-            "max workers": f"Max Workers: {self.max_workers}",
-            "total indexable texts": f"Total Indexable Texts: {self.total_indexable_texts}",
-            "total text count": f"Total Text Count: {self.total_text_count}",
-            "minimum memory": "Minimum Memory: 12 GiB",
-            "minimum cpu threads": "Minimum CPU threads: 1",
-            "minimum storage": "Minimum Storage: 30 GiB",
-            "max cpu per hour price": "Maximum CPU Per Hour Price: 0.05",
-            "max env per hour price": "Maximum ENV Per Hour Price: 0.005",
-            "stub": "F2 : this screen / F3 : word browser",
-        }
-        return fields
+        if newval is False:
+            for key, value in self.pending_config_changes.items():
+                self.to_controller.put_nowait(
+                    {"signal": "update config", "msg": {"key": key, "value": value}}
+                )
 
     def clear(self):
         self.y_offset = 0
-        # self.y_offset = self.y_padding + 1 if self._boxed else 0
         super().clear()
 
     def draw(self):
@@ -110,7 +121,10 @@ class PromptWindow(MyWindow):
             highlight_attribute = curses.A_NORMAL
 
         for i, field_key in enumerate(self.field_keys):
-            field = self.fields[field_key]
+            # titecased
+            field_name = field_key.replace("_", " ").title()
+            field_value = self.fields[field_key]
+            field = f"{field_name}: {field_value}"
             colon_index = field.find(":")
             if i == self.current_field_index:
                 if colon_index != -1:
@@ -125,6 +139,9 @@ class PromptWindow(MyWindow):
                 segments = [(field, curses.A_NORMAL)]
             self.add_line(segments, self.y_offset)
             self.y_offset += 1
+        self.y_offset += 1
+        self.add_line("PRESS ENTER TO BEGIN INDEXING", self.y_offset)
+        self.y_offset += 1
         self.refresh()
 
     def handle_key(self, key):
@@ -173,20 +190,23 @@ class PromptWindow(MyWindow):
                 field_name = self.field_keys[self.current_field_index]
                 if key in (curses.KEY_ENTER, 10, 13):
                     if field_name == "texts per worker":
-                        self.texts_per_worker = self.temp_keyboard_input
+                        self.fields[field_name] = self.temp_keyboard_input
                     self.edit_mode = False
                     self.select_mode = True
                     self.draw()
                 elif field_name == "network":
                     if key == 32:
-                        if self.network == "MAINNET":
-                            self.network = "TESTNET"
+                        if self.fields[field_name] == "MAINNET":
+                            self.fields[field_name] = "TESTNET"
                         else:
-                            self.network = "MAINNET"
+                            self.fields[field_name] = "MAINNET"
                     self.draw()
                 elif field_name == "texts per worker":
                     self.temp_keyboard_input += chr(key)
-                    self.texts_per_worker = self.temp_keyboard_input
+                    self.pending_config_changes[
+                        "texts per worker"
+                    ] = self.temp_keyboard_input
+                    self.fields[field_name] = self.temp_keyboard_input
                     self.draw()
 
         field_being_edited = self.field_keys[self.current_field_index]

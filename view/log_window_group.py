@@ -14,9 +14,11 @@ class LogWindowGroup:
             cmd_window:CmdWindow -> show command running
     """
 
-    def __init__(self, stdscr):
+    def __init__(self, to_controller, stdscr):
         self.stdscr = stdscr
+        self.to_controller = to_controller
         self.prompt_window = PromptWindow(
+            self.to_controller,
             self.stdscr,
             upper_left_y=20,
             upper_left_x=20,
@@ -25,7 +27,6 @@ class LogWindowGroup:
             boxed=True,
             padding=1,
         )
-
         BOTTOM_PADDING = 2
         TOP_PADDING = 3
         screen_height, screen_width = self.stdscr.getmaxyx()
@@ -72,6 +73,8 @@ class LogWindowGroup:
     def resize(self):
         for window in self.log_windows:
             window.resize()
+        self.prompt_window.resize()
+        self.prompt_window.draw()
 
     def refresh_all_log(self):
         for window in self.log_windows:
@@ -91,6 +94,9 @@ class LogWindowGroup:
         self.prompt_window.clear()
         self.add_lines_to_prompt_window()
         self.prompt_window.refresh()
+
+    def update_prompt_window_with_new_config(self, config):
+        self.prompt_window.config = config
 
     def update_cmd_line(self, line):
         self.cmd_window.update_command(line, 0)

@@ -64,7 +64,9 @@ if __name__ == "__main__":
     path_records_to_insert = read_json_from_file(PATH_TO_RECORDS_FILE)
     rayword_model = WordIndexerModel(path_records_to_insert)
 
-    # instantiate controller
+    #########################################
+    # instantiate & call controller         #
+    #########################################
     rayword_controller = Controller(rayword_model, batch_size=batch_size)
     rayword_controller(enable_console_logging=ENABLE_CONSOLE_LOGGING)
 

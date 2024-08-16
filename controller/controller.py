@@ -10,6 +10,7 @@ import time
 from app.worker.util.resource_loader import load_resource
 from wordbrowser.browse import extract_sentence_with_context
 import importlib.metadata
+from config import Config
 
 
 def get_ray_on_golem_version():
@@ -20,28 +21,78 @@ def get_ray_on_golem_version():
     return version
 
 
+def get_max_workers_from_yaml(path_to_yaml):
+    pass
+
+
+def set_max_workers_on_yaml(path_to_yaml):
+    pass
+
+
 class Controller:
-    def __init__(self, cmds):
-        self.cmds = cmds
+    def __init__(self):
         self.signal_start = False
         self.cmds_started = False
         self.from_view = Queue()
         self.to_view = Queue()
-        self.view = View(self.from_view, self.to_view)
         self._outputfile = open("output.txt", "w")
         # self.cmds = [["cat", "somewords.txt"]]
         self.model = MainModel("./data/main.db", "./data/paths.db")
         self.result_generator = None
         self.result_word = ""
 
-        self.props = {
-            "version": get_ray_on_golem_version(),
-            "texts per worker": None,
-            "network": None,
-            "max workers": None,
-            "total indexable texts": None,
-            "total text count": None,
-        }
+        (
+            total_texts,
+            unsearched_text_count,
+        ) = self.model.get_total_texts_and_unsearched_counts()
+        self.config = Config(
+            version=get_ray_on_golem_version(),
+            texts_per_worker=50,
+            network="MAINNET",
+            count_indexable_texts=total_texts,
+            count_unindexed_texts=unsearched_text_count,
+        )
+
+        self.view = View(self.from_view, self.to_view)
+
+    @property
+    def cmds(self):
+        cmds = [
+            ["rm", "-f", "app/output/*"],
+            ["python3", "main/update_or_insert_paths.py"],
+            [
+                "python3",
+                "main/prepare_unsearched_paths_json.py",
+                "golem-cluster.yaml",
+                "--batch-size",
+                f"{self.config.texts_per_worker}",
+            ],
+            ["ray", "up", "golem-cluster.yaml", "--yes", "--no-config-cache"],
+            [
+                "ray",
+                "rsync-up",
+                "golem-cluster.yaml",
+                "./app/input/",
+                "/root/app/input/",
+            ],
+            [
+                "ray",
+                "submit",
+                "golem-cluster.yaml",
+                "./rayword_executor.py",
+                "--enable-console-logging",
+            ],
+            [
+                "ray",
+                "rsync-down",
+                "golem-cluster.yaml",
+                "/root/app/output/",
+                "./app/output",
+            ],
+            ["python3", "main/import_ray_results.py"],
+            ["ray", "down", "golem-cluster.yaml", "--yes"],
+        ]
+        return cmds
 
     def daisy_chain_offsets(self, ebook_details):
         # Flatten the list of details with offsets from all ebook_detail objects
@@ -137,6 +188,14 @@ class Controller:
             and signal_from_view["msg"] == "start ray"
         ):
             self.signal_start = True
+        elif signal_from_view["signal"] == "get config":
+            self.to_view.put_nowait({"signal": "configupdate", "msg": self.config})
+        elif signal_from_view["signal"] == "update config":
+            logging.debug("updating config")
+            msg = signal_from_view["msg"]
+            if msg["key"] == "texts per worker":
+                self.config = self.config._replace(texts_per_worker=int(msg["value"]))
+                logging.debug(self.config)
         return signal_quit
 
     def run_commands(self):
@@ -144,6 +203,7 @@ class Controller:
         logging.debug("cmds started")
         last_return_code = 0
         signal_quit = False
+        logging.debug(self.cmds)
         for cmd in self.cmds:
             if signal_quit:
                 break

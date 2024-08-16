@@ -42,23 +42,30 @@ class View:
             self._stdscr.nodelay(True)
             init_color_pairs()
             self.view_changed = False
+
             # log window group
-            self.log_window_group = LogWindowGroup(self._stdscr)
+            self.log_window_group = LogWindowGroup(self.to_controller, self._stdscr)
+
             # word window
             self._wordwin = MyWindowSelectable(
                 self._stdscr, 2, upper_left_x=1, boxed=False
             )
+
             self.auto_scroll_active = True
             self._wordentrywin = TextEntryBox(
                 self._stdscr, upper_left_y=0, upper_left_x=0, height=2, boxed=False
             )
             self._stdscr.refresh()
             # self._wordentrywin.refresh()
+
             self.current_view = View.ViewMode.PROMPT
+
             self.current_word = ""
             self.panel_manager = PanelManager(self._stdscr)
             self.prompt_acknowledged = False
+
             self.log_window_group.refresh_prompt_window()
+
         except Exception as e:
             logging.debug(f"\n\nexception: {e}\n\n")
             raise
@@ -121,6 +128,10 @@ class View:
             self.panel_manager.add_title_and_authors(title, authors)
 
             self.panel_manager.draw_panels()
+        elif signal["signal"] == "configupdate":
+            self.log_window_group.update_prompt_window_with_new_config(signal["msg"])
+            if self.current_view == self.ViewMode.PROMPT:
+                self.log_window_group.refresh_prompt_window()
 
     def _update_browsermode(self, asciicode):
         # refresh view
@@ -226,8 +237,18 @@ class View:
         elif asciicode != -1:
             self.log_window_group.send_key_to_prompt_window(asciicode)
         if self.view_changed:
-            self.log_window_group.refresh_prompt_window()
+            logging.debug("view changed to prompt view")
+            # self.log_window_group.refresh_prompt_window()
+            self.to_controller.put_nowait({"signal": "get config", "msg": None})
             self.view_changed = False
+
+        try:
+            next_signal = self.from_controller.get_nowait()
+        except queue.Empty:
+            next_signal = None
+            pass
+        else:
+            self._process_signal(next_signal)
 
     def _update_panelmode(self, asciicode):
         # asciicode = self._stdscr.getch()
