@@ -78,6 +78,11 @@ class View:
     def current_view(self, newval):
         self._current_view = newval
         self.view_changed = True
+        if self._current_view == self.ViewMode.PROMPT:
+            self.log_window_group.prompt_window_visible = True
+        else:
+            self.log_window_group.prompt_window_visible = False
+
         # if newval == View.ViewMode.BROWSER:
         #     self._wordentrywin._textbuffer = "<search word>"
         #     self._wordentrywin.refresh()
@@ -197,6 +202,9 @@ class View:
         refresh_event = False
         if asciicode == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
+        elif asciicode == curses.KEY_RESIZE:
+            curses.update_lines_cols()
+            self.log_window_group.resize()
         elif asciicode == curses.KEY_UP:
             self.log_window_group.scroll_log_up()
             self.auto_scroll_active = False
@@ -225,7 +233,9 @@ class View:
     def _update_promptmode(self, asciicode):
         # asciicode = self._stdscr.getch()
         if asciicode == curses.KEY_RESIZE:
+            curses.update_lines_cols()
             self.log_window_group.resize()
+            curses.napms(100)
         elif asciicode == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
         elif asciicode in (curses.KEY_ENTER, 10, 13):
@@ -296,7 +306,7 @@ class View:
                 self.log_window_group.show()
             else:
                 self.current_view = View.ViewMode.PROMPT
-                self.log_window_group.show(include_prompt_window=True)
+                self.log_window_group.show()
 
         elif asciicode == curses.KEY_F3:
             self.log_window_group.hide()

@@ -80,7 +80,7 @@ class Controller:
                 "submit",
                 "golem-cluster.yaml",
                 "./rayword_executor.py",
-                "--enable-console-logging",
+                # "--enable-console-logging",
             ],
             [
                 "ray",
@@ -128,7 +128,7 @@ class Controller:
             else:
                 # Generate new entry
                 url = f"http://{IP_TO_GUTENBERG_TEXTS}{detail['path']}"
-                logging.debug(url)
+                # logging.debug(url)
                 content, timedout = load_resource(url)
 
                 if timedout:
@@ -191,19 +191,15 @@ class Controller:
         elif signal_from_view["signal"] == "get config":
             self.to_view.put_nowait({"signal": "configupdate", "msg": self.config})
         elif signal_from_view["signal"] == "update config":
-            logging.debug("updating config")
             msg = signal_from_view["msg"]
             if msg["key"] == "texts per worker":
                 self.config = self.config._replace(texts_per_worker=int(msg["value"]))
-                logging.debug(self.config)
         return signal_quit
 
     def run_commands(self):
         self.cmds_started = True
-        logging.debug("cmds started")
         last_return_code = 0
         signal_quit = False
-        logging.debug(self.cmds)
         for cmd in self.cmds:
             if signal_quit:
                 break

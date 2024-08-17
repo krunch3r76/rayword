@@ -38,14 +38,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--enable-console-logging",
         action="store_true",
+        default=False,
         help="print debug log messages",
     )
 
     args = parser.parse_args()
 
     # Setup logging
-    log_level = "DEBUG" if "KRUNCHDEBUG" in os.environ else "WARNING"
-    log_level = "DEBUG" if args.enable_console_logging else "WARNING"
+    log_level = "DEBUG" if "KRUNCHDEBUG" in os.environ else "INFO"
+    log_level = "DEBUG" if args.enable_console_logging else "INFO"
     logging.basicConfig(
         level=log_level,
         format="%(filename)s[line:%(lineno)d] - %(levelname)s - %(message)s",
@@ -56,7 +57,8 @@ if __name__ == "__main__":
     config_data = read_json_from_file(config_path)
     batch_size = config_data.get("batch_size") if config_data else None
 
-    ENABLE_CONSOLE_LOGGING = True
+    enable_console_logging = args.enable_console_logging
+
     RAY_OUTPUT_DIR = Path("./app/output")
 
     # instantiate model
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     # instantiate & call controller         #
     #########################################
     rayword_controller = Controller(rayword_model, batch_size=batch_size)
-    rayword_controller(enable_console_logging=ENABLE_CONSOLE_LOGGING)
+    rayword_controller(enable_console_logging=enable_console_logging)
 
     # export results to output after controller finishes
     # # unreachable paths

@@ -1,9 +1,7 @@
 import ray
 import logging
-import psutil
-import threading
-import time
 import os
+import datetime
 
 from .resourcemonitor import ResourceMonitor
 from ..log_memory_and_disk_usage import log_memory_and_disk_usage
@@ -28,12 +26,18 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
     # logging.getLogger().setLevel(logging.WARNING)
     from .wordsearch import WordSearcher
 
+    time_start = datetime.datetime.now()
     if enable_logging:
         logging.basicConfig(
             level=logging.DEBUG,
-            format="%(filename)s:%(lineno)d - %(levelname)s - %(message)s",
+            format="---  %(level) -- %(filename)s:%(lineno)d - %(levelname)s - %(message)s",
         )
-
+    if enable_logging:
+        logging.debug("\033[1mLOGGING ENABLED ON WORKER {os.getpid()}\033[0m")
+    else:
+        logging.debug(f"\033[1;33mLOGGING NOT ENABLED ON WORKER {os.getpid()}\033[0m")
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
     # log_memory_and_disk_usage()
     resource_monitor = ResourceMonitor()
 
@@ -57,15 +61,18 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
 
     word_search_results = word_searcher.perform_search()
 
+    time_end = datetime.datetime.now()
+    time_delta = time_end - time_start
     resource_monitor.stop()
 
     logging.debug(
-        f"""
-MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {resource_monitor.max_memory_usage / (1024 * 1024)} MB"""
+        f"FINISHED WORK SUBMITTING RESULTS TO HEAD NODE, time for work to complete: {str(time_delta)}"
     )
     logging.debug(
-        f"""
-MIN/MAX DISK USAGE (/root): {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
+        f"""MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {resource_monitor.max_memory_usage / (1024 * 1024)} MB"""
+    )
+    logging.debug(
+        f"""MIN/MAX DISK USAGE (/root): {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
     )
     return word_search_results.to_compressed_json()
 

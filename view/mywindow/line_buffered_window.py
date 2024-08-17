@@ -161,6 +161,8 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
             if current_line:
                 self._wrapped_lines.append(current_line)
 
+        logging.debug(f"wrapped lines: {self._wrapped_lines}")
+
     def add_line(self, line):
         """
         Add a new line to the buffer and update the wrapped lines.
@@ -173,6 +175,9 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         if self._scrolling:
             self._current_line_index = len(self._wrapped_lines) - 1
         else:
+            raise Exception(
+                "breakpoint for only scrolling, please remove this exception for proper workflow"
+            )
             viewable_height, _ = self._viewable_height_and_width
             self._current_line_index = min(
                 viewable_height - 1, len(self._wrapped_lines) - 1
@@ -210,7 +215,7 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         self.clear()
         for i, line in enumerate(
-            self._wrapped_lines[self._top_line_index : self._bottom_line_index]
+            self._wrapped_lines[self._top_line_index : self._bottom_line_index + 1]
         ):
             self._add_line(line, i)
         if self._boxed:

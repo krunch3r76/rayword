@@ -23,10 +23,9 @@ def log_memory_and_disk_usage():
     total_disk_root = "?"
     try:
         du_output = subprocess.check_output(
-            ["du", "-sh", "/root"], stderr=subprocess.STDOUT
+            ["du", "-s", "/root"], stderr=subprocess.STDOUT
         )
-        du_size = du_output.decode().split()[0]
-
+        du_size = int(du_output.decode().split()[0])
         # total disk
         disk_stats_root = psutil.disk_usage("/root")
         total_disk_root = disk_stats_root.total
@@ -35,11 +34,16 @@ def log_memory_and_disk_usage():
             f"Error running du: {e.output.decode()} (called from {caller_filename}:{caller_lineno})"
         )
 
-    logging.info(
-        f"Memory usage: {current_memory_usage / (1024 * 1024)} MB / {total_memory / (1024 * 1024)} MB (called from {caller_filename}:{caller_lineno})"
+    current_memory_usage_mb = current_memory_usage / (1024**2)
+    max_memory_mb = total_memory / (1024**2)
+    disk_usage_root_mb = du_size / (1024**2)
+    total_disk_size_mb = total_disk_root / (1024**2)
+
+    logging.debug(
+        f"Memory usage: {current_memory_usage_mb} MB / {max_memory_mb} MB (called from {caller_filename}:{caller_lineno})"
     )
-    logging.info(
-        f"Disk usage for /root: {du_size} / {total_disk_root / (1024 * 1024)} MB (called from {caller_filename}:{caller_lineno})"
+    logging.debug(
+        f"Disk usage for /root: {disk_usage_root_mb} / {total_disk_size_mb} MB (called from {caller_filename}:{caller_lineno})"
     )
 
 

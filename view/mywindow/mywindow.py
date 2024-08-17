@@ -86,6 +86,7 @@ class MyWindow:
         available_lines, available_cols = self._viewable_height_and_width
         self._win.erase()
         self._win.resize(available_lines, available_cols)
+        curses.napms(100)
         self.refresh()
 
     def _add_line_wrapped(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
@@ -165,8 +166,14 @@ class MyWindow:
         if not truncated:
             raise Exception("stylized text as wrapped not currently supported")
         max_height, max_width = self._viewable_height_and_width
-        available_width = self._width - 2 * self.x_padding
-        self._win.addstr(y_offset, x_offset, line[:available_width], attr)
+        available_width = max_width - x_offset
+        if available_width > 0:
+            try:
+                self._win.addstr(y_offset, x_offset, line[:available_width], attr)
+            except Exception as e:
+                logging.debug(
+                    f"{e}\nuh oh, could not addstr at {y_offset}, {x_offset} available width: {available_width} line: {line[:available_width]}"
+                )
 
     def hide(self):
         self.visible = False

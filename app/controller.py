@@ -73,7 +73,7 @@ class Controller:
         task_submitter = TaskSubmitter(self.enable_console_logging)
 
         path_prefix = os.environ.get("RAYWORD_URL_PREFIX", None)
-        print(f"searching {len(unsearched_paths)} texts")
+        logging.debug(f"searching {len(unsearched_paths)} texts")
         task_batches = task_generator.generate(unsearched_paths, path_prefix)
 
         searchResults = task_submitter.submit_and_process_tasks(task_batches)

@@ -132,6 +132,8 @@ class MyPad:
 
     def resize(self):
         # resize logic to refresh to new dimensions
+        logging.debug("resizing")
+        curses.update_lines_cols()  # this should probably be called already e.g. on resize
         self.refresh()
 
     @property

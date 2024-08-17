@@ -23,7 +23,7 @@ class TaskSubmitter:
     Utilizes Ray to distribute and execute tasks across a cluster, and aggregates results.
     """
 
-    def __init__(self, enable_console_logging=None):
+    def __init__(self, enable_console_logging=False):
         if enable_console_logging is None:
             self.enable_console_logging = True if "KRUNCHDEBUG" in os.environ else False
         else:

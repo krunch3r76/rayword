@@ -84,7 +84,7 @@ class WordSearcher:
             searchHistories.append(path_id)
 
         logging.debug(
-            f"indexed {len(self.paths_searched)} paths of which {len(self.bad_path_ids)} {'was' if len(self.bad_path_ids) == 1 else 'were'} unreachable"
+            f"\033[1;44mindexed {len(self.paths_searched)} paths of which {len(self.bad_path_ids)} {'was' if len(self.bad_path_ids) == 1 else 'were'} unreachable\033[0m"
         )
 
         search_results = WordSearchResults(
@@ -117,11 +117,9 @@ class WordSearcher:
                 find_all_words_positions(
                     self.workerModel, text, self.exclude_words, path_id
                 )
-                # self.path_id_to_results[path_id] = word_to_positions
             elif not connection_timed_out:
                 self.bad_path_ids.append(path_id)
 
             if connection_timed_out:
                 logging.debug("connection timed out")
-                continue
         self.workerModel.end_transaction()

@@ -27,6 +27,7 @@ class LogWindowGroup:
             boxed=True,
             padding=1,
         )
+        self.prompt_window_visible = True
         BOTTOM_PADDING = 2
         TOP_PADDING = 3
         screen_height, screen_width = self.stdscr.getmaxyx()
@@ -59,11 +60,12 @@ class LogWindowGroup:
             window.hide()
         self.prompt_window.hide()
 
-    def show(self, include_prompt_window=False):
-        for window in self.log_windows:
-            window.show()
-        if include_prompt_window:
+    def show(self):
+        if self.prompt_window_visible is True:
             self.prompt_window.show()
+        else:
+            for window in self.log_windows:
+                window.show()
 
     def clear(self):
         for window in self.log_windows:
@@ -71,10 +73,12 @@ class LogWindowGroup:
         self.prompt_window.clear()
 
     def resize(self):
-        for window in self.log_windows:
-            window.resize()
-        self.prompt_window.resize()
-        self.prompt_window.draw()
+        if not self.prompt_window_visible:
+            for window in self.log_windows:
+                window.resize()
+        else:
+            self.prompt_window.resize()
+            self.prompt_window.draw()
 
     def refresh_all_log(self):
         for window in self.log_windows:

@@ -233,7 +233,7 @@ def load_resource(url, max_retries=3):
             local_file_path = Path(url[7:])
             if not local_file_path.exists():
                 logger.debug(f"File not found at {local_file_path}")
-                return None, False
+                return None, True  # don't mark missing local files as a bad path
             return process_zip_file(str(local_file_path))
 
         temp_dir = Path(tempfile.gettempdir())
@@ -245,20 +245,20 @@ def load_resource(url, max_retries=3):
             logger.debug(f"URL fetching failed for {url}")
             # try alternate path
 
-            return None, True
+            return None, False  # indicate as bad url
 
         if temp_zip_path.exists():
             return process_zip_file(str(temp_zip_path))
         else:
-            logger.debug(f"Downloaded file not found for {url}")
-            return None, True
+            # logger.debug(f"Downloaded file not found for {url}")
+            return None, False  # indicate as bad url
 
     except zipfile.BadZipFile:
         logger.error(f"Bad ZIP file encountered with {url}")
-        return None, False
+        return None, False  # associate with bad url
     except Exception as e:
         logger.error(f"Error processing file from {url}: {e}")
-        return None, True
+        return None, False  # mark path bad
     finally:
         if temp_zip_path and temp_zip_path.exists():
             temp_zip_path.unlink()

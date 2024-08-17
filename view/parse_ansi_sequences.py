@@ -26,6 +26,8 @@ def parse_ansi_sequences(text: str):
             for code in params:
                 if code == 0:  # Reset
                     current_attr = curses.A_NORMAL
+                elif code == 1:
+                    current_attr = curses.A_BOLD
                 elif 30 <= code <= 37 or 90 <= code <= 97:
                     current_attr = get_color_pair(code)
 
