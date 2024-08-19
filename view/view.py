@@ -82,7 +82,7 @@ class View:
             self.log_window_group.prompt_window_visible = True
         else:
             self.log_window_group.prompt_window_visible = False
-
+            self.log_window_group.resize()
         # if newval == View.ViewMode.BROWSER:
         #     self._wordentrywin._textbuffer = "<search word>"
         #     self._wordentrywin.refresh()

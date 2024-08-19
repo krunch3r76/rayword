@@ -63,7 +63,7 @@ provider:
           # max_cost: 1.5
 
         # # Amount of GLMs for worker initiation which Golem provider offer will be rejected if exceeded.
-        # max_start_price: 1.5
+        max_start_price: 0
 
         # # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
         max_cpu_per_hour_price: 0.05
@@ -138,6 +138,6 @@ worker_start_ray_commands: [
 
 # Satisfy checks to disable warning about legacy fields at `ray up`.
 # This will be removed by ray-on-golem on the fly.
-head_node: True
-worker_nodes: True
+head_node: true
+worker_nodes: true
 
