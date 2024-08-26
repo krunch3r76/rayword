@@ -1,0 +1,35 @@
+glm is often reserved causing an error asking to release allocations
+if the webserver is already running, releasing allocations requires that yagna process be killed manually
+
+one instance took 10 minutes to launch an image, spending glm env/h in the meantime
+
+    Requested nodes status after 0:10:20.168425
+             Failed to create activity, retrying. error='golem.resources.pooling_batch.exceptions.BatchTimeoutError: PoolingBatch(ec0ad3c14dd54f66b0371d13be42b0f4) did not finish in 300.0 seconds'
+             [1/9] Getting agreement...
+      node0: [2/9] Creating activity on provider: M3 (0x7a1d6b6d8707cdc3147ada258213ac49653f64f0)...
+    Requested nodes status after 0:10:25.169757
+      node0: Failed to create activity: ya_activity.exceptions.ApiException: (400)
+Reason: Bad Request
+HTTP response headers: <CIMultiDictProxy('Content-Length': '142', 'Content-Type': 'application/json', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers', 'Date': 'Thu, 23 May 2024 22:53:21 GMT')>
+HTTP response body: {"message":"Bad request: Agreement 364c1adf47ab396e3e3185a0b44866e4484c869093a1ca10e1f6b9680ff969bb is not Approved. Current state: Rejected"}
+
+
+
+    Requested nodes status after 0:01:05.019787
+             [2/9] Creating activity on provider: frelyeaduale52620 (0x6e4c4f30d50f962b6b244994199101cfd69aa580)...
+      node2: Failed to create activity: ya_activity.exceptions.ApiException: (400)
+Reason: Bad Request
+HTTP response headers: <CIMultiDictProxy('Content-Length': '141', 'Content-Type': 'application/json', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers', 'Date': 'Thu, 23 May 2024 23:00:22 GMT')>
+HTTP response body: {"message":"Bad request: Agreement ce5c43ccf10aa5f9a49426d17b9665a59bf448169a8115c26282d3efa0a6f6ce is not Approved. Current state: Expired"}
+
+
+```
+(execute_remote_word_search pid=7698) 2024-05-24 00:31:18,364 - DEBUG - Read timeout on http://69.55.231.8/3/9/1/4/39143/39143-8.zip, attempt 1 of 3
+(raylet) The node with node id: da018a3b28bcd1a0cb0f20ac6f3e5145408452d67644b7b31d2a5ebc and address: 192.168.0.5 and node name: 192.168.0.5 has been marked dead because the detector has missed too many heartbeats from it. This can happen when a   (1) ra
+        (2) raylet has lagging heartbeats due to slow network or busy workload.
+(autoscaler +37m28s) Restarting 1 nodes of type ray.worker.default (lost contact with raylet).
+(autoscaler +38m20s) Resized to 78 CPUs.
+(autoscaler +44m57s) Adding 1 node(s) of type ray.worker.default.
+(autoscaler +46m40s) Resized to 110 CPUs.
+```
+apparently if a node doesn't finish a task it is eventually marked dead. however, after being marked dead, adding another node apparently doesn't 

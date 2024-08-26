@@ -9,19 +9,19 @@ import tempfile
 from pathlib import Path
 
 # Configure the root logger
-logging.basicConfig(
-    level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logging.basicConfig(
+#     level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s"
+# )
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
-# Add a console handler to the custom logger if not already present
-if not logger.handlers:
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+# # Add a console handler to the custom logger if not already present
+# if not logger.handlers:
+#     console_handler = logging.StreamHandler()
+#     console_handler.setLevel(logging.DEBUG)
+#     formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
+#     console_handler.setFormatter(formatter)
+#     logger.addHandler(console_handler)
 
 
 class URLContentFetcher:
@@ -86,7 +86,7 @@ class URLContentFetcher:
                 if self._handle_http_error(e):
                     return False
             except requests.exceptions.RequestException as e:
-                logger.debug(f"Unexpected error on {self.url}: {e}")
+                logging.debug(f"Unexpected error on {self.url}: {e}")
                 self.timeout_error = True
 
         return True  # Timeout error by default if all retries exhausted
@@ -118,7 +118,7 @@ class URLContentFetcher:
         """
         total_size = None
         if response.status_code == 206 or "content-range" in response.headers:
-            logger.debug("content-range seen")
+            logging.debug("content-range seen")
             content_range = response.headers.get("content-range")
             total_size = int(content_range.split("/")[-1]) if content_range else None
 
@@ -130,7 +130,7 @@ class URLContentFetcher:
                 f.write(chunk)
 
         if total_size and os.path.getsize(self.temp_zip_path) < total_size:
-            logger.debug(
+            logging.debug(
                 f"Incomplete transfer on {self.url}, attempt {attempt + 1} of {self.max_retries}"
             )
             return True  # Continue to next retry for incomplete transfer
@@ -145,7 +145,7 @@ class URLContentFetcher:
             attempt (int): Current attempt number of the download.
             timeout_type (str): Type of the timeout ('Read' or 'Connection').
         """
-        logger.debug(
+        logging.debug(
             f"{timeout_type} timeout on {self.url}, attempt {attempt + 1} of {self.max_retries}"
         )
 
@@ -160,14 +160,14 @@ class URLContentFetcher:
             bool: True if the error is a 404 (Not Found), indicating no further retries; False otherwise.
         """
         if e.response.status_code == 404:
-            logger.debug(f"URL not found (404) on {self.url}")
+            logging.debug(f"URL not found (404) on {self.url}")
             try:
                 os.remove(self.temp_zip_path)
             except FileNotFoundError:
                 pass
             return True
         else:
-            logger.debug(f"HTTP Error on {self.url}: {e}")
+            logging.debug(f"HTTP Error on {self.url}: {e}")
             return False
 
 
@@ -201,11 +201,11 @@ def process_zip_file(temp_zip_path):
                             pass  # Try the next encoding
 
                     # If all decodings fail, log an error
-                    logger.error(
+                    logging.error(
                         f"Failed to decode file {file_name} in {temp_zip_path}"
                     )
     except zipfile.BadZipFile as e:
-        logger.error(f"Bad ZIP file from {temp_zip_path}: {e}")
+        logging.error(f"Bad ZIP file from {temp_zip_path}: {e}")
         return None, False
 
     return None, True
@@ -232,8 +232,8 @@ def load_resource(url, max_retries=3):
         if url.startswith("file://"):
             local_file_path = Path(url[7:])
             if not local_file_path.exists():
-                logger.debug(f"File not found at {local_file_path}")
-                return None, True  # don't mark missing local files as a bad path
+                logging.debug(f"File not found at {local_file_path}")
+                return None, False
             return process_zip_file(str(local_file_path))
 
         temp_dir = Path(tempfile.gettempdir())
@@ -242,23 +242,23 @@ def load_resource(url, max_retries=3):
 
         fetcher = URLContentFetcher(url, str(temp_zip_path), max_retries)
         if fetcher():
-            logger.debug(f"URL fetching failed for {url}")
+            logging.debug(f"URL fetching failed for {url}")
             # try alternate path
 
-            return None, False  # indicate as bad url
+            return None, True
 
         if temp_zip_path.exists():
             return process_zip_file(str(temp_zip_path))
         else:
-            # logger.debug(f"Downloaded file not found for {url}")
-            return None, False  # indicate as bad url
+            logging.debug(f"Downloaded file not found for {url}")
+            return None, True
 
     except zipfile.BadZipFile:
-        logger.error(f"Bad ZIP file encountered with {url}")
-        return None, False  # associate with bad url
+        logging.error(f"Bad ZIP file encountered with {url}")
+        return None, False
     except Exception as e:
-        logger.error(f"Error processing file from {url}: {e}")
-        return None, False  # mark path bad
+        logging.error(f"Error processing file from {url}: {e}")
+        return None, True
     finally:
         if temp_zip_path and temp_zip_path.exists():
             temp_zip_path.unlink()

@@ -8,6 +8,25 @@ import subprocess
 from .log_memory_and_disk_usage import log_memory_and_disk_usage
 
 
+def get_node_ip():
+    import socket
+
+    # Get the non-loopback IP address directly from network interfaces
+    ip_address = None
+    for interface, addrs in psutil.net_if_addrs().items():
+        for addr in addrs:
+            if addr.family == socket.AF_INET and not addr.address.startswith("127."):
+                ip_address = addr.address
+                break
+        if ip_address:
+            break
+
+    if not ip_address:
+        ip_address = "Unknown"
+
+    return ip_address
+
+
 class Controller:
     """
     A controller class that orchestrates the word search process.
@@ -67,16 +86,20 @@ class Controller:
             SearchHistory table
             Paths table (is_unreachable)
         """
-        logging.debug(f"\033[1;33mHello from controller with pid {os.getpid()}\033[0m")
+        logging.debug(
+            f"\033[1;33mHello from controller with pid {os.getpid()} at ip address: {get_node_ip()}\033[0m"
+        )
         log_memory_and_disk_usage()
         task_generator = TaskGenerator(batch_size=self.batch_size)
         task_submitter = TaskSubmitter(self.enable_console_logging)
 
         path_prefix = os.environ.get("RAYWORD_URL_PREFIX", None)
-        logging.debug(f"searching {len(unsearched_paths)} texts")
+        task_count = len(unsearched_paths) // self.batch_size
         task_batches = task_generator.generate(unsearched_paths, path_prefix)
 
-        searchResults = task_submitter.submit_and_process_tasks(task_batches)
+        searchResults = task_submitter.submit_and_process_tasks(
+            task_batches, task_count
+        )
 
         word_indices_aggregated, search_histories_aggregated, bad_path_ids = (
             [],

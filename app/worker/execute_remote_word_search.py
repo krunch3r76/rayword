@@ -1,10 +1,13 @@
 import ray
 import logging
+import psutil
+import threading
+import time
 import os
-import datetime
-
+import socket
 from .resourcemonitor import ResourceMonitor
 from ..log_memory_and_disk_usage import log_memory_and_disk_usage
+import subprocess
 
 # runtime_env = {"pip": ["requests", "nltk"]}
 # ray.init(runtime_env=runtime_env)
@@ -23,21 +26,42 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
     Returns:
         Tuple[List[dict], Dict]: Tuple containing the search results and history information.
     """
+
     # logging.getLogger().setLevel(logging.WARNING)
     from .wordsearch import WordSearcher
 
-    time_start = datetime.datetime.now()
     if enable_logging:
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format="---  %(level) -- %(filename)s:%(lineno)d - %(levelname)s - %(message)s",
-        )
-    if enable_logging:
-        logging.debug("\033[1mLOGGING ENABLED ON WORKER {os.getpid()}\033[0m")
-    else:
-        logging.debug(f"\033[1;33mLOGGING NOT ENABLED ON WORKER {os.getpid()}\033[0m")
         logger = logging.getLogger()
-        logger.setLevel(logging.INFO)
+        logging.debug(f"handlers: {logger.handlers}")
+        logger.handlers = []
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            "%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s",
+            datefmt="%H:%M:%S",
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
+
+    # def get_node_ip():
+    #     # Get the non-loopback IP address directly from network interfaces
+    #     ip_address = None
+    #     for interface, addrs in psutil.net_if_addrs().items():
+    #         for addr in addrs:
+    #             if addr.family == socket.AF_INET and not addr.address.startswith(
+    #                 "127."
+    #             ):
+    #                 ip_address = addr.address
+    #                 break
+    #         if ip_address:
+    #             break
+
+    #     if not ip_address:
+    #         ip_address = "Unknown"
+
+    #     return ip_address
+
+    logging.debug(f"ip: \033[1;43m{ray.util.get_node_ip_address()}\033[0m")
     # log_memory_and_disk_usage()
     resource_monitor = ResourceMonitor()
 
@@ -46,11 +70,11 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
     try:
         with open(EXCLUSIONS_FILE, "r") as file:
             exclusions = {line.strip() for line in file}
-        logging.debug(
+        logger.debug(
             f"Loaded exclusions file '{EXCLUSIONS_FILE}' from directory '{current_directory}'"
         )
     except FileNotFoundError:
-        logging.error(
+        logger.error(
             f"Exclusions file '{EXCLUSIONS_FILE}' not found in directory '{current_directory}'."
         )
         exclusions = set()
@@ -61,17 +85,13 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
 
     word_search_results = word_searcher.perform_search()
 
-    time_end = datetime.datetime.now()
-    time_delta = time_end - time_start
     resource_monitor.stop()
 
-    logging.debug(
-        f"FINISHED WORK SUBMITTING RESULTS TO HEAD NODE, time for work to complete: {str(time_delta)}"
+    logger.debug(
+        f"""MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {resource_monitor.max_memory_usage / (1024 * 1024)} MB
+"""
     )
-    logging.debug(
-        f"""MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {resource_monitor.max_memory_usage / (1024 * 1024)} MB"""
-    )
-    logging.debug(
+    logger.debug(
         f"""MIN/MAX DISK USAGE (/root): {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
     )
     return word_search_results.to_compressed_json()

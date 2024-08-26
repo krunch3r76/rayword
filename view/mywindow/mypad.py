@@ -41,7 +41,6 @@ class MyPad:
         )
         self.visible = True
         self.refresh()
-        logging.debug("Hello from MyPad")
         self.overlay_win = None
 
     @property
@@ -241,21 +240,14 @@ class MyPad:
 
     def scroll_down(self):
         if self._current_line_offset > 0:
-            logging.debug("> 0")
             self._current_line_offset -= 1
             self._padline_top += 1
             if self._current_line_offset <= self._padline_at_keyup:
-                logging.debug(
-                    f"padline: {self._padline} >=? padline_at_keyup: {self._padline_at_keyup}"
-                )
                 if (
                     not self._autoscroll_active
                     and self._padline >= self._padline_at_keyup
                 ):
                     self.auto_scroll_active = True
-                    logging.debug(
-                        f"AUTOSCROLL, current line offset: {self._current_line_offset}"
-                    )
                 else:
                     self._current_line_offset = self._padline - self._padline_at_keyup
             self.refresh()
