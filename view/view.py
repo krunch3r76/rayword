@@ -243,7 +243,18 @@ class View:
             if start_signal:
                 self.current_view = View.ViewMode.LOG
                 self.prompt_acknowledged = True
-                self.to_controller.put_nowait({"signal": "cmd", "msg": "start ray"})
+                # inspect log_window_group for fields that have changed
+                pending_config_changes = (
+                    self.log_window_group.get_fields_changed_from_prompt_window()
+                )
+                # construct dictionary of values to update controller
+                self.to_controller.put_nowait(
+                    {
+                        "signal": "cmd",
+                        "msg": "start ray",
+                        "pending_config_changes": pending_config_changes,
+                    }
+                )
         elif asciicode != -1:
             self.log_window_group.send_key_to_prompt_window(asciicode)
         if self.view_changed:

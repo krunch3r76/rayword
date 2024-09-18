@@ -1,4 +1,5 @@
 # prompt_window.py
+# move this outside of mywindow because it is a specialized version of it
 
 import curses
 from .mywindow import MyWindow
@@ -51,6 +52,8 @@ class PromptWindow(MyWindow):
             "shortcuts": "F2 : this screen / F3 : word browser",
         }
 
+        self.fields_modified = set()
+
         self.field_keys = list(self.fields.keys())
         self.current_field_index = (
             0  # Start at the first modifiable field (texts per worker)
@@ -61,6 +64,13 @@ class PromptWindow(MyWindow):
         self._config = None
         self.last_mode_was_edit = False
         self.pending_config_changes = dict()
+
+    def get_fields_modified(self):
+        # iterate over list of field names modified and assign values to dict
+        self.pending_config_changes = dict()
+        for field_name in self.fields_modified:
+            self.pending_config_changes[field_name] = self.fields[field_name]
+        return self.pending_config_changes
 
     @property
     def config(self):
@@ -154,6 +164,7 @@ class PromptWindow(MyWindow):
                 while self.field_keys[self.current_field_index] not in [
                     "texts per worker",
                     "network",
+                    "max workers"
                 ]:
                     self.current_field_index = (self.current_field_index - 1) % len(
                         self.field_keys
@@ -165,6 +176,7 @@ class PromptWindow(MyWindow):
                 while self.field_keys[self.current_field_index] not in [
                     "texts per worker",
                     "network",
+                    "max workers"
                 ]:
                     self.current_field_index = (self.current_field_index + 1) % len(
                         self.field_keys
@@ -188,8 +200,9 @@ class PromptWindow(MyWindow):
                 self.draw()
             else:
                 field_name = self.field_keys[self.current_field_index]
+                self.fields_modified.add(field_name)
                 if key in (curses.KEY_ENTER, 10, 13):
-                    if field_name == "texts per worker":
+                    if field_name in [ "texts per worker", "max workers" ]:
                         self.fields[field_name] = self.temp_keyboard_input
                     self.edit_mode = False
                     self.select_mode = True
@@ -201,11 +214,12 @@ class PromptWindow(MyWindow):
                         else:
                             self.fields[field_name] = "MAINNET"
                     self.draw()
-                elif field_name == "texts per worker":
-                    self.temp_keyboard_input += chr(key)
-                    self.pending_config_changes[
-                        "texts per worker"
-                    ] = self.temp_keyboard_input
+                elif field_name in ["texts per worker", "max workers"]:
+                    if key == curses.KEY_BACKSPACE or key == 127:
+                        self.temp_keyboard_input = self.temp_keyboard_input[:-1]
+                    elif chr(key).isdigit():
+                        self.temp_keyboard_input += chr(key)
+                    self.pending_config_changes[field_name] = self.temp_keyboard_input
                     self.fields[field_name] = self.temp_keyboard_input
                     self.draw()
 

@@ -1,17 +1,8 @@
 import ray
 import logging
-import psutil
-import threading
-import time
 import os
-import socket
+from .wordsearch import WordSearcher
 from .resourcemonitor import ResourceMonitor
-from ..log_memory_and_disk_usage import log_memory_and_disk_usage
-import subprocess
-
-# runtime_env = {"pip": ["requests", "nltk"]}
-# ray.init(runtime_env=runtime_env)
-
 
 @ray.remote
 def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=False):
@@ -19,50 +10,45 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
     Executes a search for words in the given paths, run as a Ray remote function.
 
     Args:
-        words_table (list): List of dictionaries representing word records.
         paths_table (list): List of dictionaries representing path records.
         path_prefix (str, optional): Optional prefix for paths.
+        enable_logging (bool): Flag to enable detailed logging.
 
     Returns:
-        Tuple[List[dict], Dict]: Tuple containing the search results and history information.
+        serialization of WordSearcher to compressed json
+    
+    Notes:
+        called by app Controller via TaskSubmitter
     """
 
-    # logging.getLogger().setLevel(logging.WARNING)
-    from .wordsearch import WordSearcher
+    runtime_context = ray.get_runtime_context()
+    
+    node_id = str(runtime_context.node_id)
+    job_id = str(runtime_context.job_id)
+    worker_id = os.getpid()
+    node_ip = ray.util.get_node_ip_address()
 
-    if enable_logging:
-        logger = logging.getLogger()
-        logging.debug(f"handlers: {logger.handlers}")
-        logger.handlers = []
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            "%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s",
-            datefmt="%H:%M:%S",
-        )
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        logger.setLevel(logging.DEBUG)
+    # Create a unique prefix for this worker's logs
+    log_prefix = f"[Node:{node_id[:8]}|Worker:{worker_id}] "
 
-    # def get_node_ip():
-    #     # Get the non-loopback IP address directly from network interfaces
-    #     ip_address = None
-    #     for interface, addrs in psutil.net_if_addrs().items():
-    #         for addr in addrs:
-    #             if addr.family == socket.AF_INET and not addr.address.startswith(
-    #                 "127."
-    #             ):
-    #                 ip_address = addr.address
-    #                 break
-    #         if ip_address:
-    #             break
+    # Configure logging
+    logger = logging.getLogger(f"worker_{worker_id}")
+    if not logger.handlers:
+        logger.propagate = False  # Prevent log propagation to avoid duplication
+        if enable_logging:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(
+                f"%(asctime)s - {log_prefix}%(filename)s:%(lineno)d - %(levelname)s - %(message)s",
+                datefmt="%H:%M:%S"
+            )
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
 
-    #     if not ip_address:
-    #         ip_address = "Unknown"
+    logger.debug(f"Starting task. Node ID: {node_id}, Job ID: {job_id}, IP: {node_ip}")
 
-    #     return ip_address
-
-    logging.debug(f"ip: \033[1;43m{ray.util.get_node_ip_address()}\033[0m")
-    # log_memory_and_disk_usage()
     resource_monitor = ResourceMonitor()
 
     EXCLUSIONS_FILE = "/root/app/worker/exclusions.txt"
@@ -70,30 +56,29 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
     try:
         with open(EXCLUSIONS_FILE, "r") as file:
             exclusions = {line.strip() for line in file}
-        logger.debug(
-            f"Loaded exclusions file '{EXCLUSIONS_FILE}' from directory '{current_directory}'"
-        )
     except FileNotFoundError:
-        logger.error(
-            f"Exclusions file '{EXCLUSIONS_FILE}' not found in directory '{current_directory}'."
-        )
+        logger.error(f"Exclusions file '{EXCLUSIONS_FILE}' not found in directory '{current_directory}'.")
         exclusions = set()
 
     word_searcher = WordSearcher(
         paths_table, path_prefix=path_prefix, exclude_words=exclusions
     )
 
-    word_search_results = word_searcher.perform_search()
+    word_search_results = word_searcher()
 
     resource_monitor.stop()
 
-    logger.debug(
-        f"""MIN/MAX MEMORY USAGE: {resource_monitor.min_memory_usage / (1024 * 1024)} MB / {resource_monitor.max_memory_usage / (1024 * 1024)} MB
-"""
-    )
-    logger.debug(
-        f"""MIN/MAX DISK USAGE (/root): {resource_monitor.min_disk_usage / (1024 * 1024)} MB / {resource_monitor.max_disk_usage / (1024 * 1024)} MB"""
-    )
-    return word_search_results.to_compressed_json()
+    word_search_results.details = { 
+        "min_mem_mb": f"{resource_monitor.min_memory_usage / (1024 * 1024)}",
+        "max_mem_mb": f"{resource_monitor.max_memory_usage / (1024 * 1024)}",
+        "min_disk_mb": f"{resource_monitor.min_disk_usage / (1024 * 1024)}",
+        "max_disk_mb": f"{resource_monitor.max_disk_usage / (1024 * 1024)}",
+        "ip": f"{node_ip}",
+        "pid": f"{os.getpid()}",
+        "node_id": node_id,
+        "job_id": job_id,
+        "worker_id": worker_id
+    }
 
-    # return perform_word_search(words_table, paths_table, path_prefix)
+    logger.debug(f"Task completed. PID: {os.getpid()}")
+    return word_search_results.to_compressed_json()

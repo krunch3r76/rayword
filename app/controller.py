@@ -2,11 +2,19 @@
 from .task_submitter import TaskSubmitter
 from .task_generator import TaskGenerator
 import logging
+from dataclasses import dataclass
+from typing import Optional, List
 import os
 import psutil
 import subprocess
 from .log_memory_and_disk_usage import log_memory_and_disk_usage
 
+@dataclass
+class SearchSummary:
+    all_targets_already_searched: bool
+    num_paths_searched: Optional[int] = None
+    num_unreachable_paths: Optional[int] = None
+    node_distribution: Optional[List[dict]] = None
 
 def get_node_ip():
     import socket
@@ -27,87 +35,54 @@ def get_node_ip():
     return ip_address
 
 
+import logging
+import os
+from app.task_submitter import TaskSubmitter
+from app.task_generator import TaskGenerator
+from .log_memory_and_disk_usage import log_memory_and_disk_usage
+
 class Controller:
-    """
-    A controller class that orchestrates the word search process.
-
-    This class takes a list of words, generates tasks for searching them in paths,
-    submits these tasks to the Ray cluster, and processes the results.
-
-    Attributes:
-        model: The data model used for fetching and updating word and path records.
-        view: An optional view component for displaying results (not implemented yet).
-    """
-
     def __init__(self, model, batch_size, view=None):
-        """
-        Initializes the Controller with a model and an optional view.
-
-        Args:
-            model: The head data model for accessing and updating records.
-            view: An optional view component for displaying results (currently not implemented).
-        """
         self.model = model
         self.view = view
         self.enable_console_logging = None
         self.batch_size = batch_size
 
     def __call__(self, enable_console_logging=False):
-        """
-        Begins the process of distributing word search tasks.
-
-        This method is the entry point for the word search operation. It retrieves
-        unsearched paths for a given word and its internal set of related words
-        and initiates the task distribution.
-
-        Args:
-            words: A list of words to be searched in the paths.
-        """
         self.enable_console_logging = enable_console_logging
         unsearched_path_records = self.model.get_path_records()
+
         if len(unsearched_path_records) > 0:
-            self.distribute_word_search_tasks(unsearched_path_records)
+            return self._distribute_word_search_tasks(unsearched_path_records)
         else:
-            print("All targets have been searched")
+            return SearchSummary(all_targets_already_searched=True)
 
-    def distribute_word_search_tasks(self, unsearched_paths):
+    def _distribute_word_search_tasks(self, unsearched_paths):
         """
-        Distributes word search tasks across a Ray cluster.
-
-        This method generates tasks for each group of words and their associated unsearched paths.
-        These tasks are then submitted to the Ray cluster for processing. The search results
-        are aggregated and updated in the model.
-
-        Args:
-            words_to_unsearched_paths: A dictionary mapping words to their corresponding unsearched paths.
-
-        Post:
-            WordIndices table
-            SearchHistory table
-            Paths table (is_unreachable)
+        distributes word search tasks to workers
+        returns summary of search results
         """
         logging.debug(
-            f"\033[1;33mHello from controller with pid {os.getpid()} at ip address: {get_node_ip()}\033[0m"
+            f"Hello from controller with pid {os.getpid()} at ip address: {get_node_ip()}"
         )
-        log_memory_and_disk_usage()
+        # log_memory_and_disk_usage()
         task_generator = TaskGenerator(batch_size=self.batch_size)
-        task_submitter = TaskSubmitter(self.enable_console_logging)
 
         path_prefix = os.environ.get("RAYWORD_URL_PREFIX", None)
         task_count = len(unsearched_paths) // self.batch_size
         task_batches = task_generator.generate(unsearched_paths, path_prefix)
 
-        searchResults = task_submitter.submit_and_process_tasks(
-            task_batches, task_count
-        )
+        task_submitter = TaskSubmitter(enable_console_logging=self.enable_console_logging, tasks=task_batches, task_count=task_count)
+        searchResults = task_submitter.submit_and_process_tasks()
 
-        word_indices_aggregated, search_histories_aggregated, bad_path_ids = (
+        word_indices_aggregated, search_histories_aggregated, bad_path_ids, details = (
             [],
             [],
             set(),
+            []
         )
 
-        log_memory_and_disk_usage()
+
         for searchResult in searchResults:
             search_histories_aggregated.extend(searchResult["paths_searched"])
             word_positions_by_paths = searchResult["word_positions_by_paths"]
@@ -122,11 +97,21 @@ class Controller:
                             "text_number": text_number,
                         }
                         word_indices_aggregated.append(wordIndex)
-                    # create WordIndices record
-                    # add WordIndicesRecord
             bad_path_ids.update(searchResult["bad_paths"])
+            details.extend(searchResult["details"])
 
         self.model.insert_search_histories(search_histories_aggregated)
         self.model.insert_search_results(word_indices_aggregated)
         self.model.mark_paths_unreachable(bad_path_ids)
-        log_memory_and_disk_usage()
+
+        summary = SearchSummary(
+            all_targets_already_searched=False,
+            num_paths_searched=len(search_histories_aggregated),
+            num_unreachable_paths=len(bad_path_ids),
+            node_distribution=searchResults  # This includes the node distribution information
+        )
+
+        return summary
+
+
+        # log_memory_and_disk_usage()

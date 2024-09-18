@@ -48,6 +48,9 @@ class LogWindowGroup:
         start_signal = self.prompt_window.handle_key(asciicode)
         return start_signal
 
+    def get_fields_changed_from_prompt_window(self):
+        return self.prompt_window.get_fields_modified()
+
     def add_lines_to_prompt_window(self):
         # consider making prompt_window remember this internally and just rewrite on refresh
 

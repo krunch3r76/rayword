@@ -1,16 +1,22 @@
 checking data/targets.txt to add any new targets...
 
+prepare_unsearched_paths_json.py[line:89] - DEBUG - 12324 texts out of 50131 have not been indexed
+
+prepare_unsearched_paths_json.py[line:95] - DEBUG - attempting to index 150 texts on ray
+
+prepare_unsearched_paths_json.py[line:96] - DEBUG - selecting at most a total of 150 paths to search based on max workers of 3 and batch size of 50
+
 [37mCluster[39m: [1mgolem-cluster[22m
 
 
 
-2024-08-29 19:05:11,836	INFO util.py:375 -- setting max workers for head node type to 0
-
 Checking External environment settings
 
-[36mRay On Golem 0.12.1[39m
+[36mRay On Golem 0.13.0[39m
 
   Starting webserver on http://127.0.0.1:4578...
+
+  Webserver is not yet running, waiting additional `2` seconds...
 
   Webserver is not yet running, waiting additional `2` seconds...
 
@@ -30,21 +36,21 @@ Checking External environment settings
 
     
 
-    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬────────────────┐
+    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬─────────────────┐
 
-    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas           │
+    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas            │
 
-    ├────────────────────┼────────────────┼────────────┼─────────────┼────────────┼────────────────────────────┼────────────────┤
+    ├────────────────────┼────────────────┼────────────┼─────────────┼────────────┼────────────────────────────┼─────────────────┤
 
-    │  driver: erc20     │  11.9972 GLM   │  0 GLM     │  accepted   │  0 GLM     │  2.530773576289521111 GLM  │  0.1867 MATIC  │
+    │  driver: erc20     │  41.5430 GLM   │  0 GLM     │  accepted   │  0 GLM     │  0.628258677
 
-    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.490335977775856554 GLM  │                │
+135504689 GLM  │  13.5666 MATIC  │
 
-    │  token: GLM        │                │            │  requested  │  0 GLM     │  2.701255008669154230 GLM  │                │
+    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.167624506040124865 GLM  │                 │
 
-    └────────────────
+    │  token: GLM        │                │            │  requested  │  0 GLM     │  0.717635073059663066 GLM  │                 │
 
-────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴────────────────┘
+    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴─────────────────┘
 
   
 
@@ -62,227 +68,109 @@ Usage stats collection is enabled. To disable this, add `--disable-usage-stats` 
 
 [36mAcquiring an up-to-date head node[39m
 
-  [36mRay On Golem 0.12.1[39m
+  [36mRay On Golem 0.13.0[39m
 
     Requesting 1 nodes...
 
-    [36mRequested nodes status after 0:00:00.002990[39m
+    [36mRequested nodes status after 0:00:00.001994[39m
 
       [37mnode0[39m: [1m[1/9] Getting an agreement...[22m
 
-    [36mRequested nodes status after 0:00:05.004428[39m
+    [36mRequested nodes status after 0:00:05.003489[39m
 
       [37mnode0[39m: [1m[1/9] Getting an agreement...[22m
 
-    [36mRequested nodes status after 0:00:10.005920[39m
+    [36mRequested nodes status after 0:00:10.004714[39m
 
       [37mnode0[39m: [1m[1/9] Getting an agreement...[22m
 
-    [36mRequested nodes status after 0:00:15.007117[39m
+    [36mRequested nodes status after 0:00:15.006089[39m
 
       [37mnode0[39m: [1m[1/9] Getting an agreement...[22m
 
-    [36mRequested nodes status after 0:00:20.008408[39m
+    [36mRequested nodes status after 0:00:20.007394[39m
 
       [37mnode0[39m: [1m[1/9] Getting an agreement...[22m
 
-    [36mRequested nodes status after 0:00:25.009642[39m
+    [36mRequested nodes status after 0:00:25.008777[39m
 
       [37mnode0[39m: [1m[1/9] Getting an agreement...[22m
 
-    [36mRequested nodes status after 0:00:30.010946[39m
+    [36mRequested nodes status after 0:00:30.009969[39m
 
       [37mnode0[39m: [1mNo recommended providers were found. We are extending the search to all public providers, which might be less stable. Restart the cluster to try finding recommended providers again. If the problem persists please let us know at `#Ray on Golem` discord channel (https://chat.golem.network/)[22m
 
-    [36mRequested nodes status after 0:00:35.012215[39m
+    [36mRequested nodes status after 0:00:35.011199[39m
 
-             [2/9] Creating activity on provider: 1724867897440180900 (0xc9aa5fbe70bbb2317cf8f86305859f74c56ab3fd)...
+      [37mnode0[39m: [1mNo recommended providers were found. We are extending the search to all public providers, which might be less stable. Restart the cluster to try finding recommended providers again. If the problem persists please let us know at `#Ray on Golem` discord channel (https://chat.golem.network/)[22m
+
+    [36mRequested nodes status after 0:00:40.012316[39m
+
+             [2/9] Creating activity on provider: 1726670556797698905 (0xc17d9c663467f36f09f85b21eb30bad57f30246e)...
 
              [3/9] Adding activity to internal VPN...
 
       [37mnode0[39m: [1m[4/9] Deploying image...[22m
 
-    [36mRequested nodes status after 0:00:40.013670[39m
+    [36mRequested nodes status after 0:00:45.013518[39m
 
       [37mnode0[39m: [1m[4/9] Deploying image...[22m
 
-    [36mRequested nodes status after 0:00:45.015015[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:00:50.016362[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:00:55.017563[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:01:00.018713[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:01:05.019981[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:01:10.021342[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:01:15.022672[39m
-
-      [37mnode0[39m: [1m[4/9] Deploying image...[22m
-
-    [36mRequested nodes status after 0:01:20.024098[39m
+    [36mRequested nodes status after 0:00:50.014645[39m
 
       [37mnode0[39m: [1m[5/9] Starting VM container...[22m
 
-    [36mRequested nodes status after 0:01:25.025398[39m
+    [36mRequested nodes status after 0:00:55.015946[39m
+
+      [37mnode0[39m: [1m[5/9] Starting VM container...[22m
+
+    [36mRequested nodes status after 0:01:00.017219[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:01:30.026768[39m
+    [36mRequested nodes status after 0:01:05.018471[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:01:35.027922[39m
+    [36mRequested nodes status after 0:01:10.019884[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:01:40.029134[39m
+    [36mRequested nodes status after 0:01:15.021204[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:01:45.030466[39m
+    [36mRequested nodes status after 0:01:20.022500[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:01:50.031581[39m
+    [36mRequested nodes status after 0:01:25.023764[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:01:55.032855[39m
+    [36mRequested nodes status after 0:01:30.025033[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:02:00.034214[39m
+    [36mRequested nodes status after 0:01:35.026337[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:02:05.035546[39m
+    [36mRequested nodes status after 0:01:40.027718[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:02:10.036880[39m
+    [36mRequested nodes status after 0:01:45.029033[39m
 
       [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
 
-    [36mRequested nodes status after 0:02:15.038016[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:20.039257[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:25.040389[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:30.041778[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:35.043072[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:40.044412[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:45.045738[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:50.047259[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:02:55.048609[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:00.049794[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:05.051060[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:10.052124[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:15.053463[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:20.054848[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:25.056190[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:30.057448[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:35.058683[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:40.059887[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:45.061004[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:50.062381[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:03:55.063649[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:04:00.064986[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:04:05.066155[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:04:10.067417[39m
-
-      [37mnode0[39m: [1m[6/9] Running bootstrap commands...[22m
-
-    [36mRequested nodes status after 0:04:15.068658[39m
+    [36mRequested nodes status after 0:01:50.030412[39m
 
              [7/9] Starting ssh service...
 
-      [37mnode0[39m: [1m[8/9] Checking SSH connection...[22m
+             [8/9] Checking SSH connection...
 
-    [36mRequested nodes status after 0:04:20.069973[39m
-
-      [37mnode0[39m: [1m[9/9] Activity ready on provider: 1724867897440180900 (0xc9aa5fbe70bbb2317cf8f86305859f74c56ab3fd)[22m
+      [37mnode0[39m: [1m[9/9] Activity ready on provider: 1726670556797698905 (0xc17d9c663467f36f09f85b21eb30bad57f30246e)[22m
 
     [32mAll 1 requested nodes ready[39m
 
@@ -308,7 +196,7 @@ Warning: Permanently added '192.168.0.3' (ED25519) to the list of known hosts.
 
 
 
- 02:09:40 up 3 min,  0 user,  load average: 0.73, 0.40, 0.16
+ 23:46:15 up 1 min,  0 user,  load average: 0.45, 0.14, 0.05
 
 Shared connection to 192.168.0.3 closed.
 
@@ -316,7 +204,7 @@ Shared connection to 192.168.0.3 closed.
 
     [32mSuccess.[39m
 
-  Updating cluster configuration.[0m[2m [hash=160d5c67b4ffed1950caa443b763613a45c669fe][22m[0m
+  Updating cluster configuration.[0m[2m [hash=0ff9cad0e0236d39cbdb0ac627f3686f6ff3be6d][22m[0m
 
   [37mNew status[39m: [1msyncing-files[22m
 
@@ -438,9 +326,9 @@ Usage stats collection is disabled.
 
   
 
-  [4mIf connection to the dashboard fails, check your firewall settings and network 
+  [4mIf connection to the dashboard fails, check your firewall settings and networ
 
-configuration.[24m
+k configuration.[24m
 
 [0m
 
@@ -492,11 +380,11 @@ Shared connection to 192.168.0.3 closed.
 
 [0m
 
-2024-08-29 19:10:31,375	INFO util.py:375 -- setting max workers for head node type to 0
+[33mLoaded cached provider configuration[39m
 
-Checking External environment settings
+[33mIf you experience issues with the cloud provider, try re-running the command with [1m--no-config-cache[22m[26m.[39m
 
-[36mRay On Golem 0.12.1[39m
+[36mRay On Golem 0.13.0[39m
 
   Not starting the webserver, as it's already running
 
@@ -514,21 +402,21 @@ Checking External environment settings
 
     
 
-    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬────────────────┐
+    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬─────────────────┐
 
-    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas           │
+    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas            │
 
-    ├────────────────────┼────────────────┼────────────┼─────────────┼────────────┼────────────────────────────┼────────────────┤
+    ├────────────────────┼────────────────┼────────────┼─────────────┼────────────┼────────────────────────────┼─────────────────┤
 
-    │  driver: erc20     │  11.9972 GLM   │  5 GLM     │  accepted   │  0 GLM     │  2.5307735762895211
+    │  driver: erc20     │  41.5430 GLM   │  5 GLM     │  accepted   │  0 GLM     │  0.628258677
 
-11 GLM  │  0.1867 MATIC  │
+135504689 GLM  │  13.5666 MATIC  │
 
-    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.490335977775856554 GLM  │                │
+    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.167624506040124865 GLM  │                 │
 
-    │  token: GLM        │                │            │  requested  │  0 GLM     │  2.701255008669154230 GLM  │                │
+    │  token: GLM        │                │            │  requested  │  0 GLM     │  0.717635073059663066 GLM  │                 │
 
-    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴────────────────┘
+    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴─────────────────┘
 
   
 
@@ -540,13 +428,11 @@ Checking External environment settings
 
 [0m
 
-2024-08-29 19:10:34,643	INFO util.py:375 -- setting max workers for head node type to 0
-
 [33mLoaded cached provider configuration[39m
 
 [33mIf you experience issues with the cloud provider, try re-running the command with [1m--no-config-cache[22m[26m.[39m
 
-[36mRay On Golem 0.12.1[39m
+[36mRay On Golem 0.13.0[39m
 
   Not starting the webserver, as it's already running
 
@@ -564,3563 +450,327 @@ Checking External environment settings
 
     
 
-    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬────────────────┐
+    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬─────────────────┐
 
-    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas           │
+    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas            │
 
-    ├────────────────────┼────────────────┼────────────┼─────────────┼───
+    ├────────────────────┼────────────────┼────────────┼─────────────┼─�
 
-─────────┼────────────────────────────┼────────────────┤
+�──────────┼────────────────────────────┼─────────────────┤
 
-    │  driver: erc20     │  11.9972 GLM   │  5 GLM     │  accepted   │  0 GLM     │  2.531453733933416667 GLM  │  0.1867 MATIC  │
+    │  driver: erc20     │  41.5430 GLM   │  5 GLM     │  accepted   │  0 GLM     │  0.628258677135504689 GLM  │  13.5666 MATIC  │
 
-    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.490335977775856554 GLM  │                │
+    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.167624506040124865 GLM  │                 │
 
-    │  token: GLM        │                │            │  requested  │  0 GLM     │  2.702451833241870897 GLM  │                │
+    │  token: GLM        │                │            │  requested  │  0 GLM     │  0.717635073059663066 GLM  │                 │
 
-    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴────────────────┘
+    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴─────────────────┘
 
   
 
-  You can use the Golem Onbo
+  You can use t
 
-arding portal to top up: https://glm.golem.network/#/onboarding/budget?yagnaAddress=0xbf86e9cf42d9be1b0050117b00ea9d2ff40f1160&network=polygon
+he Golem Onboarding portal to top up: https://glm.golem.network/#/onboarding/budget?yagnaAddress=0xbf86e9cf42d9be1b0050117b00ea9d2ff40f1160&network=polygon
 
   
 
 [37mFetched IP[39m: [1m192.168.0.3[22m
 
-2024-08-29 19:10:37,308	INFO util.py:375 -- setting max workers for head node type to 0
-
 [37mFetched IP[39m: [1m192.168.0.3[22m
 
-2024-08-30 02:10:39,260	INFO worker.py:1540 -- Connecting to existing Ray cluster at address: 192.168.0.3:6379...
+2024-09-18 23:47:38,608	INFO worker.py:1540 -- Connecting to existing Ray cluster at address: 192.168.0.3:6379...
 
-2024-08-30 02:10:39,314	INFO worker.py:1715 -- Connected to Ray cluster. View the dashboard at [1m[32m192.168.0.3:8265 [39m[22m
+2024-09-18 23:47:38,613 - DEBUG - Attempting to acquire lock 140250573059888 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/node_ip_address.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,614 - DEBUG - Lock 140250573059888 acquired on /tmp/ray/session_2024-09-18_23-46-43_289984_779/node_ip_address.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,614 - DEBUG - Attempting to release lock 140250573059888 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/node_ip_address.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,614 - DEBUG - Lock 140250573059888 released on /tmp/ray/session_2024-09-18_23-46-43_289984_779/node_ip_address.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,615 - DEBUG - Attempting to acquire lock 140250573061808 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,615 - DEBUG - Lock 140250573061808 acquired on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,615 - DEBUG - Attempting to release lock 140250573061808 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,615 - DEBUG - Lock 140250573061808 released on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Attempting to acquire lock 140250573062048 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
+2024-09-18 23:47:38,616 - DEBUG - Lock 140250573062048 acquired on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
+2024-09-18 23:47:38,616 - DEBUG - Attempting to release lock 140250573062048 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.jso
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+n.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Lock 140250573062048 released on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Attempting to acquire lock 140250573061808 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Lock 140250573061808 acquired on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Attempting to release lock 140250573061808 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Lock 140250573061808 released on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Attempting to acquire lock 140250573062048 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Lock 140250573062048 acquired on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.loc
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+k
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Attempting to release lock 140250573062048 on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616 - DEBUG - Lock 140250573062048 released on /tmp/ray/session_2024-09-18_23-46-43_289984_779/ports_by_node.json.lock
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:47:38,616	INFO worker.py:1715 -- Connected to Ray cluster. View the dashboard at [1m[32m192.168.0.3:8265 [39m[22m
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:48:05,599 - DEBUG - Hello from controller with pid 969 at ip address: 192.168.0.3
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 1
+2024-09-18 23:48:05,644 - INFO - Waiting for 3 nodes. Currently available: 0
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 3
+2024-09-18 23:48:10,650 - INFO - Waiting for 3 nodes. Currently available: 0
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 4
+2024-09-18 23:48:15,655 - INFO - Waiting for 3 nodes. Currently available: 0
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 6
+2024-09-18 23:48:20,657 - INFO - Waiting for 3 nodes. Currently available: 0
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 7
+2024-09-18 23:48:25,663 - INFO - Waiting for 3 nodes. Currently available: 0
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 7
+2024-09-18 23:48:30,668 - INFO - Waiting for 3 nodes. Currently available: 0
 
-[36m(autoscaler +2m32s)[0m Tip: use `ray status` to view detailed cluster status. To disable these messages, set RAY_SCHEDULER_EVENTS=0.
+2024-09-18 23:48:35,669 - INFO - Waiting for 3 nodes. Currently available: 0
 
-[36m(autoscaler +2m32s)[0m Adding 5 node(s) of type ray.worker.default.
+2024-09-18 23:48:40,672 - INFO - Waiting for 3 nodes. Currently available: 0
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 8
+2024-09-18 23:48:45,678 - INFO - Waiting for 3 nodes. Currently available: 1
 
-task_submitter.py[line:55] - INFO - Waiting for 10 nodes. Currently available: 8
+2024-09-18 23:48:50,679 - INFO - Waiting for 3 nodes. Currently available: 1
 
-[33m(raylet)[0m Traceback (most recent call last):
+2024-09-18 23:48:55,681 - INFO - Waiting for 3 nodes. Currently available: 1
 
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
+2024-09-18 23:49:00,686 - INFO - Waiting for 3 nodes. Currently available: 1
 
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
+2024-09-18 23:49:05,690 - INFO - Waiting for 3 nodes. Currently available: 1
 
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
+2024-09-18 23:49:10,695 - INFO - Waiting for 3 nodes. Currently available: 1
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
+2024-09-18 23:49:15,696 - INFO - Waiting for 3 nodes. Currently available: 1
 
-    context = self.get_serialization_context()
+2024-09-18 23:49:20,698 - INFO - Waiting for 3 nodes. Currently available: 2
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
+2024-09-18 23:49:25,702 - DEBUG - Path records count: 150
 
-    context_map[job_id] = serialization.SerializationContext(self)
+2024-09-18 23:49:25,702 - DEBUG - Batch size: 50
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
+2024-09-18 23:49:25,702 - DEBUG - Generated task with 50 path records.
 
-    serialization_addons.apply(self)
+2024-09-18 23:49:26,407 - DEBUG - Generated task with 50 path records.
 
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
+2024-09-18 23:49:26,408 - DEBUG - Generated task with 50 path records.
 
-    from ray._private.pydantic_compat import register_pydantic_serializers
+2024-09-18 23:49:26,409 - DEBUG - ---------Number of futures: 3
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
+[36m(autoscaler +1m48s)[0m Tip: use `ray status` to view detailed cluster status. To disable these messages, set RAY_SCHEDULER_EVENTS=0.
 
-dule>
+[36m(autoscaler +1m48s)[0m Resized to 34 CPUs.
 
-    from pkg_resources import packaging
+[36m(autoscaler +1m48s)[0m Adding 3 node(s) of type ray.worker.default.
 
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
+[36m(execute_remote_word_search pid=1114, ip=192.168.0.6)[0m 23:49:28 - [Node:NodeID(f|Worker:1114] execute_remote_word_search.py:50 - DEBUG - Starting task. Node ID: NodeID(f301fc73fc6e0a4cdb2a71baf3330cfc84431f399e4a72d73058ba67), Job ID: JobID(01000000), IP: 192.168.0.6
 
+[36m(execute_remote_word_search pid=1170, ip=192.168.0.5)[0m 2024-09-18 23:50:15,235 - DEBUG - URL not found (404) on http://69.55.231.8/5/6/2/0/56200/56200-0.zip
 
+[36m(execute_remote_word_search pid=1170, ip=192.168.0.5)[0m 2024-09-18 23:50:15,235 - DEBUG - Downloaded file not found for http://69.55.231.8/5/6/2/0/56200/56200-0.zip
 
-During handling of the above exception, another exception occurred:
+[36m(execute_remote_word_search pid=1170, ip=192.168.0.5)[0m 2024-09-18 23:50:15,235 - DEBUG - [1;31mconnection timed out[0m
 
+[36m(execute_remote_word_search pid=1170, ip=192.168.0.5)[0m 23:49:33 - [Node:NodeID(6|Worker:1170] execute_remote_word_search.py:50 - DEBUG - Starting task. Node ID: NodeID(651dd6cc0e43b644c98c1a8e861467b564cc25bc0c4d2baf75dfb47a), Job ID: JobID(01000000), IP: 192.168.0.5[32m [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)[0m
 
+[36m(autoscaler +2m55s)[0m Resized to 70 CPUs.
 
-Traceback (most recent call last):
+[36m(execute_remote_word_search pid=1114, ip=192.168.0.6)[0m 2024-09-18 23:50:43,478 - DEBUG - indexed 50 paths of which 0 were unreachable
 
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
+[36m(execute_remote_word_search pid=1329, ip=192.168.0.4)[0m 2024-09-18 23:50:15,564 - DEBUG - URL not found (404) on http://69.55.231.8/3/9/4/0/39401/39401-8.zip
 
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
+[36m(execute_remote_word_search pid=1329, ip=192.168.0.4)[0m 2024-09-18 23:50:15,565 - DEBUG - Downloaded file not found for http://69.55.231.8/3/9/4/0/39401/39401-8.zip
 
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
+[36m(execute_remote_word_search pid=1329, ip=192.168.0.4)[0m 2024-09-18 23:50:15,565 - DEBUG - [1;31mconnection timed out[0m
 
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
+[36m(execute_remote_word_search pid=1329, ip=192.168.0.4)[0m 2024-09-18 23:50:43,817 - DEBUG - indexed 49 paths of which 1 was unreachable
 
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
+[36m(execute_remote_word_search pid=1170, ip=192.168.0.5)[0m 23:51:07 - [Node:NodeID(6|Worker:1170] execute_remote_word_search.py:83 - DEBUG - Task completed. PID: 1170
 
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
+[36m(execute_remote_word_search pid=1170, ip=192.168.0.5)[0m 2024-09-18 23:50:47,749 - DEBUG - indexed 49 paths of which 1 was unreachable
 
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
+[36m(execute_remote_word_search pid=1329, ip=192.168.0.4)[0m 23:51:43 - [Node:NodeID(c|Worker:1329] execute_remote_word_search.py:83 - DEBUG - Task completed. PID: 1329
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_
+[36m(execute_remote_word_search pid=1114, ip=192.168.0.6)[0m 23:51:53 - [Node:NodeID(f|Worker:1114] execute_remote_word_search.py:83 - DEBUG - Task completed. PID: 1114
 
-private/worker.py", line 678, in get_serialization_context
+2024-09-18 23:51:56,619 - DEBUG - Memory usage: 584.97265625 MB / 18750.71875 MB (called from /root/app/task_submitter.py:59)
 
-    context_map[job_id] = serialization.SerializationContext(self)
+2024-09-18 23:51:56,619 - DEBUG - Disk usage for /root: 0.0376129150390625 / 1192915.8359375 MB (called from /root/app/task_submitter.py:59)
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
+2024-09-18 23:51:56,629 - INFO - Node NodeID(f301fc73fc6e0a4cdb2a71baf3330cfc84431f399e4a72d73058ba67) processed 1 tasks
 
-    serialization_addons.apply(self)
+2024-09-18 23:51:56,630 - INFO - Node NodeID(c2167169ec8a29e8028b358358e7a823e703c78d3976770b35c12982) processed 1 tasks
 
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
+2024-09-18 23:51:56,630 - INFO - Node NodeID(651dd6cc0e43b644c98c1a8e861467b564cc25bc0c4d2baf75dfb47a) processed 1 tasks
 
-    from ray._private.pydantic_compat import register_pydantic_serializers
+2024-09-18 23:51:56,781 - DEBUG - inserting 25181 records
 
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To trouble
-
-shoot the problem, check the logs for the dead worker. RayTask ID: fbd998a8a6368db6b8347043f4aad81a32ba31d601000000 Worker ID: 089f8c5ceca8954f8e9313c0e39e3cc2422d285e0293e6b4d312d306 Node ID: 2203bc8391e2faa191d8b9b471bcb8562fcb74f9cdda95d902e3a2e0 Worker IP address: 192.168.0.8 Worker port: 10002 Worker PID: 1321 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
- 
-
- File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet
-
-.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot
-
- import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 3e5aabe524402498067981b46814016e617874b101000000 Worker ID: 27b348f30d1b4c9c7b06add3004fa1754c715d302c805855631911d6 Node ID: 332e684330e696ab411b0317d3c059c490349d5ce7a2036f1845a183 Worker IP address: 192.168.0.4 Worker port: 10002 Worker PID: 1328 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", li
-
-ne 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_com
-
-pat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._rayl
-
-et.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resourc
-
-es' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.Serializa
-
-tionContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 3f1160e24ccf701b74b0eef6a414a6e24f9dab0e01000000 Worker ID: c6a12896129e57df857fd181dbe869a5e34bc5744eed1b321f7075ef Node ID: b31285ac1b8a28ef33b76f5900716d8e164f86017781322ded095bd0 Worker IP address: 192.168.0.7 Worker port: 10002 Worker PID: 1327 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 4757b7cbb62ae4008a54a818bdf5b2f2da04b58c01000000 Worker ID: e9303e12c7a09b21e621a2247b2954056cf83828262376c351b1fd74 Node ID: 8b6ec2cd0cae56580618af91d964a60a677b0a1d14770baa571ca7c4 Worker IP address: 192.168.0.10 Worker port: 10002 Worker PID: 1319 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py"
-
-, line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python
-
-/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/
-
-_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: b9a50141d6660ef04591855a047fe193f65376d101000000 Worker ID: edf4c9a27c101c8e99fc686612677e7252f625fd8271ee583f90d39b Node ID: 52fdb1fbddd63d053c03e52bf899cc7f4a98ea948531726e9fddea15 Worker IP address: 192.168.0.9 Worker port: 10002 Worker PID: 1340 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx
-
-", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'pac
-
-kaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] 
-
-= serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To trouble
-
-shoot the problem, check the logs for the dead worker. RayTask ID: 777afc4479c01728deb6913f66978273572b61f001000000 Worker ID: 9359c5cd46f4470b1643efacafccebe6c1d099dbced136f2e8a44bc5 Node ID: d4528ed11215bbc6e47cbb1e3e83bb3b7309a5ac76dddc121d62a00d Worker IP address: 192.168.0.12 Worker port: 10002 Worker PID: 1026 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_rayle
-
-t.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: canno
-
-t import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 6
-
-78, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 1732ebf5b35e92da2e895cb90bf6226d41fc1c5601000000 Worker ID: 78aa56a1e4c3fa610db1143352750fe0daa6bfda4d0313add12cabaa Node ID: 332e684330e696ab411b0317d3c059c490349d5ce7a2036f1845a183 Worker IP address: 192.168.0.4 Worker port: 10003 Worker PID: 1387 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 9029daf3434dcd366296367d787398d1b7b1d2e901000000 Worker ID: ee2b568b01c67b3229fbc58724fed1fcf4508811c2117e6dee8f4f0d Node ID: 2203bc8391e2faa191d8b9b471bcb8562fcb74f9cdda95d902e3a2e0 Worker IP address: 192.168.0.8 Worker port: 10003 Worker PID: 1384 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", li
-
-ne 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_com
-
-pat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 6
-
-78, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 549482c4387a6e817a67baf25e0a4dc2555c262801000000 Worker ID: 290fdd844363045a1013bef293ed7e939373906f1ef99f17104262c9 Node ID: 8b6ec2cd0cae56580618af91d964a60a677b0a1d14770baa571ca7c4 Worker IP address: 192.168.0.10 Worker port: 10003 Worker PID: 1377 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py"
-
-, line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python
-
-/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/
-
-_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: c1ee6df7963f754e0af33aaf219ed7801bccc32301000000 Worker ID: 5eb24cdb99cf78d265e9a920001a8646575277321199a3438fe1bfe7 Node ID: b31285ac1b8a28ef33b76f5900716d8e164f86017781322ded095bd0 Worker IP address: 192.168.0.7 Worker port: 10003 Worker PID: 1385 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_rayle
-
-t.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: canno
-
-t import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 7876b9f71daa42d784b3405130abdf33d4bab6e001000000 Worker ID: 1dbbde8fa1a1606df31b205a2acbdf541ef903ceba8f545705b4b3f6 Node ID: 52fdb1fbddd63d053c03e52bf899cc7f4a98ea948531726e9fddea15 Worker IP address: 192.168.0.9 Worker port: 10003 Worker PID: 1398 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_t
-
-ask
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e78
-
-26fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serial
-
-ization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: ae2d107fbcf2a5cd688e06056042466cf6a07eed01000000 Worker ID: 04dc62fde59b2a4cf3d72c627bcc3644f315e51481caf0bc135b5c28 Node ID: d4528ed11215bbc6e47cbb1e3e83bb3b7309a5ac76dddc121d62a00d Worker IP address: 192.168.0.12 Worker port: 10003 Worker PID: 1064 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py"
-
-, line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python
-
-/ray/_raylet.pyx", l
-
-ine 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_co
-
-mpat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 6
-
-78, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 96092a2608de914b38e1a731b9f2baca5c2376f401000000 Worker ID: 303e067294ec2416458f6d2f605af19737faa88a0ce84c821fabbf29 Node ID: 2bb6050dd7d10c8723b3d1ec8168ded811770b739c5d2de7d7c0803e Worker IP address: 192.168.0.5 Worker port: 10002 Worker PID: 853 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", 
-
-line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/r
-
-ay/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_p
-
-rivate/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 6
-
-78, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: b40ae440716b3ada2b96d9f6e619b3e833b4ab4001000000 Worker ID: 1d4c7f9483a3c358b3230f664160bcd1813824fb4fb0860f53a71679 Node ID: 2203bc8391e2faa191d8b9b471bcb8562fcb74f9cdda95d902e3a2e0 Worker IP address: 192.168.0.8 Worker port: 10004 Worker PID: 1442 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 32579e4067fc6eb495db6e6571c77a9abf3a10ce01000000 Worker ID: c85fe5b51f2165d3688fea5bd2c63dac3b878b32157f762ed644f2a1 Node ID: 332e684330e696ab411b0317d3c059c490349d5ce7a2036f1845a183 Worker IP address: 192.168.0.4 Worker port: 10004 Worker PID: 1445 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 6
-
-78, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 20885efc6feafc9c2cda6d4f94794be59cb0aaeb01000000 Worker ID: 6ae4237d1d7111f301aaae9075fe5a6d64bb7611597c381e7be96c02 Node ID: 8b6ec2cd0cae56580618af91d964a60a677b0a1d14770baa571ca7c4 Worker IP address: 192.168.0.10 Worker port: 10004 Worker PID: 1437 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py"
-
-, line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python
-
-/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/
-
-_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_rayl
-
-et.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cann
-
-ot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 65d49ae613480626c8ed539d7bcf26e482698ff001000000 Worker ID: 15c652f241f2bbca4b6b3307fa2f3b1952cdb2032603faa39eb53ac1 Node ID: b31285ac1b8a28ef33b76f5900716d8e164f86017781322ded095bd0 Worker IP address: 192.168.0.7 Worker port: 10004 Worker PID: 1451 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", li
-
-ne 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_com
-
-pat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: a32236e28d6b090d82148abb28ebcb6dbfabe48901000000 Worker ID: 7cca1cf85ba8f035e1e0abd1f4172913fc49d65371fc97949c5bbe7d Node ID: 52fdb1fbddd63d053c03e52bf899cc7f4a98ea948531726e9fddea15 Worker IP address: 192.168.0.9 Worker port: 10004 Worker PID: 1456 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", li
-
-ne 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_com
-
-pat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/li
-
-b/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in
-
- ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packag
-
-ing' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: de9e5c386151893cee744b7b04270f142f3c03bf01000000 Worker ID: bb62084c32a77fac61d69fa5674d854de302ad6cfbb2df846a179ef7 Node ID: d4528ed11215bbc6e47cbb1e3e83bb3b7309a5ac76dddc121d62a00d Worker IP address: 192.168.0.12 Worker port: 10004 Worker PID: 1102 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/
-
-ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a20513
-
-96f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 15
-
-3, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <mo
-
-dule>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 88bac9656b196ce326653c054368a4f74b41886e01000000 Worker ID: c87347128cb196934bdf38786770c29429d43f4f80605153dc04b469 Node ID: 332e684330e696ab411b0317d3c059c490349d5ce7a2036f1845a183 Worker IP address: 192.168.0.4 Worker port: 10005 Worker PID: 1503 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py",
-
- line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/
-
-ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_
-
-private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_rayle
-
-t.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: canno
-
-t import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: ac12c85edb474acd8417a53554e17b833c26b9e201000000 Worker ID: 1dc5833cb848816206145888fd156ff61c0f77b38dacfe5abf993b42 Node ID: 2203bc8391e2faa191d8b9b471bcb8562fcb74f9cdda95d902e3a2e0 Worker IP address: 192.168.0.8 Worker port: 10005 Worker PID: 1500 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_t
-
-ask
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e78
-
-26fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/seria
-
-lization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-Traceback (most recent call last):
-
-  File "/root/rayword_executor.py", line 73, in <module>
-
-    rayword_controller(enable_console_logging=enable_console_logging)
-
-  File "/root/app/controller.py", line 69, in __call__
-
-    self.distribute_word_search_tasks(unsearched_path_records)
-
-  File "/root/app/controller.py", line 100, in distribute_word_search_tasks
-
-    searchResults = task_submitter.submit_and_process_tasks(
-
-  File "/root/app/task_submitter.py", line 110, in submit_and_process_tasks
-
-    searchResults_compressed = ray.get(futures)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
-
-    return fn(*args, **kwargs)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
-
-    return func(*args, **kwargs)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 2626, in get
-
-    raise value
-
-ray.exceptions.WorkerCrashedError: The worker died unexpectedly while executing this task. Check python-core-worker-*.log files for more information.
-
-[0m[33m(raylet)[0m Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in
-
- <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/ray/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/r
-
-ay/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
-
-[33m(raylet)[0m A worker died or was killed while executing a task by an unexpected system error. To troubleshoot the problem, check the logs for the dead worker. RayTask ID: 03f495333fa97511a02f24cd900ede8fee1b8a1c01000000 Worker ID: cd86d8647290343dd5771bb1856f0d5f0b8db94dedb00b895eb57261 Node ID: 2bb6050dd7d10c8723b3d1ec8168ded811770b739c5d2de7d7c0803e Worker IP address: 192.168.0.5 Worker port: 10003 Worker PID: 878 Worker exit type: SYSTEM_ERROR Worker exit detail: Worker exits unexpectedly. Worker exits with an exit code None. Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 1760, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1788, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1790, in ray._raylet.execute_task
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 790, in deserialize_objects
-
-    context = self.get_serialization_context()
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", 
-
-line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-
-
-During handling of the above exception, another exception occurred:
-
-
-
-Traceback (most recent call last):
-
-  File "python/ray/_raylet.pyx", line 2206, in ray._raylet.task_execution_handler
-
-  File "python/r
-
-ay/_raylet.pyx", line 2102, in ray._raylet.execute_task_with_cancellation_handler
-
-  File "python/ray/_raylet.pyx", line 1756, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1757, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1995, in ray._raylet.execute_task
-
-  File "python/ray/_raylet.pyx", line 1085, in ray._raylet.store_task_errors
-
-  File "python/ray/_raylet.pyx", line 4375, in ray._raylet.CoreWorker.store_task_outputs
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/worker.py", line 678, in get_serialization_context
-
-    context_map[job_id] = serialization.SerializationContext(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_private/serialization.py", line 153, in __init__
-
-    serialization_addons.apply(self)
-
-  File "/usr/local/lib/python3.10/site-packages/ray/util/serialization_addons.py", line 29, in apply
-
-    from ray._private.pydantic_compat import register_pydantic_serializers
-
-  File "/usr/local/lib/python3.10/site-packages/ray/_p
-
-rivate/pydantic_compat.py", line 2, in <module>
-
-    from pkg_resources import packaging
-
-ImportError: cannot import name 'packaging' from 'pkg_resources' (/tmp/ray/session_2024-08-30_02-10-19_550876_823/runtime_resources/pip/acbdf231e7826fbe008cec9a7a2051396f2d7a43/virtualenv/lib/python3.10/site-packages/pkg_resources/__init__.py)
-
-An unexpected internal error occurred while the worker was executing a task.
+[0m
 
 Shared connection to 192.168.0.3 closed.
 
 
 
-Error: Command failed:
+[0m
+
+[33mLoaded cached provider configuration[39m
+
+[33mIf you experience issues with the cloud provider, try re-running the command with [1m--no-config-cache[22m[26m.[39m
+
+[36mRay On Golem 0.13.0[39m
+
+  Not starting the webserver, as it's already running
 
 
 
-  ssh -tt -i /tmp/ray_on_golem/ray_on_golem_rsa_2b6976a4b5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=300 -o ServerAliveCountMax=3 -o ControlMaster=auto -o ControlPath=/tmp/ray_ssh_1a7ed4177e/2b6976a4b5/%C -o ControlPersist=10s -o ProxyCommand=websocat asyncstdio: ws://127.0.0.1:7465/net-api/v1/net/4d7420bdd1804512af4fc2046008f46f/tcp/192.168.0.3/22 --binary -H=Authorization:'Bearer 80be4a5a730b4a06b3b67da07e728e9b' -o ConnectTimeout=120s root@192.168.0.3 bash --login -c -i 'source ~/.bashrc; export OMP_NUM_THREADS=1 PYTHONWARNINGS=ignore && (python ~/rayword_executor.py)'
+  Running Ray on Golem on the mainnet requires GLM and MATIC tokens on the Polygon blockchain (see: https://docs.golem.network/docs/creators/ray/mainnet).
+
+  Your wallet:
+
+    
+
+    Status for account: 0xbf86e9cf42d9be1b0050117b00ea9d2ff40f1160
+
+    Payment Driver status: OK
+
+    
+
+    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬─────────────────┐
+
+    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas            │
+
+    ├────────────────────┼────────────────┼────────────┼─────────────┼─�
+
+�──────────┼────────────────────────────┼─────────────────┤
+
+    │  driver: erc20     │  41.5430 GLM   │  5 GLM     │  accepted   │  0 GLM     │  0.634496411796802467 GLM  │  13.5666 MATIC  │
+
+    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.167624506040124865 GLM  │                 │
+
+    │  token: GLM        │                │            │  requested  │  0 GLM     │  0.725840585773048622 GLM  │                 │
+
+    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴─────────────────┘
+
+  
+
+  You can use t
+
+he Golem Onboarding portal to top up: https://glm.golem.network/#/onboarding/budget?yagnaAddress=0xbf86e9cf42d9be1b0050117b00ea9d2ff40f1160&network=polygon
+
+  
+
+[37mFetched IP[39m: [1m192.168.0.3[22m
+
+[0m
+
+import_ray_results.py[line:73] - DEBUG - decompression took 0.018419504165649414 seconds
+
+import_ray_results.py[line:76] - DEBUG - loading records into memory took 0.008590936660766602 seconds
+
+import_ray_results.py[line:87] - DEBUG - insert_search_histories took 0.0005934238433837891 seconds
+
+import_ray_results.py[line:93] - DEBUG - mark_texts_unreachable took 0.006542682647705078 seconds
+
+import_ray_results.py[line:97] - DEBUG - insert_word_indices took 0.16881680488586426 seconds
+
+[33mLoaded cached provider configuration[39m
+
+[33mIf you experience issues with the cloud provider, try re-running the command with [1m--no-config-cache[22m[26m.[39m
+
+Destroying cluster. [4mConfirm [y/N]:[24m y [2m[automatic, due to --yes][22m
+
+[36mRay On Golem 0.13.0[39m
+
+  Not starting the webserver, as it's already running
 
 
+
+  Running Ray on Golem on the mainnet requires GLM and MATIC tokens on the Polygon blockchain (see: https://docs.golem.network/docs/creators/ray/mainnet).
+
+  Your wallet:
+
+    
+
+    Status for account: 0xbf86e9cf42d9be1b0050117b00ea9d2ff40f1160
+
+    Payment Driver status: OK
+
+    
+
+    ┌────────────────────┬────────────────┬────────────┬─────────────┬────────────┬────────────────────────────┬─────────────────┐
+
+    │  platform          │  total amount  │  reserved  │  amount     │  incoming  │  outgoing                  │  gas            │
+
+    ├────────────────────┼────────────────┼────────────┼─────────────┼─�
+
+�──────────┼────────────────────────────┼─────────────────┤
+
+    │  driver: erc20     │  41.5430 GLM   │  5 GLM     │  accepted   │  0 GLM     │  0.634496411796802467 GLM  │  13.5666 MATIC  │
+
+    │  network: polygon  │                │            │  confirmed  │  0 GLM     │  0.167624506040124865 GLM  │                 │
+
+    │  token: GLM        │                │            │  requested  │  0 GLM     │  0.725840585773048622 GLM  │                 │
+
+    └────────────────────┴────────────────┴────────────┴─────────────┴────────────┴────────────────────────────┴─────────────────┘
+
+  
+
+  You can use t
+
+he Golem Onboarding portal to top up: https://glm.golem.network/#/onboarding/budget?yagnaAddress=0xbf86e9cf42d9be1b0050117b00ea9d2ff40f1160&network=polygon
+
+  
+
+[37mFetched IP[39m: [1m192.168.0.3[22m
+
+1/1 stopped.
+
+1/4 stopped.
+
+2/4 stopped.
+
+3/4 stopped.
+
+4/4 stopped.
+
+[33mStopped only 5 out of 6 Ray processes within the grace period 16 seconds. Set `[1m-v[22m[33m` to see more details. Remaining processes [psutil.Process(pid=780, name='gcs_server', status='terminated', started='23:46:42')] will be forcefully terminated.[39m
+
+[33mYou can also use `[1m--force[22m[33m` to forcefully terminate processes or set higher `--grace-period` to wait longer time for proper termination.[39m
+
+[0m
+
+Shared connection to 192.168.0.3 closed.
+
+
+
+2024-09-18 16:52:13,729	INFO node_provider.py:173 -- NodeProvider: node0: Terminating node
+
+2024-09-18 16:52:14,791	INFO node_provider.py:173 -- NodeProvider: node1: Terminating node
+
+2024-09-18 16:52:14,793	INFO node_provider.py:173 -- NodeProvider: node2: Terminating node
+
+2024-09-18 16:52:14,794	INFO node_provider.py:173 -- NodeProvider: node3: Terminating node
+
+Requested [1m4[22m[26m nodes to shut down.[0m[2m [interval=1s][22m[0m
+
+[1m0[22m[26m nodes remaining after 5 second(s).
+
+[32mNo nodes remaining.[39m
 
 [0m
 

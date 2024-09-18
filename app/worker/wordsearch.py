@@ -4,8 +4,7 @@
 import logging
 import json
 import bz2
-
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 from .model import WorkerIndexerModel
 from .util.resource_loader import load_resource
@@ -25,6 +24,7 @@ class WordSearchResults:
     word_positions_by_paths: dict
     paths_searched: list
     bad_paths: list
+    details: dict = field(default_factory=dict)
 
     def to_json(self):
         return json.dumps(asdict(self))
@@ -55,6 +55,8 @@ class WordSearcher:
         Args:
             paths_table (list): A list of path records to be searched.
             path_prefix (str, optional): An optional prefix to be prepended to each path.
+        
+        Notes: called by execute_remote_word_search.py::execute_remote_word_search
         """
         if exclude_words is None:
             exclude_words = []
@@ -62,20 +64,24 @@ class WordSearcher:
         self.paths_table = paths_table
         self.path_prefix = path_prefix
         self.workerModel = WorkerIndexerModel(paths_table, path_prefix)
-        # self.path_id_to_results = (
-        #     dict()
-        # )  # maps path to a dictionary of word to list of offsets
         self.paths_searched = []
         self.bad_path_ids = []
 
-    def perform_search(self):
+
+    def __call__(self):
+        return self._perform_search()
+
+    def _perform_search(self):
         """
         Performs the word search operation and returns the results.
 
         Returns:
-            tuple of dict, list of paths searched, list bad paths: a dictionary mapping path_id to results that maps a word to its offsets
+            WordSearchResults: a namedtuple of word_positions_by_paths, paths_searched, bad_paths
+        
+        Notes:
+            calls _search_words_in_paths()
         """
-        self.search_words_in_paths()
+        self._search_words_in_paths()
 
         # update search histories
         searchHistories = []
@@ -88,18 +94,14 @@ class WordSearcher:
         )
 
         search_results = WordSearchResults(
-            word_positions_by_paths=self.path_id_to_results(),
+            word_positions_by_paths=self.workerModel.serialize_to_dict_or_compressed_json(),
             paths_searched=self.paths_searched,
             bad_paths=self.bad_path_ids,
         )
 
         return search_results
 
-    def path_id_to_results(self):
-        word_to_positions = self.workerModel.serialize_to_dict_or_compressed_json()
-        return word_to_positions
-
-    def search_words_in_paths(self):
+    def _search_words_in_paths(self):
         """
         Searches for words in each path and updates the class with the findings.
 
@@ -121,7 +123,7 @@ class WordSearcher:
             elif not connection_timed_out:
                 pass
             if connection_timed_out:
-                logging.debug("connection timed out")
+                logging.debug("\033[1;31mconnection timed out\033[0m")
                 self.bad_path_ids.append(path_id)
                 continue
         self.workerModel.end_transaction()

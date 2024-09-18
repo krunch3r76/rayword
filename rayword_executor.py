@@ -43,7 +43,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
+    if args.enable_console_logging:
+        os.environ["KRUNCHDEBUG"] = "1"
+    
     # Setup logging
     log_level = "DEBUG" if "KRUNCHDEBUG" in os.environ else "INFO"
     log_level = "DEBUG" if args.enable_console_logging else "INFO"
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     # instantiate & call controller         #
     #########################################
     rayword_controller = Controller(rayword_model, batch_size=batch_size)
-    rayword_controller(enable_console_logging=enable_console_logging)
+    summary = rayword_controller(enable_console_logging=enable_console_logging)
 
     # export results to output after controller finishes
     # # unreachable paths

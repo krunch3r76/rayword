@@ -7,11 +7,11 @@ from main.model import MainModel
 import queue
 import logging
 import time
+import os
 from app.worker.util.resource_loader import load_resource
 from wordbrowser.browse import extract_sentence_with_context
 import importlib.metadata
 from config import Config
-
 
 def get_ray_on_golem_version():
     try:
@@ -31,6 +31,10 @@ def set_max_workers_on_yaml(path_to_yaml):
 
 class Controller:
     def __init__(self):
+        if "KRUNCHDEBUG" in os.environ:
+            self.enable_console_logging = True
+        else:
+            self.enable_console_logging = False
         self.signal_start = False
         self.cmds_started = False
         self.from_view = Queue()
@@ -80,7 +84,7 @@ class Controller:
                 "submit",
                 "golem-cluster.yaml",
                 "./rayword_executor.py",
-                # "--enable-console-logging",
+                "--enable-console-logging" if self.enable_console_logging else "",
             ],
             [
                 "ray",
@@ -154,6 +158,30 @@ class Controller:
             yield index, cached_detail
             index += 1
 
+    def _update_config(self, pending_config_changes):
+        import re
+        def set_max_workers_on_yaml(path_to_yaml, max_workers):
+            with open(path_to_yaml, 'r') as file:
+                lines = file.readlines()
+            
+            new_lines = []
+            for line in lines:
+                if line.strip().startswith('max_workers:') or line.strip().startswith('min_workers:'):
+                    new_lines.append(f'{line.split(":")[0]}: {max_workers}\n')
+                else:
+                    new_lines.append(line)
+            
+            with open(path_to_yaml, 'w') as file:
+                file.writelines(new_lines)
+
+
+        for key, value in pending_config_changes.items():
+            if key == "max workers":
+                # load yaml file and update max_workers
+                set_max_workers_on_yaml("golem-cluster.yaml", value)
+            if hasattr(self.config, key):
+                setattr(self.config, key, value)
+
     def _process_signal_from_view(self, signal_from_view):
         signal_quit = False
         if signal_from_view["signal"] == "cmd" and signal_from_view["msg"] == "quit":
@@ -188,12 +216,16 @@ class Controller:
             and signal_from_view["msg"] == "start ray"
         ):
             self.signal_start = True
+            with open("/tmp/log.txt", "w") as f:
+                f.write(str(signal_from_view["pending_config_changes"]))
+            self._update_config(signal_from_view["pending_config_changes"])
         elif signal_from_view["signal"] == "get config":
             self.to_view.put_nowait({"signal": "configupdate", "msg": self.config})
         elif signal_from_view["signal"] == "update config":
             msg = signal_from_view["msg"]
-            if msg["key"] == "texts per worker":
-                self.config = self.config._replace(texts_per_worker=int(msg["value"]))
+            self._update_config({msg["key"]: msg["value"]})
+            # if msg["key"] == "texts per worker":
+            #     self.config = self.config._replace(texts_per_worker=int(msg["value"]))
         return signal_quit
 
     def run_commands(self):

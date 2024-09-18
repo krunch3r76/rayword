@@ -7,8 +7,8 @@
 cluster_name: golem-cluster
 
 # The maximum number of workers the cluster will have at any given time
-max_workers: 10
-min_workers: 10
+max_workers: 3
+min_workers: 3
 
 # The number of minutes that need to pass before an idle worker node is removed by the Autoscaler
 idle_timeout_minutes: 5
@@ -33,7 +33,8 @@ provider:
       # Parameters for golem demands (same for head and workers)
       demand:
         # Check available versions at https://registry.golem.network/explore/golem/ray-on-golem
-        image_tag: "golem/ray-on-golem:0.12.1-py3.10.13-ray2.9.3"
+        image_tag: "krunch3r/rayword:first"
+        # image_tag: "golem/ray-on-golem:0.12.1-py3.10.13-ray2.9.3"
 
         # List of urls which will be added to the Computation Manifest
         # Requires protocol to be defined in all URLs
@@ -77,10 +78,10 @@ provider:
 available_node_types:
   ray.head.default:
     # The minimum number of worker nodes of this type to launch
-    #min_workers: 0
+    min_workers: 0
 
     # The maximum number of worker nodes of this type to launch
-    #max_workers: 0
+    max_workers: 0
 
     # The node type's CPU and GPU resources - leave it empty for autodetection
     resources: {}
@@ -92,9 +93,10 @@ available_node_types:
     #    min_mem_gib: 10
 
   ray.worker.default:
-    min_workers: 10
-    max_workers: 10
-    resources: {}
+    min_workers: 3
+    max_workers: 3
+    resources: 
+      worker: 1
     node_config: {}
 
 # The files or directories to copy to the head and worker nodes
