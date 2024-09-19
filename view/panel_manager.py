@@ -1,4 +1,4 @@
-from .mywindow import ContextWindow
+from .specialized import ContextWindow
 import curses
 import logging
 

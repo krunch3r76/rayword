@@ -7,7 +7,7 @@ from typing import Optional, List
 import os
 import psutil
 import subprocess
-from .log_memory_and_disk_usage import log_memory_and_disk_usage
+from .util.log_memory_and_disk_usage import log_memory_and_disk_usage
 
 @dataclass
 class SearchSummary:
@@ -39,7 +39,7 @@ import logging
 import os
 from app.task_submitter import TaskSubmitter
 from app.task_generator import TaskGenerator
-from .log_memory_and_disk_usage import log_memory_and_disk_usage
+from .util.log_memory_and_disk_usage import log_memory_and_disk_usage
 
 class Controller:
     def __init__(self, model, batch_size, view=None):

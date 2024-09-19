@@ -1,6 +1,7 @@
 # log_window_group.py
 # manage the log view
-from .mywindow import PromptWindow, LogWindow, CmdWindow
+# from .mywindow import PromptWindow, LogWindow, CmdWindow
+from .specialized import LogWindow, PromptWindow, CmdWindow
 import curses
 import logging
 
