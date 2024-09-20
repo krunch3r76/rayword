@@ -122,7 +122,7 @@ class View:
                 or len(self.panel_manager.panels) == 0
             ):
                 self.panel_manager.add_panel(
-                    upper_left_y=5, upper_left_x=20, height=30, width=40
+                    upper_left_y=5, upper_left_x=20, height=15, width=40
                 )
                 if index > 0:
                     self.panel_manager.switch_panel(index)

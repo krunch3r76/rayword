@@ -41,7 +41,7 @@ class MyWindowSelectable(MyWindowLineBuffered):
         """
         Clear all lines from the buffer and reset the current selection index.
         """
-        super().clearlines()
+        self._lines = []
         self._selected_line_index = -1
 
     def refresh(self):
@@ -51,15 +51,15 @@ class MyWindowSelectable(MyWindowLineBuffered):
         Draws all lines from the top to the line designated as the bottom line.
         Highlights the selected line with the reverse attribute.
         """
-        self.clear()
+        self._win.clear()
         for cursor, line in enumerate(
             self._lines[self._top_line_index : self._bottom_line_index + 1]
         ):
             corresponding_line_index = self._top_line_index + cursor
             if corresponding_line_index == self._selected_line_index:
-                super()._add_line(line, cursor, attr=curses.A_REVERSE)
+                super()._write_line(line, cursor, attr=curses.A_REVERSE)
             else:
-                super()._add_line(line, cursor)
+                super()._write_line(line, cursor)
         if self._boxed:
             self._win.box()
         self._win.refresh()

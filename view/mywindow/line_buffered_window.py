@@ -34,24 +34,6 @@ class MyWindowLineBuffered(MyWindow):
         self._scrolling = scrolling
 
     @property
-    def _bottom_line_index(self):
-        """
-        Calculate and return the index of the bottom visible line.
-
-        Adjusts for the height of the window and the boxed condition.
-
-        Returns:
-        - int: The index of the bottom visible line.
-        """
-        viewable_height, _ = self._viewable_height_and_width
-        if self._current_line_index >= viewable_height:
-            invisible_portion = self._height - viewable_height
-            invisible_portion -= self.padding * 2
-            return self._current_line_index - invisible_portion
-        else:
-            return self._current_line_index
-
-    @property
     def _top_line_index(self):
         """
         Calculate and return the index of the top visible line.
@@ -61,11 +43,41 @@ class MyWindowLineBuffered(MyWindow):
         Returns:
         - int: The index of the top visible line.
         """
-        viewable_height, _ = self._viewable_height_and_width
-        if self._current_line_index >= viewable_height:
-            return self._bottom_line_index - (viewable_height - 1)
+        actual_height, _ = self._actual_height_and_width
+        if self._current_line_index >= actual_height:
+            return self._current_line_index - actual_height + 0
         else:
             return 0
+
+    @property
+    def _bottom_line_index(self):
+        """
+        Calculate and return the index of the bottom visible line.
+
+        Adjusts for the height of the window and the boxed condition.
+
+        Returns:
+        - int: The index of the bottom visible line.
+        """
+        actual_height, _ = self._actual_height_and_width
+        if self._current_line_index >= actual_height:
+            return self._current_line_index
+        else:
+            return min(actual_height - 1, len(self._lines) - 1)
+        # viewable_height, _ = self._viewable_height_and_width
+        # if self._current_line_index >= viewable_height:
+        #     invisible_portion = self._height - viewable_height
+        #     invisible_portion -= self.padding * 2
+        #     return self._current_line_index - invisible_portion
+        # else:
+        #     return self._current_line_index
+
+
+        # viewable_height, _ = self._viewable_height_and_width
+        # if self._current_line_index >= viewable_height:
+        #     return self._bottom_line_index - (viewable_height - 1)
+        # else:
+        #     return 0
 
     def refresh(self):
         """
@@ -78,22 +90,20 @@ class MyWindowLineBuffered(MyWindow):
         for cursor, line in enumerate(
             self._lines[self._top_line_index : self._bottom_line_index + 1]
         ):
-            super()._add_line(line, cursor)
+            super()._write_line(line, cursor)
         if self._boxed:
             self._win.box()
         super().refresh()
 
-    def clearlines(self):
-        """
-        Clear all lines from the buffer and reset the current line index.
-        """
+    def clear_buffer(self):
         self._lines = []
-        self._current_line_index = -1
 
     def clear(self):
         """
-        Clear the window content.
+        Clear all lines from the buffer and reset the current line index.
         """
+        # self._lines = []
+        self._current_line_index = -1
         super().clear()
 
     def add_line(self, line):
@@ -140,6 +150,18 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         )
         self._wrapped_lines = []
 
+    def clear_buffer(self):
+        self.wrapped_lines = []
+        self._lines = []
+
+    def clear(self):
+        """
+        erase the visible content and reset the current line index
+        """
+        super().clear()
+        self._current_line_index = -1
+    
+
     def _wrap_lines(self):
         """
         Wrap lines to fit within the viewable width of the window.
@@ -182,47 +204,8 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
             self._current_line_index = min(
                 viewable_height - 1, len(self._wrapped_lines) - 1
             )
-
-    @property
-    def _bottom_line_index(self):
-        """
-        Calculate and return the index of the bottom visible line for wrapped lines.
-        """
-        viewable_height, _ = self._viewable_height_and_width
-        return self._current_line_index
-
-        # if self._current_line_index >= viewable_height:
-        #     invisible_portion = len(self._wrapped_lines) - viewable_height
-        #     invisible_portion -= 2 * self.padding
-        #     return self._current_line_index - invisible_portion
-        # else:
-        #     return self._current_line_index
-
-    @property
-    def _top_line_index(self):
-        """
-        Calculate and return the index of the top visible line for wrapped lines.
-        """
-        viewable_height, _ = self._actual_height_and_width
-        if self._current_line_index >= viewable_height:
-            return self._bottom_line_index - (viewable_height - 1)
-        else:
-            return 0
-
-    def refresh(self):
-        """
-        Refresh the window, drawing the wrapped lines.
-        """
-        self.clear()
-        for i, line in enumerate(
-            self._wrapped_lines[self._top_line_index : self._bottom_line_index + 1]
-        ):
-            self._add_line(line, i)
-        if self._boxed:
-            self._win.box()
-        self._win.refresh()
-
-    def _add_line(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
+    
+    def _write_line(self, line, y_offset, x_offset=0, attr=curses.A_NORMAL):
         """
         Add a line to the window at the specified offset with attributes.
 
@@ -232,21 +215,114 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         - x_offset (int): The x-coordinate offset. Default is 0.
         - attr (int): Text attributes (e.g., color). Default is curses.A_NORMAL.
         """
-        max_height, max_width = self._actual_height_and_width
-
+        _, max_width = self._actual_height_and_width
         y_offset += self.y_padding
         x_offset += self.x_padding
 
-        if y_offset >= max_height:
-            raise ValueError("Line written outside of boundaries")
+        viewable_height, _ = self._viewable_height_and_width
+        effective_y_padding = self.y_padding
+        max_y_offset = viewable_height - effective_y_padding - 1
+
+        if y_offset > max_y_offset:
+            logging.debug(f"Line written outside of boundaries y_offset: {y_offset} where max_y_offset is: {max_y_offset}")
+            logging.debug(f"---line: {line}")
+            self.log_window_dimensions()
+            raise Exception("Line written outside of boundaries")
 
         try:
             self._win.move(y_offset, x_offset)
+            # logging.debug(f"writing line: {line} to y-offset {y_offset}")
             self._win.insstr(line, attr)
         except:
             logging.debug(f"COULD NOT ADD LINE: {line}")
             # kludge, include logic to not draw lines that would not fit
             pass
+
+    def log_window_dimensions(self):
+        """
+        Log the dimensions and properties of the window for debugging purposes.
+        """
+        viewable_height, viewable_width = self._viewable_height_and_width
+        actual_height, actual_width = self._actual_height_and_width
+        
+        effective_y_padding = self.y_padding
+        effective_x_padding = self.x_padding
+        
+        y_start = effective_y_padding
+        y_end = viewable_height - effective_y_padding - 1
+        
+        logging.debug(f"Window Dimensions:")
+        logging.debug(f"  Viewable: {viewable_height}x{viewable_width}")
+        logging.debug(f"  Actual: {actual_height}x{actual_width}")
+        logging.debug(f"  Boxed: {self._boxed}")
+        logging.debug(f"  Y Padding: {self._y_padding}")
+        logging.debug(f"  X Padding: {self._x_padding}")
+        logging.debug(f"  Effective Y Padding: {effective_y_padding}")
+        logging.debug(f"  Effective X Padding: {effective_x_padding}")
+        logging.debug(f"  Y Offset Range: {y_start} to {y_end}")
+
+    @property
+    def _bottom_line_index(self):
+        """
+        Calculate and return the index of the bottom visible line.
+
+        Adjusts for the height of the window and the boxed condition.
+
+        Returns:
+        - int: The index of the bottom visible line.
+        """
+        actual_height, _ = self._actual_height_and_width
+        if self._current_line_index >= actual_height:
+            return self._current_line_index
+        else:
+            return min(actual_height - 1, len(self._wrapped_lines) - 1)
+        # viewable_height, _ = self._viewable_height_and_width
+        # if self._current_line_index >= viewable_height:
+        #     invisible_portion = self._height - viewable_height
+        #     invisible_portion -= self.padding * 2
+        #     return self._current_line_index - invisible_portion
+        # else:
+        #     return self._current_line_index
+
+    # @property
+    # def _bottom_line_index(self):
+    #     # return the index corresponding to the bottom of the viewable area
+    #     viewable_height, _ = self._actual_height_and_width
+    #     return max(self._current_line_index, viewable_height - 1)
+
+        # if self._current_line_index >= viewable_height:
+        #     invisible_portion = len(self._wrapped_lines) - viewable_height
+        #     invisible_portion -= 2 * self.padding
+        #     return self._current_line_index - invisible_portion
+        # else:
+        #     return self._current_line_index
+
+    # @property
+    # def _top_line_index(self):
+    #     """
+    #     Calculate and return the index of the top visible line for wrapped lines.
+    #     """
+    #     viewable_height, _ = self._actual_height_and_width
+    #     if self._current_line_index >= viewable_height:
+    #         return self._bottom_line_index - (viewable_height)
+    #     else:
+    #         return 0
+
+    def refresh(self):
+        """
+        Refresh the window, drawing the wrapped lines.
+        """
+        self.clear()
+        for y_offset, line in enumerate(
+            self._wrapped_lines[self._top_line_index : self._bottom_line_index + 1]
+        ):
+            logging.debug(f"writing line: {line} to y-offset {y_offset}")
+            self._write_line(line, y_offset)
+        if self._boxed:
+            self._win.box()
+        self._win.refresh()
+
+
 
     def scroll_up(self):
         """

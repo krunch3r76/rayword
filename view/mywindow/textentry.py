@@ -17,16 +17,16 @@ class TextEntryBox(MyWindow):
         self._textbuffer = "<search word>"
         self._stdscr.refresh()  # kludge for display
 
-    def _add_line(self, line):
+    def _write_line(self, line):
         self.clear()
-        super()._add_line(
+        super()._write_line(
             line,
             self._upper_left_y + 1 if self._boxed else 0,
             self._upper_left_x + 1 if self._boxed else 0,
         )
 
     def refresh(self):
-        self._add_line(self._textbuffer)
+        self._write_line(self._textbuffer)
         self._stdscr.refresh()
         super().refresh()
         # self._stdscr.refresh()

@@ -25,14 +25,11 @@ class MyWindow:
         )
         self._width = width if width is not None else screen_width - self._upper_left_x
         self._boxed = boxed
-        self.y_padding = y_padding
-        self.x_padding = x_padding
+        self._y_padding = y_padding
+        self._x_padding = x_padding
 
         if padding is not None:
-            self.y_padding, self.x_padding = padding, padding
-        if self._boxed:
-            self.y_padding += 1
-            self.x_padding += 1
+            self._y_padding, self._x_padding = padding, padding
         self._win = curses.newwin(
             *self._viewable_height_and_width,
             self._upper_left_y,
@@ -45,21 +42,52 @@ class MyWindow:
         self.overlay_win = None
 
     @property
+    def y_padding(self):
+        # return y_padding plus 1 if boxed
+        return self._y_padding + (1 if self._boxed else 0)
+    
+    @property
+    def x_padding(self):
+        # return x_padding plus 1 if boxed
+        return self._x_padding + (1 if self._boxed else 0)
+
+    @property
     def _viewable_height_and_width(self):
+        """
+        Calculate and return the viewable height and width of the window.
+
+        This method takes into account the screen dimensions, the window's position,
+        and its specified size to determine the actual viewable area.
+
+        Returns:
+            tuple: A tuple containing the viewable height and width.
+        """
         screen_height, screen_width = self._stdscr.getmaxyx()
-        drawable_height = screen_height - self._upper_left_y
-        drawable_width = screen_width - self._upper_left_x
-        viewable_height = min(self._height, drawable_height)
-        viewable_width = min(self._width, drawable_width)
+        max_drawable_height = screen_height - self._upper_left_y
+        max_drawable_width = screen_width - self._upper_left_x
+        viewable_height = min(self._height, max_drawable_height)
+        viewable_width = min(self._width, max_drawable_width)
         return viewable_height, viewable_width
 
     @property
     def _actual_height_and_width(self):
+        """
+        Calculate and return the actual usable height and width of the window.
+
+        This property takes into account the viewable dimensions, padding,
+        and the boxed condition to determine the actual space available for content.
+
+        Returns:
+            tuple: A tuple containing the actual usable height and width.
+        """
         viewable_height, viewable_width = self._viewable_height_and_width
+        height_reduction = 2 * self.y_padding
+        width_reduction = 2 * self.x_padding
         return (
-            viewable_height - 2 * self.y_padding,
-            viewable_width - 2 * self.x_padding,
+            viewable_height - height_reduction,
+            viewable_width - width_reduction,
         )
+
 
     def refresh(self, clear=False):
         if not self.visible:
@@ -129,7 +157,7 @@ class MyWindow:
         self._win.move(y_offset, x_offset)
         self._win.insstr(truncated_line, attr)
 
-    def _add_line(
+    def _write_line(
         self, line, y_offset, x_offset=0, attr=curses.A_NORMAL, truncated=True
     ):
         line = line.rstrip()
