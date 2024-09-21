@@ -43,11 +43,8 @@ class MyWindowLineBuffered(MyWindow):
         Returns:
         - int: The index of the top visible line.
         """
-        actual_height, _ = self._actual_height_and_width
-        if self._current_line_index >= actual_height:
-            return self._current_line_index - actual_height + 0
-        else:
-            return 0
+        # actual_height, _ = self._actual_height_and_width
+        return max(0,self._current_line_index - self.y_padding)
 
     @property
     def _bottom_line_index(self):
@@ -60,24 +57,11 @@ class MyWindowLineBuffered(MyWindow):
         - int: The index of the bottom visible line.
         """
         actual_height, _ = self._actual_height_and_width
+        return self._top_line_index + actual_height - 1
         if self._current_line_index >= actual_height:
             return self._current_line_index
         else:
             return min(actual_height - 1, len(self._lines) - 1)
-        # viewable_height, _ = self._viewable_height_and_width
-        # if self._current_line_index >= viewable_height:
-        #     invisible_portion = self._height - viewable_height
-        #     invisible_portion -= self.padding * 2
-        #     return self._current_line_index - invisible_portion
-        # else:
-        #     return self._current_line_index
-
-
-        # viewable_height, _ = self._viewable_height_and_width
-        # if self._current_line_index >= viewable_height:
-        #     return self._bottom_line_index - (viewable_height - 1)
-        # else:
-        #     return 0
 
     def refresh(self):
         """
@@ -261,6 +245,25 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         logging.debug(f"  Effective X Padding: {effective_x_padding}")
         logging.debug(f"  Y Offset Range: {y_start} to {y_end}")
 
+
+    @property
+    def _top_line_index(self):
+        """
+        Calculate and return the index of the top visible line.
+
+        Adjusts for the height of the window and the boxed condition.
+
+        Returns:
+        - int: The index of the top visible line.
+        """
+        # actual_height, _ = self._actual_height_and_width
+        candidate = max(0,self._current_line_index)
+        if len(self._wrapped_lines) -1 < candidate:
+            return len(self._wrapped_lines) -1
+        else:
+            return candidate
+
+
     @property
     def _bottom_line_index(self):
         """
@@ -272,47 +275,25 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         - int: The index of the bottom visible line.
         """
         actual_height, _ = self._actual_height_and_width
+        return self._top_line_index + actual_height - 1
+        # return self._current_line_index + actual_height - 1
         if self._current_line_index >= actual_height:
             return self._current_line_index
         else:
             return min(actual_height - 1, len(self._wrapped_lines) - 1)
-        # viewable_height, _ = self._viewable_height_and_width
-        # if self._current_line_index >= viewable_height:
-        #     invisible_portion = self._height - viewable_height
-        #     invisible_portion -= self.padding * 2
-        #     return self._current_line_index - invisible_portion
-        # else:
-        #     return self._current_line_index
 
-    # @property
-    # def _bottom_line_index(self):
-    #     # return the index corresponding to the bottom of the viewable area
-    #     viewable_height, _ = self._actual_height_and_width
-    #     return max(self._current_line_index, viewable_height - 1)
-
-        # if self._current_line_index >= viewable_height:
-        #     invisible_portion = len(self._wrapped_lines) - viewable_height
-        #     invisible_portion -= 2 * self.padding
-        #     return self._current_line_index - invisible_portion
-        # else:
-        #     return self._current_line_index
-
-    # @property
-    # def _top_line_index(self):
-    #     """
-    #     Calculate and return the index of the top visible line for wrapped lines.
-    #     """
-    #     viewable_height, _ = self._actual_height_and_width
-    #     if self._current_line_index >= viewable_height:
-    #         return self._bottom_line_index - (viewable_height)
-    #     else:
-    #         return 0
-
-    def refresh(self):
+    def refresh(self, scrolling=False):
         """
         Refresh the window, drawing the wrapped lines.
         """
-        self.clear()
+        if scrolling:
+            line_index = self._current_line_index
+            self.clear()
+            self._current_line_index = line_index
+        else:
+            self.clear()
+
+        logging.debug(f"top line index: {self._top_line_index} and bottom line index: {self._bottom_line_index}")
         for y_offset, line in enumerate(
             self._wrapped_lines[self._top_line_index : self._bottom_line_index + 1]
         ):
@@ -330,20 +311,24 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         """
         logging.debug(f"current line index: {self._current_line_index}")
         if self._current_line_index > 0:
-            if self._current_line_index >= self._viewable_height_and_width[0]:
-                self._current_line_index -= 1
-                self.refresh()
+            self._current_line_index -= 1
+            self.refresh(True)
 
     def scroll_down(self):
         """
         Scroll the view down by one line.
         """
-        # logging.debug(
-        #     f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
-        # )
-        if self._current_line_index < len(self._wrapped_lines) - 1:
-            self._current_line_index += 1
-            self.refresh()
+        if self._current_line_index < 0:
+            self._current_line_index = 0
+        
+        actual_height, _ = self._actual_height_and_width
+        max_scroll_index = len(self._wrapped_lines) - actual_height
+
+        if self._current_line_index >= max_scroll_index:
+            return
+
+        self._current_line_index += 1
+        self.refresh(True)
 
         # logging.debug(
         #     f"current line index: {self._current_line_index} < {len(self._wrapped_lines)}"
