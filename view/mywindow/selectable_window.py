@@ -52,6 +52,7 @@ class MyWindowSelectable(MyWindowLineBuffered):
         Highlights the selected line with the reverse attribute.
         """
         self._win.clear()
+        logging.debug(f"refreshing with lines {self._lines[self._top_line_index : self._bottom_line_index + 1]}")
         for cursor, line in enumerate(
             self._lines[self._top_line_index : self._bottom_line_index + 1]
         ):

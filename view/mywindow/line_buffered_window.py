@@ -44,7 +44,7 @@ class MyWindowLineBuffered(MyWindow):
         - int: The index of the top visible line.
         """
         # actual_height, _ = self._actual_height_and_width
-        return max(0,self._current_line_index - self.y_padding)
+        return max(0,self._current_line_index)
 
     @property
     def _bottom_line_index(self):
@@ -77,7 +77,8 @@ class MyWindowLineBuffered(MyWindow):
             super()._write_line(line, cursor)
         if self._boxed:
             self._win.box()
-        super().refresh()
+        self._win.refresh()
+        # super().refresh()
 
     def clear_buffer(self):
         self._lines = []
@@ -97,12 +98,13 @@ class MyWindowLineBuffered(MyWindow):
         Parameters:
         - line: The line to be added to the buffer.
         """
+        logging.debug(f"----adding line: {line}, current line index: {self._current_line_index}")
         self._lines.append(line)
-        if self._scrolling:
-            self._current_line_index += 1
-        else:
-            viewable_height, _ = self._viewable_height_and_width
-            self._current_line_index = min(viewable_height - 1, len(self._lines) - 1)
+        # if self._scrolling:
+        #     self._current_line_index += 1
+        # else:
+        viewable_height, _ = self._viewable_height_and_width
+        # self._current_line_index = min(viewable_height - 1, len(self._lines) - 1)
 
 
 class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
@@ -324,8 +326,11 @@ class MyWindowLineBufferedWrapped(MyWindowLineBuffered):
         actual_height, _ = self._actual_height_and_width
         max_scroll_index = len(self._wrapped_lines) - actual_height
 
-        if self._current_line_index >= max_scroll_index:
+        if self._top_line_index >= max_scroll_index:
             return
+
+        # if self._current_line_index >= max_scroll_index:
+        #     return
 
         self._current_line_index += 1
         self.refresh(True)

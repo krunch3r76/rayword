@@ -80,9 +80,19 @@ class View:
         self.view_changed = True
         if self._current_view == self.ViewMode.PROMPT:
             self.log_window_group.prompt_window_visible = True
+        # handle case where viewmode is changed to BROWSER so that the view associated with PANEL is removed
+        if self._current_view == self.ViewMode.BROWSER:
+            # hide panel window
+            self.log_window_group.hide()
+            self.panel_manager.hide()
+            self._wordwin.show()
+            self._wordentrywin.show()
+            self._wordwin.refresh()
+            self._wordentrywin.refresh()
         else:
             self.log_window_group.prompt_window_visible = False
             self.log_window_group.resize()
+        
         # if newval == View.ViewMode.BROWSER:
         #     self._wordentrywin._textbuffer = "<search word>"
         #     self._wordentrywin.refresh()
@@ -104,6 +114,7 @@ class View:
             self._wordwin.refresh()
         elif signal["signal"] == "wordlist":
             self._wordwin.clearlines()
+            logging.debug(f"wordlist: {signal['msg']}")
             for word in signal["msg"]:
                 self._wordwin.add_line(word)
             self._wordwin.refresh()
@@ -290,6 +301,8 @@ class View:
                     "msg": self._wordwin._lines[self._wordwin._selected_line_index],
                 }
             )
+        elif asciicode == 27:
+            self.current_view = View.ViewMode.BROWSER
         if refresh_event:
             refresh_event = False
 
@@ -320,11 +333,10 @@ class View:
                 self.log_window_group.show()
 
         elif asciicode == curses.KEY_F3:
-            self.log_window_group.hide()
+            # self.log_window_group.hide()
             # self.log_window_group.clear()
-            self._wordwin.show()
-            self._wordentrywin.show()
-
+            # self._wordwin.show()
+            # self._wordentrywin.show()
             self.current_view = View.ViewMode.BROWSER
         if self.current_view == View.ViewMode.BROWSER:
             self._update_browsermode(asciicode)

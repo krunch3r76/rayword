@@ -10,6 +10,10 @@ class PanelManager:
         self.panels = []
         self.current_panel_index = 0
 
+    def hide(self):
+        for panel in self.panels:
+            panel.hide()
+
     def add_panel(self, upper_left_y, upper_left_x, height, width):
         panel = ContextWindow(self.stdscr, upper_left_y, upper_left_x, height, width)
         self.panels.append(panel)
