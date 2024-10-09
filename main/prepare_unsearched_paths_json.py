@@ -89,6 +89,11 @@ if __name__ == "__main__":
     logging.debug(
         f"{unsearched_count} texts out of {total_texts} have not been indexed"
     )
+
+    if unsearched_count == 0:
+        import sys
+        sys.exit(1)
+
     number_of_texts_to_search_on_this_run = (
         path_limit if path_limit >= unsearched_count else unsearched_count
     )

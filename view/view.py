@@ -242,7 +242,38 @@ class View:
             self.log_window_group.refresh_all_log()
 
     def _update_promptmode(self, asciicode):
-        # asciicode = self._stdscr.getch()
+        """
+        Update the prompt mode based on the input ASCII code.
+
+        This method handles various key inputs in the prompt mode, including
+        resizing, quitting, starting Ray, and updating the view. Most key presses
+        are processed by the log_window_group, which manages the prompt window
+        and its interactions.
+
+        The method specifically updates the view presented by the prompt window.
+        It allows users to navigate through and edit configuration fields such as
+        'texts per worker', 'network', and 'max workers'. The prompt window
+        displays these fields and their current values, allowing for real-time
+        updates as the user interacts with them.
+
+        When the user presses Enter, it checks if the log_window_group is ready to start.
+        The log_window_group returns a 'ready_to_start' signal which is True if it's not currently
+        modifying any fields and is ready to proceed. If ready_to_start is True, it triggers
+        the following actions:
+        - Switches the view mode to LOG
+        - Collects any pending configuration changes
+        - Sends a command to start Ray with the updated configuration
+
+        Args:
+            asciicode (int): The ASCII code of the input key.
+
+        Side effects:
+            - Updates the prompt window view based on user input
+            - May resize or refresh the prompt window
+            - Sends updated configuration values to the controller when confirmed
+            - Can switch the view mode to LOG and start Ray with new configuration
+            - Delegates key processing to log_window_group for prompt window interactions
+        """
         if asciicode == curses.KEY_RESIZE:
             curses.update_lines_cols()
             self.log_window_group.resize()
@@ -250,8 +281,8 @@ class View:
         elif asciicode == ord("q"):
             self.to_controller.put_nowait({"signal": "cmd", "msg": "quit"})
         elif asciicode in (curses.KEY_ENTER, 10, 13):
-            start_signal = self.log_window_group.send_key_to_prompt_window(asciicode)
-            if start_signal:
+            ready_to_start = self.log_window_group.send_key_to_prompt_window(asciicode)
+            if ready_to_start:
                 self.current_view = View.ViewMode.LOG
                 self.prompt_acknowledged = True
                 # inspect log_window_group for fields that have changed
@@ -281,7 +312,6 @@ class View:
             pass
         else:
             self._process_signal(next_signal)
-
     def _update_panelmode(self, asciicode):
         # asciicode = self._stdscr.getch()
         refresh_event = False

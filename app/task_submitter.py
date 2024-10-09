@@ -17,7 +17,7 @@ from .util.log_memory_and_disk_usage import log_memory_and_disk_usage
 runtime_env = {"pip": ["requests", "nltk==3.8.1"]}
 ray.init(runtime_env=runtime_env)
 
-def wait_for_nodes(required_node_count:int, check_interval=1, timeout=300):
+def wait_for_nodes(required_node_count:int, check_interval=1, timeout=6000):
     import time
 
     start_time = time.time()
@@ -44,7 +44,8 @@ class TaskSubmitter:
         self.enable_console_logging = enable_console_logging
         self.tasks = tasks
         self.task_count = task_count
-        self.nodes = wait_for_nodes(3)  # Ensure at least 3 worker nodes
+        required_nodes = min(10, task_count)  # Adjust the number of required nodes based on task count
+        self.nodes = wait_for_nodes(required_nodes)
 
     def submit_and_process_tasks(self):
         futures = []
@@ -59,21 +60,39 @@ class TaskSubmitter:
         
         completed_futures, remaining_futures = [], futures
         searchResults_compressed = []
+        max_retries = 3
+        future_retries = {future: 0 for future in futures}
+        max_stall_iterations = 5
+        stall_iterations = 0
         
         while remaining_futures:
-            done_futures, remaining_futures = ray.wait(remaining_futures, timeout=300)
+            logging.debug(f"Waiting for futures. Remaining: {len(remaining_futures)}")
+            done_futures, remaining_futures = ray.wait(remaining_futures, num_returns=len(remaining_futures), timeout=6000)
+            if not done_futures:
+                stall_iterations += 1
+                logging.warning("No tasks completed in this iteration. Possible stall detected.")
+                if stall_iterations >= max_stall_iterations:
+                    logging.critical("Stall detected: No tasks completed for multiple iterations. Exiting.")
+                    break
+            else:
+                stall_iterations = 0  # Reset stall counter if tasks complete
+
             for future in done_futures:
                 try:
-                    result = ray.get(future)
+                    result = ray.get(future)  # Attempt to get the result of the future
                     searchResults_compressed.append(result)
+                    future_retries.pop(future, None)  # Remove from retries tracking
                 except Exception as e:
-                    logging.error(f"Task failed with error: {str(e)}")
+                    logging.error(f"Task failed with error: {str(e)}")  # Log the error
+                    if future_retries[future] < max_retries:
+                        future_retries[future] += 1
+                        remaining_futures.append(future)  # Retry the future
+                    else:
+                        logging.error(f"Task failed after {max_retries} retries: {str(e)}")
+                        future_retries.pop(future, None)  # Remove from retries tracking
             
             completed_futures.extend(done_futures)
             logging.debug(f"Completed: {len(completed_futures)}, Remaining: {len(remaining_futures)}")
-
-            if not done_futures:
-                logging.warning("No tasks completed in this iteration. Possible stall detected.")
 
         # log_memory_and_disk_usage()
 

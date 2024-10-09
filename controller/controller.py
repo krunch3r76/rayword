@@ -49,14 +49,17 @@ class Controller:
             total_texts,
             unsearched_text_count,
         ) = self.model.get_total_texts_and_unsearched_counts()
+        # self.config = Config(
+        #     version=get_ray_on_golem_version(),
+        #     texts_per_worker=500,
+        #     network="MAINNET",
+        #     count_indexable_texts=total_texts,
+        #     count_unindexed_texts=unsearched_text_count,
+        # )
         self.config = Config(
-            version=get_ray_on_golem_version(),
-            texts_per_worker=50,
-            network="MAINNET",
             count_indexable_texts=total_texts,
-            count_unindexed_texts=unsearched_text_count,
+            count_unindexed_texts=unsearched_text_count
         )
-
         self.view = View(self.from_view, self.to_view)
 
     @property
@@ -94,8 +97,46 @@ class Controller:
                 "./app/output",
             ],
             ["python3", "main/import_ray_results.py"],
-            ["ray", "down", "golem-cluster.yaml", "--yes"],
+            # ["ray", "down", "golem-cluster.yaml", "--yes"],
         ]
+        return cmds
+
+    @property
+    def cmds_havehead(self):
+        cmds = [
+                ["rm", "-f", "app/output/*"],
+                ["python3", "main/update_or_insert_paths.py"],
+                [
+                    "python3",
+                    "main/prepare_unsearched_paths_json.py",
+                    "golem-cluster.yaml",
+                    "--batch-size",
+                    f"{self.config.texts_per_worker}",
+                ],
+                [
+                    "ray",
+                    "rsync-up",
+                    "golem-cluster.yaml",
+                    "./app/input/",
+                    "/root/app/input/",
+                ],
+                [
+                    "ray",
+                    "submit",
+                    "golem-cluster.yaml",
+                    "./rayword_executor.py",
+                    "--enable-console-logging" if self.enable_console_logging else "",
+                ],
+                [
+                    "ray",
+                    "rsync-down",
+                    "golem-cluster.yaml",
+                    "/root/app/output/",
+                    "./app/output",
+                ],
+                ["python3", "main/import_ray_results.py"],
+                # ["ray", "down", "golem-cluster.yaml", "--yes"],
+            ]
         return cmds
 
     def daisy_chain_offsets(self, ebook_details):
@@ -176,11 +217,14 @@ class Controller:
 
 
         for key, value in pending_config_changes.items():
-            if key == "max workers":
+            normalized_key = key.replace(" ", "_")
+            if normalized_key == "max_workers":
                 # load yaml file and update max_workers
                 set_max_workers_on_yaml("golem-cluster.yaml", value)
-            if hasattr(self.config, key):
-                setattr(self.config, key, value)
+            # if normalized_key == "text_per_worker":
+            #     pass
+            if hasattr(self.config, normalized_key):
+                setattr(self.config, normalized_key, value)
 
     def _process_signal_from_view(self, signal_from_view):
         signal_quit = False
@@ -224,50 +268,82 @@ class Controller:
         elif signal_from_view["signal"] == "update config":
             msg = signal_from_view["msg"]
             self._update_config({msg["key"]: msg["value"]})
-            # if msg["key"] == "texts per worker":
-            #     self.config = self.config._replace(texts_per_worker=int(msg["value"]))
+            logging.debug(f"config updated: {msg}")
         return signal_quit
 
     def run_commands(self):
         self.cmds_started = True
         last_return_code = 0
         signal_quit = False
-        for cmd in self.cmds:
-            if signal_quit:
-                break
-            if last_return_code != 0:
-                break
-            self.to_view.put_nowait({"signal": "cmdstart", "msg": " ".join(cmd)})
-            # self.view.receive_signal({"signal": "cmdstart", "msg": " ".join(cmd)})
-            pq = ProcessQueue(cmd)
-            while True:
-                try:
-                    line = pq.get_nowait()
-                except queue.Empty:
-                    pass
-                except ProcessTerminated:
-                    last_return_code = pq.get_return_code()
-                    self.to_view.put_nowait(
-                        {"signal": "cmdend", "msg": last_return_code}
-                    )
+        while True:
+            for cmd in self.cmds:
+                if signal_quit:
                     break
-                    # self.view.receive_signal({"signal": "cmdend", "msg": rc})
-                else:
-                    self.to_view.put_nowait({"signal": "cmdout", "msg": line})
-                    # self.to_view.put_nowait({"signal": "addword", "msg": line.rstrip()})
-                    self._outputfile.write(line + "\n")
-                    # self.view.receive_signal({"signal": "cmdout", "msg": line})
-                try:
-                    signal_from_view = self.from_view.get_nowait()
-                except queue.Empty:
-                    pass
-                else:
-                    signal_quit = self._process_signal_from_view(signal_from_view)
+                if last_return_code != 0:
+                    break
+                self.to_view.put_nowait({"signal": "cmdstart", "msg": " ".join(cmd)})
+                pq = ProcessQueue(cmd)
+                while True:
+                    try:
+                        line = pq.get_nowait()
+                    except queue.Empty:
+                        pass
+                    except ProcessTerminated:
+                        last_return_code = pq.get_return_code()
+                        self.to_view.put_nowait(
+                            {"signal": "cmdend", "msg": last_return_code}
+                        )
+                        if "prepare_unsearched_paths_json.py" in cmd and last_return_code == 1:
+                            logging.info("All paths have been searched.")
+                            return  # Exit the loop prematurely
+                        break
+                    else:
+                        self.to_view.put_nowait({"signal": "cmdout", "msg": line})
+                        self._outputfile.write(line + "\n")
+                    try:
+                        signal_from_view = self.from_view.get_nowait()
+                    except queue.Empty:
+                        pass
+                    else:
+                        signal_quit = self._process_signal_from_view(signal_from_view)
+                        if signal_quit:
+                            break
+                    self.view.update()
+                    time.sleep(0.001)
+                self.to_view.put_nowait({"signal": "wake", "msg": None})
+            while True:
+                for cmd in self.cmds_havehead:
                     if signal_quit:
                         break
-                self.view.update()
-                time.sleep(0.001)
-            self.to_view.put_nowait({"signal": "wake", "msg": None})
+                    if last_return_code != 0:
+                        break
+                    self.to_view.put_nowait({"signal": "cmdstart", "msg": " ".join(cmd)})
+                    pq = ProcessQueue(cmd)
+                    while True:
+                        try:
+                            line = pq.get_nowait()
+                        except queue.Empty:
+                            pass
+                        except ProcessTerminated:
+                            last_return_code = pq.get_return_code()
+                            self.to_view.put_nowait(
+                                {"signal": "cmdend", "msg": last_return_code}
+                            )
+                            break
+                        else:
+                            self.to_view.put_nowait({"signal": "cmdout", "msg": line})
+                            self._outputfile.write(line + "\n")
+                        try:
+                            signal_from_view = self.from_view.get_nowait()
+                        except queue.Empty:
+                            pass
+                        else:
+                            signal_quit = self._process_signal_from_view(signal_from_view)
+                            if signal_quit:
+                                break
+                        self.view.update()
+                        time.sleep(0.001)
+                    self.to_view.put_nowait({"signal": "wake", "msg": None})
 
     def __call__(self):
         while True:

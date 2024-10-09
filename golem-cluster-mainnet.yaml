@@ -7,8 +7,8 @@
 cluster_name: golem-cluster
 
 # The maximum number of workers the cluster will have at any given time
-max_workers: 3
-min_workers: 3
+max_workers: 10
+min_workers: 20
 
 # The number of minutes that need to pass before an idle worker node is removed by the Autoscaler
 idle_timeout_minutes: 5
@@ -42,9 +42,9 @@ provider:
         outbound_urls: ["https://pypi.dev.golem.network","http://69.55.231.8" ]
 
         # Minimal values of parameters offered by Golem provider 
-        min_mem_gib: 3
-        min_cpu_threads: 1
-        min_storage_gib: 10
+min_mem_gib: 4
+min_cpu_threads: 1
+min_storage_gib: 10
 
         # Maximal values of parameters offered by Golem provider
         #max_cpu_threads: null
@@ -68,10 +68,10 @@ provider:
         max_start_price: 0
 
         # # Amount of GLMs for CPU utilisation per hour which Golem provider offer will be rejected if exceeded.
-        max_cpu_per_hour_price: 0.05
+max_cpu_per_hour_price: 0.1
 
         # # Amount of GLMs for each hour that worker runs which Golem provider offer will be rejected if exceeded.
-        max_env_per_hour_price: 0.005
+max_env_per_hour_price: 0.05
 
 
 # Tells the autoscaler the allowed node types and the resources they provide
@@ -93,8 +93,8 @@ available_node_types:
     #    min_mem_gib: 10
 
   ray.worker.default:
-    min_workers: 3
-    max_workers: 3
+    min_workers: 20
+    max_workers: 20
     resources: 
       worker: 1
     node_config: {}
