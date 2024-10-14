@@ -60,6 +60,7 @@ class Controller:
             count_indexable_texts=total_texts,
             count_unindexed_texts=unsearched_text_count
         )
+        logging.debug(f"config: {self.config.__dict__}")
         self.view = View(self.from_view, self.to_view)
 
     @property

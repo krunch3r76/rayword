@@ -47,6 +47,7 @@ class Config:
                 config_dict = json.load(json_file)
                 for key, value in config_dict.items():
                     if key not in ["count_indexable_texts", "count_unindexed_texts", "version"]:
+                        logging.debug(f"loading {key} from json: {value}")
                         setattr(self, key, value)
         else:
             logging.warning(f"JSON file {self.json_file_path} does not exist. Using default values.")

@@ -312,6 +312,7 @@ class View:
             pass
         else:
             self._process_signal(next_signal)
+
     def _update_panelmode(self, asciicode):
         # asciicode = self._stdscr.getch()
         refresh_event = False
