@@ -137,7 +137,9 @@ class Config:
             for line_number, line in enumerate(file, 1):
                 stripped_line = line.strip()
                 if not updated and not stripped_line.startswith("#") and stripped_line.startswith(key + ":"):
-                    new_lines.append(f"{key}: {value}\n")
+                    # Preserve the original indentation
+                    indentation = line[:len(line) - len(line.lstrip())]
+                    new_lines.append(f"{indentation}{key}: {value}\n")
                     updated = True
                     logging.debug(f"Updated {key} to {value} in {self.path_to_yaml} at line {line_number}")
                 else:
@@ -151,6 +153,7 @@ class Config:
             return False
 
         return updated
+        
 
     def save_metadata(self):
         """Save metadata such as the last used network."""
@@ -166,6 +169,7 @@ class Config:
                 self.network = metadata.get('last_used_network', self.network)
                 self.defaults = metadata.get('defaults', {})
         else:
+            raise Exception(f"Metadata file {self.METADATA_FILE_PATH} does not exist.")
             logging.info(f"Metadata file {self.METADATA_FILE_PATH} does not exist. Using default network.")
             self.defaults = {}
 

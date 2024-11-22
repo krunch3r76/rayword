@@ -1,10 +1,10 @@
-# temporary project files
-/app/manager/input/*
-/app/output/*
-!app/output/.gitkeep
-/app/input/*
-!/app/input/.gitkeep
-# !app/input/.gitkeep
+# Ignore all input and output directories anywhere in the project
+**/input/*
+**/output/*
+
+# Keep directory structure with .gitkeep files
+!**/input/.gitkeep
+!**/output/.gitkeep
 
 # Byte-compiled / optimized files
 __pycache__/
@@ -24,6 +24,7 @@ data/*.db
 
 # Compiled Python files
 *.pyc
+
 # Other generated files
 *.swp
 *.swo

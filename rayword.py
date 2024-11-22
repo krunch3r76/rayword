@@ -2,8 +2,14 @@
 
 import logging
 import traceback
+import sys, os
+# Get the directory where rayword.py is located (root of the project)
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
-from controller import Controller
+# Add the root directory to PYTHONPATH instead of sys.path
+os.environ['PYTHONPATH'] = os.pathsep.join([root_dir, os.environ.get('PYTHONPATH', '')])
+from app.local.controller.controller import Controller
+
 
 # logging.basicConfig(
 #     filename="debug.log",
@@ -17,7 +23,7 @@ root_logger.handlers = []
 root_logger.setLevel(logging.DEBUG)
 
 # Create a file handler to write logs to a file
-file_handler = logging.FileHandler("wtf.log", mode="w")
+file_handler = logging.FileHandler("developer.log", mode="w")
 file_handler.setLevel(logging.DEBUG)
 
 # Create a formatter and set it for the handler

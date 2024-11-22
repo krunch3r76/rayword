@@ -30,7 +30,6 @@ def execute_remote_word_search(paths_table, path_prefix=None, enable_logging=Fal
 
     # Create a unique prefix for this worker's logs
     log_prefix = f"[Node:{node_id[:8]}|Worker:{worker_id}] "
-
     # Configure logging
     logger = logging.getLogger(f"worker_{worker_id}")
     if not logger.handlers:

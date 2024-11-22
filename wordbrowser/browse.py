@@ -6,15 +6,13 @@ from pathlib import Path
 import argparse
 import logging
 import os
-
+#---
 project_root_dir = Path(__file__).parent.parent.absolute()
 sys.path.insert(0, str(project_root_dir))
-from main.model.maindbmodel import MainModel
+from app.local.model.maindbmodel import MainModel
 from app.worker.util.resource_loader import load_resource
-
 import nltk
 from nltk.tokenize import sent_tokenize
-
 nltk_data_path = project_root_dir / "app" / "worker" / "nltk_data"
 nltk.data.path.append(str(nltk_data_path))
 
