@@ -1,0 +1,23 @@
+{
+  "last_used_network": "MAINNET",
+  "defaults": {
+    "MAINNET": {
+      "texts_per_worker": 100,
+      "max_workers": 10,
+      "min_mem_gib": 4,
+      "min_cpu_threads": 1,
+      "min_storage_gib": 10,
+      "max_cpu_per_hour_price": 0.1,
+      "max_env_per_hour_price": 0.05
+    },
+    "TESTNET": {
+      "texts_per_worker": 50,
+      "max_workers": 5,
+      "min_mem_gib": 2,
+      "min_cpu_threads": 1,
+      "min_storage_gib": 5,
+      "max_cpu_per_hour_price": 100.05,
+      "max_env_per_hour_price": 100.025
+    }
+  }
+}
